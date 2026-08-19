@@ -1,0 +1,6 @@
+{
+  "name": "OOU StudentCircle",
+  "description": "The official student freelance marketplace, jobs & SIWES opportunities hub, product commerce, Student Connect networking directory, and verified professional portfolio platform for Olabisi Onabanjo University.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,488 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Represents an authenticated user account (student, client, or admin).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "role": { "type": "string", "enum": ["student", "client", "admin"] },
+        "fullName": { "type": "string", "maxLength": 120 },
+        "phoneNumber": { "type": "string", "maxLength": 30 },
+        "profilePhoto": { "type": "string", "maxLength": 1024 },
+        "location": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "suspended", "pending"] },
+        "isVerified": { "type": "boolean" },
+        "faculty": { "type": "string", "maxLength": 100 },
+        "department": { "type": "string", "maxLength": 100 },
+        "level": { "type": "string", "maxLength": 30 },
+        "matricNumber": { "type": "string", "maxLength": 50 },
+        "shortBio": { "type": "string", "maxLength": 1000 },
+        "businessName": { "type": "string", "maxLength": 120 },
+        "businessCategory": { "type": "string", "maxLength": 80 }
+      },
+      "required": ["id", "email", "role", "fullName", "status"]
+    },
+    "ServiceItem": {
+      "title": "ServiceItem",
+      "description": "Represents a skill or service offered by a student.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 120 },
+        "studentDepartment": { "type": "string", "maxLength": 100 },
+        "studentLevel": { "type": "string", "maxLength": 30 },
+        "isStudentVerified": { "type": "boolean" },
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "startingPrice": { "type": "number" },
+        "deliveryTime": { "type": "string", "maxLength": 50 },
+        "location": { "type": "string", "maxLength": 120 },
+        "isDigital": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["published", "draft", "under_review", "rejected"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "studentId", "title", "category", "startingPrice", "status"]
+    },
+    "JobPost": {
+      "title": "JobPost",
+      "description": "Represents a task, gig, or project posted by a client.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "clientId": { "type": "string", "maxLength": 128 },
+        "clientName": { "type": "string", "maxLength": 120 },
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "budget": { "type": "number" },
+        "deadline": { "type": "string", "maxLength": 50 },
+        "location": { "type": "string", "maxLength": 120 },
+        "isDigital": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["open", "proposals_received", "hired", "in_progress", "submitted", "completed", "cancelled", "disputed"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "clientId", "title", "category", "budget", "status"]
+    },
+    "JobProposal": {
+      "title": "JobProposal",
+      "description": "A pitch or proposal from a student for a job post.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "jobId": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 120 },
+        "coverMessage": { "type": "string", "maxLength": 2000 },
+        "price": { "type": "number" },
+        "deliveryTime": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "jobId", "studentId", "coverMessage", "price", "status"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A direct message between a student and a client.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "conversationId": { "type": "string", "maxLength": 128 },
+        "senderId": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 120 },
+        "text": { "type": "string", "maxLength": 2000 },
+        "timestamp": { "type": "string" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["id", "conversationId", "senderId", "text", "timestamp"]
+    },
+    "ReviewItem": {
+      "title": "ReviewItem",
+      "description": "Client review and star rating for a completed job.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "jobId": { "type": "string", "maxLength": 128 },
+        "reviewerId": { "type": "string", "maxLength": 128 },
+        "recipientId": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "feedback": { "type": "string", "maxLength": 1500 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "jobId", "reviewerId", "recipientId", "rating", "feedback"]
+    },
+    "VendorProfile": {
+      "title": "VendorProfile",
+      "description": "Represents an authenticated student's business/store vendor profile.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 120 },
+        "storeName": { "type": "string", "maxLength": 150 },
+        "businessDescription": { "type": "string", "maxLength": 3000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "location": { "type": "string", "maxLength": 150 },
+        "profileImage": { "type": "string", "maxLength": 2048 },
+        "verificationStatus": { "type": "string", "enum": ["pending", "approved", "rejected", "suspended"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "studentId", "storeName", "category", "verificationStatus"]
+    },
+    "ProductItem": {
+      "title": "ProductItem",
+      "description": "Physical product listed in the StudentCircle marketplace.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "vendorId": { "type": "string", "maxLength": 128 },
+        "vendorName": { "type": "string", "maxLength": 120 },
+        "vendorStoreName": { "type": "string", "maxLength": 150 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 4000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "price": { "type": "number" },
+        "discountPrice": { "type": "number" },
+        "quantity": { "type": "number" },
+        "sku": { "type": "string", "maxLength": 80 },
+        "mainImage": { "type": "string", "maxLength": 2048 },
+        "condition": { "type": "string", "maxLength": 50 },
+        "location": { "type": "string", "maxLength": 150 },
+        "deliveryFee": { "type": "number" },
+        "estimatedDeliveryTime": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["draft", "pending_review", "published", "out_of_stock", "paused", "rejected", "archived"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "vendorId", "title", "category", "price", "quantity", "status"]
+    },
+    "MarketplaceCategory": {
+      "title": "MarketplaceCategory",
+      "description": "Admin managed product category.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "slug": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "name", "slug"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Parent marketplace order placed by a customer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 120 },
+        "customerPhone": { "type": "string", "maxLength": 30 },
+        "customerEmail": { "type": "string", "maxLength": 256 },
+        "subtotal": { "type": "number" },
+        "totalDeliveryFee": { "type": "number" },
+        "grandTotal": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["pending", "paid", "failed", "refunded"] },
+        "overallStatus": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "customerId", "grandTotal", "paymentStatus", "overallStatus", "createdAt"]
+    },
+    "VendorOrder": {
+      "title": "VendorOrder",
+      "description": "Suborder scoped to a single student vendor.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "parentOrderId": { "type": "string", "maxLength": 128 },
+        "vendorId": { "type": "string", "maxLength": 128 },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "subtotal": { "type": "number" },
+        "deliveryFee": { "type": "number" },
+        "platformCommission": { "type": "number" },
+        "netVendorEarnings": { "type": "number" },
+        "status": { "type": "string", "maxLength": 50 },
+        "paymentStatus": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "parentOrderId", "vendorId", "customerId", "subtotal", "status", "createdAt"]
+    },
+    "ProductReview": {
+      "title": "ProductReview",
+      "description": "Product review submitted after verified completed purchase.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "productId": { "type": "string", "maxLength": 128 },
+        "vendorId": { "type": "string", "maxLength": 128 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "productId", "vendorId", "orderId", "customerId", "rating", "comment", "createdAt"]
+    },
+    "PayoutRequest": {
+      "title": "PayoutRequest",
+      "description": "Withdrawal payout request created by a vendor.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "vendorId": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "bankName": { "type": "string", "maxLength": 100 },
+        "accountNumber": { "type": "string", "maxLength": 30 },
+        "accountName": { "type": "string", "maxLength": 120 },
+        "status": { "type": "string", "enum": ["pending", "processing", "paid", "failed", "cancelled"] },
+        "requestedAt": { "type": "string" }
+      },
+      "required": ["id", "vendorId", "amount", "bankName", "accountNumber", "accountName", "status", "requestedAt"]
+    },
+    "ProductReport": {
+      "title": "ProductReport",
+      "description": "Community report against a product.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "productId": { "type": "string", "maxLength": 128 },
+        "reporterId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "investigating", "resolved", "dismissed"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "productId", "reporterId", "reason", "description", "status", "createdAt"]
+    },
+    "Opportunity": {
+      "title": "Opportunity",
+      "description": "Represents jobs, internships, SIWES, scholarships, competitions, fellowships, projects, and entrepreneurship opportunities.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 180 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "opportunityType": { "type": "string", "enum": ["job", "internship", "scholarship", "competition", "fellowship", "project", "program"] },
+        "category": { "type": "string", "maxLength": 100 },
+        "organizationName": { "type": "string", "maxLength": 150 },
+        "creatorId": { "type": "string", "maxLength": 128 },
+        "creatorName": { "type": "string", "maxLength": 120 },
+        "creatorRole": { "type": "string", "maxLength": 50 },
+        "deadline": { "type": "string" },
+        "location": { "type": "string", "maxLength": 120 },
+        "campus": { "type": "string", "maxLength": 120 },
+        "workMode": { "type": "string", "enum": ["remote", "on_campus", "hybrid"] },
+        "status": { "type": "string", "enum": ["open", "under_review", "filled", "expired", "suspended", "draft"] },
+        "moderationStatus": { "type": "string", "enum": ["pending", "approved", "rejected", "suspended"] },
+        "applicationCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "opportunityType", "category", "creatorId", "deadline", "status", "moderationStatus"]
+    },
+    "OpportunityApplication": {
+      "title": "OpportunityApplication",
+      "description": "Represents student applications submitted to an opportunity.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "opportunityId": { "type": "string", "maxLength": 128 },
+        "opportunityTitle": { "type": "string", "maxLength": 180 },
+        "creatorId": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "studentName": { "type": "string", "maxLength": 120 },
+        "studentEmail": { "type": "string", "format": "email", "maxLength": 256 },
+        "coverMessage": { "type": "string", "maxLength": 4000 },
+        "status": { "type": "string", "enum": ["pending", "under_review", "shortlisted", "rejected", "hired", "awarded"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "opportunityId", "creatorId", "studentId", "studentName", "coverMessage", "status", "createdAt"]
+    },
+    "TransactionRequest": {
+      "title": "TransactionRequest",
+      "description": "Unified request record for services, products, campus services, or jobs.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "requestId": { "type": "string", "maxLength": 64 },
+        "buyerId": { "type": "string", "maxLength": 128 },
+        "sellerId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["service", "product", "campus_service", "job"] },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "budget": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "quoted", "accepted", "declined", "cancelled"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "requestId", "buyerId", "sellerId", "type", "description", "status", "createdAt"]
+    },
+    "TransactionQuote": {
+      "title": "TransactionQuote",
+      "description": "Provider quote containing pricing, turnaround time, milestones, and expiration.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "quoteId": { "type": "string", "maxLength": 64 },
+        "requestId": { "type": "string", "maxLength": 128 },
+        "buyerId": { "type": "string", "maxLength": 128 },
+        "sellerId": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "deliveryTime": { "type": "string", "maxLength": 60 },
+        "message": { "type": "string", "maxLength": 3000 },
+        "validUntil": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined", "expired"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "quoteId", "requestId", "buyerId", "sellerId", "amount", "deliveryTime", "message", "status", "createdAt"]
+    },
+    "UnifiedOrder": {
+      "title": "UnifiedOrder",
+      "description": "Unified order record tracking escrow lifecycle from payment to delivery and completion.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "orderId": { "type": "string", "maxLength": 64 },
+        "buyerId": { "type": "string", "maxLength": 128 },
+        "sellerId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["service", "product", "campus_service", "job"] },
+        "targetItemTitle": { "type": "string", "maxLength": 200 },
+        "amount": { "type": "number" },
+        "platformFee": { "type": "number" },
+        "status": { "type": "string", "enum": ["Pending", "Paid", "Confirmed", "Processing", "Ready", "Delivered", "Completed", "Cancelled", "Disputed", "Refunded"] },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "paid", "refunded", "disputed"] },
+        "hasReview": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "orderId", "buyerId", "sellerId", "amount", "platformFee", "status", "paymentStatus", "createdAt", "updatedAt"]
+    },
+    "OrderDispute": {
+      "title": "OrderDispute",
+      "description": "Dispute record opened against an active or delivered order for tribunal arbitration.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "disputeId": { "type": "string", "maxLength": 64 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "openedById": { "type": "string", "maxLength": 128 },
+        "againstId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "status": { "type": "string", "enum": ["Open", "Under Review", "Resolved", "Rejected"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "disputeId", "orderId", "openedById", "againstId", "reason", "description", "status", "createdAt"]
+    },
+    "UnifiedReview": {
+      "title": "UnifiedReview",
+      "description": "Verified post-completion review strictly bound to a completed order.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "reviewerId": { "type": "string", "maxLength": 128 },
+        "sellerId": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "maxLength": 4000 },
+        "isVerifiedTransaction": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "orderId", "reviewerId", "sellerId", "rating", "comment", "isVerifiedTransaction", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Stores core user profile data."
+    },
+    "/services/{serviceId}": {
+      "schema": { "$ref": "ServiceItem" },
+      "description": "Stores published and draft services offered by student professionals."
+    },
+    "/jobs/{jobId}": {
+      "schema": { "$ref": "JobPost" },
+      "description": "Stores jobs and gig postings created by clients."
+    },
+    "/proposals/{proposalId}": {
+      "schema": { "$ref": "JobProposal" },
+      "description": "Stores proposals submitted by students for jobs."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "ChatMessage" },
+      "description": "Direct message threads between students and clients."
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "ReviewItem" },
+      "description": "Client reviews for completed jobs."
+    },
+    "/vendors/{vendorId}": {
+      "schema": { "$ref": "VendorProfile" },
+      "description": "Stores student business/vendor profiles."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "ProductItem" },
+      "description": "Stores physical products listed by vendors."
+    },
+    "/productCategories/{categoryId}": {
+      "schema": { "$ref": "MarketplaceCategory" },
+      "description": "Stores admin-managed marketplace categories."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "Order" },
+      "description": "Stores master customer orders."
+    },
+    "/vendorOrders/{vendorOrderId}": {
+      "schema": { "$ref": "VendorOrder" },
+      "description": "Stores vendor-specific suborders."
+    },
+    "/productReviews/{reviewId}": {
+      "schema": { "$ref": "ProductReview" },
+      "description": "Stores product reviews by verified buyers."
+    },
+    "/payoutRequests/{payoutId}": {
+      "schema": { "$ref": "PayoutRequest" },
+      "description": "Stores vendor payout withdrawal requests."
+    },
+    "/productReports/{reportId}": {
+      "schema": { "$ref": "ProductReport" },
+      "description": "Stores user product reports and complaints."
+    },
+    "/opportunities/{opportunityId}": {
+      "schema": { "$ref": "Opportunity" },
+      "description": "Stores public and campus opportunities."
+    },
+    "/opportunityApplications/{applicationId}": {
+      "schema": { "$ref": "OpportunityApplication" },
+      "description": "Stores student applications submitted to opportunities."
+    },
+    "/transactionRequests/{requestId}": {
+      "schema": { "$ref": "TransactionRequest" },
+      "description": "Stores transaction requests for services, products, campus services, and jobs."
+    },
+    "/transactionQuotes/{quoteId}": {
+      "schema": { "$ref": "TransactionQuote" },
+      "description": "Stores quotes dispatched by providers."
+    },
+    "/unifiedOrders/{orderId}": {
+      "schema": { "$ref": "UnifiedOrder" },
+      "description": "Stores unified escrow orders accessible only to the buyer, seller, or admin."
+    },
+    "/orderDisputes/{disputeId}": {
+      "schema": { "$ref": "OrderDispute" },
+      "description": "Stores transaction disputes and arbitration decisions."
+    },
+    "/unifiedReviews/{reviewId}": {
+      "schema": { "$ref": "UnifiedReview" },
+      "description": "Stores verified post-completion reviews."
+    }
+  }
+}
