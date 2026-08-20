@@ -276,8 +276,8 @@ class TrustSafetyService {
     return activeTiers;
   }
 
-  public isUserTierVerified(userId: string, tier: VerificationTier): boolean {
-    return this.getUserActiveTiers(userId).includes(tier);
+  public isUserTierVerified(userId: string, tier: VerificationTier | string): boolean {
+    return this.getUserActiveTiers(userId).includes(tier as VerificationTier);
   }
 
   public submitVerificationRequest(data: {

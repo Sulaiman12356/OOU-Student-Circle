@@ -122,10 +122,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { label: 'Marketplace Management', path: '/admin/marketplace', icon: Store },
     { label: 'User Management', path: '/admin/users', icon: Users },
     { label: 'Student Verification', path: '/admin/verification', icon: ShieldCheck },
-    { label: 'Service Moderation', path: '/admin/services', icon: Sparkles },
-    { label: 'Categories', path: '/admin/categories', icon: Tags },
-    { label: 'Transactions', path: '/admin/transactions', icon: DollarSign },
     { label: 'Reports & Disputes', path: '/admin/reports', icon: AlertTriangle },
+    { label: 'Trust & Safety Lab', path: '/admin/trust-test', icon: Shield },
+    { label: 'Service Moderation', path: '/admin/services', icon: Sparkles },
     { label: 'Activity Logs', path: '/admin/activity', icon: FileText },
     { label: 'Platform Settings', path: '/admin/settings', icon: Sliders },
   ];

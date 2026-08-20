@@ -154,9 +154,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
 
             <h4 className="text-sm font-bold text-[#061A4F] uppercase tracking-wider mt-6 mb-3">
-              Legal
+              Trust & Safety
             </h4>
             <ul className="space-y-2 text-sm">
+              <li>
+                <button onClick={() => onNavigate('/safety')} className="text-slate-600 hover:text-[#061A4F] transition font-medium flex items-center gap-1.5">
+                  <span>Safety & Escrow Guide</span>
+                </button>
+              </li>
               <li>
                 <button onClick={() => onNavigate('/terms')} className="text-slate-600 hover:text-[#061A4F] transition font-medium">
                   Terms of Service

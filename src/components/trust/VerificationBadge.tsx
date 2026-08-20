@@ -34,7 +34,7 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
   // STRICT RULE: Do not display verification badges unless verification has actually occurred!
   const hasVerified = isVerified !== undefined 
     ? Boolean(isVerified)
-    : (userId ? TrustSafetyStore.isUserTierVerified(userId, tier) : false);
+    : (userId ? TrustSafetyStore.isUserTierVerified(userId, tier as VerificationTier) : false);
 
   if (!hasVerified) {
     return null;

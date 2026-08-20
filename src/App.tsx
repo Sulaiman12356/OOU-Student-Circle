@@ -16,6 +16,8 @@ import { FaqPage } from './pages/public/FaqPage';
 import { ContactPage } from './pages/public/ContactPage';
 import { TermsPage } from './pages/public/TermsPage';
 import { PrivacyPage } from './pages/public/PrivacyPage';
+import { SafetyCenterPage } from './pages/public/SafetyCenterPage';
+import { TrustAndSafetyTestPage } from './pages/trust/TrustAndSafetyTestPage';
 
 // Auth Pages
 import { LoginPage } from './pages/auth/LoginPage';
@@ -212,6 +214,8 @@ const AppContent: React.FC = () => {
         content = <AdminTransactionsPage />;
       } else if (currentPath === '/admin/reports') {
         content = <AdminReportsPage />;
+      } else if (currentPath === '/admin/trust-test' || currentPath === '/admin/trust-safety' || currentPath === '/admin/test-trust-safety') {
+        content = <TrustAndSafetyTestPage />;
       } else if (currentPath === '/admin/activity') {
         content = <AdminActivityPage />;
       } else if (currentPath === '/admin/settings') {
@@ -383,6 +387,14 @@ const AppContent: React.FC = () => {
       publicContent = <TermsPage onNavigate={navigate} />;
     } else if (currentPath === '/privacy') {
       publicContent = <PrivacyPage onNavigate={navigate} />;
+    } else if (currentPath === '/safety' || currentPath === '/safety-center' || currentPath === '/trust' || currentPath === '/trust-and-safety') {
+      publicContent = <SafetyCenterPage onNavigate={navigate} />;
+    } else if (currentPath === '/test-trust-safety' || currentPath === '/trust/test') {
+      publicContent = (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <TrustAndSafetyTestPage />
+        </div>
+      );
     }
 
     return (
