@@ -313,7 +313,7 @@ const AppContent: React.FC = () => {
 
     // 7. Public Marketplace, Campus Hub, Locations & Landing Routes (With Header & Footer)
     let publicContent = <LandingPage onNavigate={navigate} />;
-    if (currentPath === '/student-connect') {
+    if (currentPath === '/student-connect' || currentPath === '/connect') {
       publicContent = (
         <StudentConnectPage 
           onNavigate={navigate} 

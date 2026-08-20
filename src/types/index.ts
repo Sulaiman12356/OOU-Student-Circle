@@ -661,11 +661,18 @@ export interface AdminLog {
 export interface PlatformSettings {
   platformName: string;
   platformFeePercent: number;
+  platformFeePercentage?: number;
+  minEscrowAmount?: number;
   maintenanceMode: boolean;
   supportEmail: string;
   supportPhone: string;
   primaryCampus: string;
   allowedFaculties: string[];
+  requireStudentVerification?: boolean;
+  autoApproveServices?: boolean;
+  allowNotifications?: boolean;
+  allowEmailNotifications?: boolean;
+  allowInstantPayouts?: boolean;
 }
 
 export * from './marketplace';

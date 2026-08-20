@@ -18,6 +18,7 @@ import {
 import { VerificationTier, VERIFICATION_TIERS } from '../../types/trustSafety';
 import { TrustSafetyStore } from '../../services/trustSafetyStore';
 import { useAuth } from '../../context/AuthContext';
+import { MediaUploader } from '../common/MediaUploader';
 
 interface VerificationModalProps {
   isOpen: boolean;
@@ -358,41 +359,20 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Student ID Card or Admission Letter Scan
-                  </label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:border-slate-400 transition bg-slate-50/50">
-                    {idCardFile ? (
-                      <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-emerald-200">
-                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>{idCardFile}</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setIdCardFile(null)}
-                          className="text-xs text-rose-600 font-bold hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-1.5">
-                        <UploadCloud className="w-6 h-6 text-slate-400 mx-auto" />
-                        <p className="text-xs font-bold text-slate-700">
-                          Upload image of OOU Student ID Card or JAMB Slip
-                        </p>
-                        <p className="text-[10px] text-slate-400">JPG, PNG, or PDF up to 10MB</p>
-                        <button
-                          type="button"
-                          onClick={() => handleSimulateUpload(setIdCardFile)}
-                          className="mt-2 px-3 py-1.5 bg-[#061A4F] text-[#F5B400] text-xs font-black rounded-lg hover:bg-[#0B2A6F] shadow-xs"
-                        >
-                          Select File / Take Photo
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <MediaUploader
+                    storagePathPrefix={`verification/${currentUser.id}/student`}
+                    images={idCardFile ? [idCardFile] : []}
+                    onChange={(imgs) => setIdCardFile(imgs[0] || null)}
+                    single={true}
+                    maxImages={1}
+                    maxFileSizeMB={15}
+                    acceptedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']}
+                    isPrivate={true}
+                    label="Student ID Card or Admission Letter Scan"
+                    helperText="Upload JPG, PNG, or PDF document. Encrypted & strictly private."
+                    buttonText="Upload Verification Document"
+                    aspectRatio="video"
+                  />
                 </div>
               </div>
             )}
@@ -477,38 +457,20 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Campus Merchant Permit or Storefront Photo
-                  </label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center bg-slate-50/50">
-                    {shopPermitFile ? (
-                      <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-emerald-200">
-                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>{shopPermitFile}</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setShopPermitFile(null)}
-                          className="text-xs text-rose-600 font-bold hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-1.5">
-                        <UploadCloud className="w-6 h-6 text-slate-400 mx-auto" />
-                        <p className="text-xs font-bold text-slate-700">Upload campus trade permit or kiosk banner</p>
-                        <button
-                          type="button"
-                          onClick={() => handleSimulateUpload(setShopPermitFile)}
-                          className="mt-2 px-3 py-1.5 bg-[#061A4F] text-[#F5B400] text-xs font-black rounded-lg hover:bg-[#0B2A6F]"
-                        >
-                          Upload Proof
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <MediaUploader
+                    storagePathPrefix={`verification/${currentUser.id}/shop`}
+                    images={shopPermitFile ? [shopPermitFile] : []}
+                    onChange={(imgs) => setShopPermitFile(imgs[0] || null)}
+                    single={true}
+                    maxImages={1}
+                    maxFileSizeMB={15}
+                    acceptedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']}
+                    isPrivate={true}
+                    label="Campus Merchant Permit or Storefront Photo"
+                    helperText="Upload campus trade permit, shop allocation slip, or kiosk storefront photo."
+                    buttonText="Upload Shop Document"
+                    aspectRatio="video"
+                  />
                 </div>
               </div>
             )}
@@ -554,6 +516,23 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
                     onChange={(e) => setRepName(e.target.value)}
                     placeholder="e.g. Johnson Peter (HR Director)"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#061A4F]"
+                  />
+                </div>
+
+                <div>
+                  <MediaUploader
+                    storagePathPrefix={`verification/${currentUser.id}/business`}
+                    images={businessDocFile ? [businessDocFile] : []}
+                    onChange={(imgs) => setBusinessDocFile(imgs[0] || null)}
+                    single={true}
+                    maxImages={1}
+                    maxFileSizeMB={15}
+                    acceptedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']}
+                    isPrivate={true}
+                    label="CAC Certificate or Tax Clearance Document"
+                    helperText="Upload official CAC certificate, BN status document, or TIN proof."
+                    buttonText="Upload Corporate Proof"
+                    aspectRatio="video"
                   />
                 </div>
               </div>

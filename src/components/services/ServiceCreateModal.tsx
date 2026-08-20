@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { DataStore } from '../../services/dataStore';
+import { MediaUploader } from '../common/MediaUploader';
 import { 
   ServiceItem, 
   ServiceCategory, 
@@ -499,114 +500,21 @@ export const ServiceCreateModal: React.FC<ServiceCreateModalProps> = ({
 
           {/* Section 4: Device Photo Upload & Media Gallery */}
           <div className="space-y-4 pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#061A4F]">
-                  4. Service Photos & Work Samples
-                </h3>
-                <p className="text-xs text-gray-500">
-                  Upload photos directly from your device (JPG, JPEG, PNG, WEBP). Select one as primary cover photo.
-                </p>
-              </div>
-
-              {/* Hidden Native File Input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                multiple
-                onChange={handleDeviceImageUpload}
-                className="hidden"
-              />
-
-              {/* Primary Action Button: "Upload Photos" */}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 rounded-xl bg-[#061A4F] hover:bg-[#082266] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload Photos</span>
-              </button>
-            </div>
-
-            {/* Photos Preview Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {images.map((imgUrl, idx) => {
-                const isPrimary = idx === primaryImageIndex;
-                return (
-                  <div 
-                    key={idx}
-                    className={`relative rounded-xl overflow-hidden border-2 bg-gray-50 group aspect-video transition-all ${
-                      isPrimary ? 'border-[#061A4F] ring-2 ring-[#061A4F]/20' : 'border-gray-200'
-                    }`}
-                  >
-                    <img 
-                      src={imgUrl} 
-                      alt={`Upload sample ${idx + 1}`} 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-
-                    {/* Primary Badge */}
-                    {isPrimary && (
-                      <div className="absolute top-1.5 left-1.5 bg-[#061A4F] text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                        Primary Cover
-                      </div>
-                    )}
-
-                    {/* Reorder and Delete Toolbar */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                      <div className="flex items-center justify-end">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="p-1 rounded bg-red-600/90 text-white hover:bg-red-700 text-xs"
-                          title="Delete photo"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center gap-1">
-                          {idx > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => handleMoveImage(idx, 'left')}
-                              className="p-1 rounded bg-white/80 hover:bg-white text-gray-900"
-                              title="Move left"
-                            >
-                              <ArrowLeft className="w-3 h-3" />
-                            </button>
-                          )}
-                          {idx < images.length - 1 && (
-                            <button
-                              type="button"
-                              onClick={() => handleMoveImage(idx, 'right')}
-                              className="p-1 rounded bg-white/80 hover:bg-white text-gray-900"
-                              title="Move right"
-                            >
-                              <ArrowRight className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-
-                        {!isPrimary && (
-                          <button
-                            type="button"
-                            onClick={() => handleSetPrimaryImage(idx)}
-                            className="text-[10px] bg-white/90 hover:bg-white text-gray-900 px-2 py-0.5 rounded font-bold"
-                          >
-                            Set Cover
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <MediaUploader
+              storagePathPrefix={`services/${currentUser?.id || 'general'}`}
+              images={images}
+              onChange={(newImgs) => {
+                setImages(newImgs);
+                if (primaryImageIndex >= newImgs.length) {
+                  setPrimaryImageIndex(0);
+                }
+              }}
+              maxImages={6}
+              maxFileSizeMB={15}
+              label="4. Service Photos & Work Samples"
+              helperText="Upload photos directly from your device (JPG, JPEG, PNG, WEBP). Select one as primary cover photo."
+              aspectRatio="video"
+            />
           </div>
 
           {/* Section 5: Skills & External Portfolio Links */}

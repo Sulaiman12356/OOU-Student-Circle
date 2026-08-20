@@ -32,10 +32,16 @@ import {
   TrendingUp,
   Shield,
   Layers,
-  HelpCircle
+  HelpCircle,
+  UserCheck,
+  PackageCheck,
+  Send,
+  AlertCircle,
+  Eye,
+  FileCheck2,
+  Cpu
 } from 'lucide-react';
 import { founderConfig } from '../../config/founder';
-import { OouLogo } from '../../components/brand/OouLogo';
 import { CampusStore } from '../../services/campusStore';
 import { initialServices } from '../../services/dataStore';
 import { initialProducts } from '../../services/marketplaceStore';
@@ -47,462 +53,639 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
-  const [activeAudienceTab, setActiveAudienceTab] = useState<'students' | 'vendors' | 'clients' | 'aspirants'>('students');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeCampusTab, setActiveCampusTab] = useState<string>('all');
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
   const campusLocations = CampusStore.getPublicLocations();
-
   const featuredServices = initialServices.slice(0, 4);
   const featuredProducts = initialProducts.slice(0, 4);
 
-  const studentSkillsList = [
-    'Graphic Design & Branding', 'Full-Stack Web Development', 'Video Editing & Motion Graphics',
-    'Content Writing & Proofreading', 'Academic Tutoring & Exam Prep', 'Data Analysis & Statistics',
-    'Mobile App Development', 'Social Media Management', 'UI/UX Interface Design', 'Hardware & PC Repair'
-  ];
-
-  const marketplaceCategoriesList = [
-    'Campus Fashion & Hoodies', 'Artisanal Snacks & Pastries', 'Beauty & Hair Care Essentials',
-    'Gadgets & Phone Accessories', 'Textbooks & Course Packs', 'Hostel Comfort Essentials'
-  ];
-
-  const campusHubHighlights = [
+  const problemItems = [
     {
-      title: 'Online Document Printing',
-      desc: 'Send lecture slides, lab manuals, and PDFs from your room; pick up ready and printed at Motion Ground.',
+      id: 'p1',
+      title: 'Students struggle to find trustworthy service providers',
+      problemDesc: 'When students need a graphic designer, typist, developer, or tutor, they rely on chaotic WhatsApp statuses with zero verification, risking substandard work, missed deadlines, or lost upfront deposits.',
+      solutionTitle: 'Verified Student Badges & Escrow Security',
+      solutionDesc: 'StudentCircle verifies student status, matriculation details, and portfolios. Payments are held in escrow until work is delivered and approved.'
+    },
+    {
+      id: 'p2',
+      title: 'Student professionals struggle to find clients',
+      problemDesc: 'Skilled student graphic designers, developers, writers, and technicians have immense talent but lack a dedicated platform to showcase their portfolio to paying campus and external clients.',
+      solutionTitle: 'Dedicated Professional Profiles & Global Client Exposure',
+      solutionDesc: 'Student freelancers get structured service listings, custom portfolio galleries, milestone tracking, and direct access to client job briefs.'
+    },
+    {
+      id: 'p3',
+      title: 'Campus vendors struggle to reach customers before they arrive',
+      problemDesc: 'Business centers at Motion Ground and campus food/fashion vendors rely purely on foot traffic. Freshmen and busy students spend hours waiting in long physical queues.',
+      solutionTitle: 'Campus Hub Pre-Ordering & Remote Document Printing',
+      solutionDesc: 'Students can upload lecture slides, thesis drafts, or project files online, pay securely, and pick up ready prints and bound copies with zero queueing.'
+    },
+    {
+      id: 'p4',
+      title: 'Students across different campuses rarely have one digital network',
+      problemDesc: 'Ago-Iwoye Main, Mini Campus, Ibogun, Ayetoro, and Sagamu operate in isolated geographical silos with virtually no shared student marketplace or collaboration channel.',
+      solutionTitle: 'Unified 5-Campus Directory & Student Connect',
+      solutionDesc: 'One interconnected ecosystem bridging all 5 campuses. Connect by faculty, department, skill set, or project ideas across the university.'
+    },
+    {
+      id: 'p5',
+      title: 'Clients struggle to discover student talent',
+      problemDesc: 'Startups, SMEs, local businesses, and university faculty struggle to recruit affordable, skilled student freelancers and SIWES interns with proven competencies.',
+      solutionTitle: 'Open Job Briefs & Milestone Contract Escrow',
+      solutionDesc: 'Post job requirements, receive structured proposals from verified OOU students, and manage delivery safely through clear project milestones.'
+    }
+  ];
+
+  const agendaGoals = [
+    {
+      title: 'Connect OOU Students',
+      desc: 'Unite students across Ago-Iwoye, Ibogun, Ayetoro, and Sagamu in one dynamic, collaborative digital campus network.',
+      icon: <Users className="w-5 h-5 text-[#061A4F]" />
+    },
+    {
+      title: 'Unlock Student Talent',
+      desc: 'Transform classroom knowledge into verified, portfolio-backed professional experience with real client projects.',
+      icon: <Sparkles className="w-5 h-5 text-[#061A4F]" />
+    },
+    {
+      title: 'Digitize Campus Commerce',
+      desc: 'Bring physical campus businesses, student makers, and service providers into a structured online marketplace.',
+      icon: <Store className="w-5 h-5 text-[#061A4F]" />
+    },
+    {
+      title: 'Improve Access to Campus Services',
+      desc: 'Enable incoming aspirants and busy students to pre-order printing, binding, and screening before setting foot on campus.',
       icon: <Printer className="w-5 h-5 text-[#061A4F]" />
     },
     {
-      title: 'Hardcover & Spiral Binding',
-      desc: 'Gold-foil thesis hardcover binding for final year defense without waiting in physical queues.',
-      icon: <FileText className="w-5 h-5 text-[#061A4F]" />
+      title: 'Create Economic Opportunities',
+      desc: 'Provide legitimate, flexible on-campus income streams that fit around academic timetables and study commitments.',
+      icon: <TrendingUp className="w-5 h-5 text-[#061A4F]" />
     },
     {
-      title: 'JAMB & Screening Verification',
-      desc: 'Direct portal screening, slip reprints, and verified OOU credential processing for incoming aspirants.',
+      title: 'Build a Stronger Student Ecosystem',
+      desc: 'Cultivate an enduring peer economy and entrepreneurial culture that prepares OOU graduates for industry leadership.',
       icon: <ShieldCheck className="w-5 h-5 text-[#061A4F]" />
+    }
+  ];
+
+  const howItWorksSteps = [
+    {
+      step: '01',
+      name: 'Discover',
+      title: 'Search & Explore',
+      desc: 'Browse verified student freelancers, campus marketplace products, client job opportunities, or Motion Ground business centers.'
     },
     {
-      title: 'Instant Passport Photographs',
-      desc: 'High-resolution official passport shots formatted to exact faculty screening dimensions.',
-      icon: <Award className="w-5 h-5 text-[#061A4F]" />
+      step: '02',
+      name: 'Connect',
+      title: 'Initiate Communication',
+      desc: 'Chat directly with student professionals, submit proposals for job briefs, or specify custom print/product requirements.'
+    },
+    {
+      step: '03',
+      name: 'Request/Order',
+      title: 'Secure Escrow Payment',
+      desc: 'Place your order or accept a job proposal. Funds are held safely in escrow protection before work begins or items are prepared.'
+    },
+    {
+      step: '04',
+      name: 'Complete',
+      title: 'Deliver & Inspect',
+      desc: 'Receive digital deliverables, collect your printed documents at campus pickup points, or receive your physical marketplace order.'
+    },
+    {
+      step: '05',
+      name: 'Review',
+      title: 'Release Funds & Rate',
+      desc: 'Approve completion to release escrow funds directly to the student or vendor, and leave an authentic verified peer rating.'
     }
   ];
 
   const faqs = [
     {
       q: "What is OOU StudentCircle?",
-      a: "OOU StudentCircle is the unified digital economy platform built specifically for the Olabisi Onabanjo University community. It connects student freelancers, campus product vendors, enterprise clients, and incoming aspirants across Ago-Iwoye Main Campus, Ibogun, Ayetoro, and Sagamu."
+      a: "OOU StudentCircle is the digital home for the OOU student economy. It is a single unified platform connecting student freelance talent, student-made physical marketplace products, client job opportunities, campus business center services, and student-to-student networking across all OOU campuses."
     },
     {
-      q: "How does the Campus Hub document ordering work?",
-      a: "Instead of walking around Motion Ground or Main Gate searching for an open shop and standing in line, you can choose a verified business center (like Alhaja Biz Venture Shop E6), upload your documents, select print specifications, pay securely, and get a secure pickup reference code to collect immediately."
+      q: "How does the Campus Hub document printing work?",
+      a: "Instead of walking around Motion Ground or campus gates and waiting in long queues, you can upload lecture slides, assignments, lab manuals, or thesis documents online, select print specifications, pay securely, and pick up your ready prints with zero wait time using your pickup reference code."
     },
     {
-      q: "How does StudentCircle protect payments?",
-      a: "We use an escrow protection model. When a client hires a student or places a product order, the payment is securely held by StudentCircle. Funds are released to the student's Nigerian bank account only when the client confirms the work has been satisfactorily completed."
+      q: "How does StudentCircle protect transactions?",
+      a: "We use an escrow protection model. When a client hires a student freelancer or orders a custom product, payment is held safely by StudentCircle. Funds are released to the student's Nigerian bank account only after the buyer confirms that the deliverable meets all agreed specifications."
     },
     {
       q: "Can clients outside OOU hire student talent?",
-      a: "Yes! Businesses, startups, alumni, and individuals anywhere in Nigeria or internationally can post job briefs, browse verified student portfolios, and hire talented OOU students for remote and on-campus projects."
+      a: "Yes! Startups, alumni, corporate businesses, and individuals anywhere in Nigeria and internationally can post job briefs, browse verified student portfolios, and hire talented OOU students for remote, hybrid, or on-campus tasks."
     },
     {
-      q: "Is it free for OOU students to join and list services?",
-      a: "Yes. Creating your verified student account, listing your freelance services, and opening your student product storefront is completely free."
+      q: "Which OOU campuses are supported?",
+      a: "StudentCircle supports all five campus locations: Main Campus (Permanent Site, Ago-Iwoye), Mini Campus (Ago-Iwoye), Ibogun Campus (College of Engineering & Technology), Ayetoro Campus (College of Agricultural Sciences), and Sagamu Campus (Obafemi Awolowo College of Health Sciences)."
+    },
+    {
+      q: "Is it free for students to join and list services?",
+      a: "Yes. Registering your student account, creating your verified profile, listing your freelance services, and opening a product storefront is 100% free."
     }
   ];
 
   return (
-    <div className="bg-white text-slate-900 selection:bg-[#F5B400] selection:text-[#061A4F]">
+    <div id="landing-page-root" className="bg-white text-slate-900 selection:bg-[#F5B400] selection:text-[#061A4F] font-sans antialiased">
       
       {/* ============================================================ */}
-      {/* SECTION 1: HERO & FOUR PILLARS (ABOVE THE FOLD VIEWPORT)    */}
+      {/* 1. HERO SECTION                                              */}
       {/* ============================================================ */}
-      <section className="relative pt-8 pb-16 sm:pt-12 sm:pb-20 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white border-b border-slate-100">
-        
-        {/* Ambient background glow */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[380px] bg-gradient-to-tr from-amber-100/50 via-blue-50/50 to-transparent rounded-full blur-3xl" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
+      <section id="hero-section" className="relative pt-8 pb-14 sm:pt-14 sm:pb-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Main Hero Header Block */}
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#061A4F]/5 border border-[#061A4F]/10">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            
+            {/* Tagline Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#061A4F]/5 border border-[#061A4F]/10">
               <span className="w-2 h-2 rounded-full bg-[#F5B400] animate-pulse" />
-              <span className="text-[11px] sm:text-xs font-black tracking-widest text-[#061A4F] uppercase">
-                OOU STUDENTCIRCLE • THE DIGITAL STUDENT ECONOMY
+              <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase">
+                OOU STUDENTCIRCLE
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#061A4F] tracking-tight leading-[1.12]">
-              The digital home for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#061A4F] via-[#0B2A6F] to-amber-600">OOU student economy</span>.
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-[#061A4F] tracking-tight leading-[1.12]">
+              The digital home for the <br className="hidden sm:inline" />
+              <span className="text-[#061A4F] border-b-4 border-[#F5B400]">OOU student economy.</span>
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-slate-600 font-normal leading-relaxed max-w-2xl mx-auto">
-              One platform connecting student talent, campus businesses, clients and incoming students across Ago-Iwoye, Ibogun, Ayetoro, and Sagamu.
+            {/* Supporting Copy */}
+            <p className="text-base sm:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl mx-auto">
+              One platform connecting student talent, campus businesses, clients and incoming students.
             </p>
 
+            {/* Primary Action Row */}
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
+                id="hero-cta-join"
                 onClick={() => onNavigate('/auth/register')}
-                className="px-6 py-3 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs sm:text-sm font-black rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2"
+                className="px-6 py-3.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2"
               >
                 <span>Join StudentCircle</span>
                 <ArrowRight className="w-4 h-4 text-[#F5B400]" />
               </button>
               <button
-                onClick={() => onNavigate('/about')}
-                className="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 shadow-2xs transition"
+                id="hero-cta-explore"
+                onClick={() => onNavigate('/explore')}
+                className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 text-sm font-bold rounded-xl border border-slate-300 shadow-2xs transition"
               >
-                Learn How It Works
+                Explore the Platform
               </button>
             </div>
+
+            {/* ============================================================ */}
+            {/* FOUR PRIMARY ACTION BUTTONS (IMMEDIATELY DISPLAYED)          */}
+            {/* ============================================================ */}
+            <div className="pt-6">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">
+                Quick Access • What are you looking for today?
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 max-w-3xl mx-auto">
+                
+                <button
+                  id="quick-action-services"
+                  onClick={() => onNavigate('/explore')}
+                  className="px-3.5 py-3 rounded-xl bg-slate-50 hover:bg-[#061A4F] hover:text-white border border-slate-200 hover:border-[#061A4F] transition-all text-left flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <Sparkles className="w-4 h-4 text-[#061A4F] group-hover:text-[#F5B400]" />
+                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300">01</span>
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-xs font-black text-slate-900 group-hover:text-white">Student Services</div>
+                    <div className="text-[11px] text-slate-500 group-hover:text-slate-200">Find talent</div>
+                  </div>
+                </button>
+
+                <button
+                  id="quick-action-marketplace"
+                  onClick={() => onNavigate('/marketplace')}
+                  className="px-3.5 py-3 rounded-xl bg-slate-50 hover:bg-[#061A4F] hover:text-white border border-slate-200 hover:border-[#061A4F] transition-all text-left flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <ShoppingBag className="w-4 h-4 text-[#061A4F] group-hover:text-[#F5B400]" />
+                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300">02</span>
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-xs font-black text-slate-900 group-hover:text-white">Marketplace</div>
+                    <div className="text-[11px] text-slate-500 group-hover:text-slate-200">Shop products</div>
+                  </div>
+                </button>
+
+                <button
+                  id="quick-action-opportunities"
+                  onClick={() => onNavigate('/opportunities')}
+                  className="px-3.5 py-3 rounded-xl bg-slate-50 hover:bg-[#061A4F] hover:text-white border border-slate-200 hover:border-[#061A4F] transition-all text-left flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <Briefcase className="w-4 h-4 text-[#061A4F] group-hover:text-[#F5B400]" />
+                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300">03</span>
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-xs font-black text-slate-900 group-hover:text-white">Opportunities</div>
+                    <div className="text-[11px] text-slate-500 group-hover:text-slate-200">Find gigs & jobs</div>
+                  </div>
+                </button>
+
+                <button
+                  id="quick-action-campus"
+                  onClick={() => onNavigate('/campus')}
+                  className="px-3.5 py-3 rounded-xl bg-slate-50 hover:bg-[#061A4F] hover:text-white border border-slate-200 hover:border-[#061A4F] transition-all text-left flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <Store className="w-4 h-4 text-[#061A4F] group-hover:text-[#F5B400]" />
+                    <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-300">04</span>
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-xs font-black text-slate-900 group-hover:text-white">Campus Hub</div>
+                    <div className="text-[11px] text-slate-500 group-hover:text-slate-200">Print & services</div>
+                  </div>
+                </button>
+
+              </div>
+            </div>
+
           </div>
 
-          {/* ============================================================ */}
-          {/* THE FOUR CORE PILLARS (IMMEDIATELY VISIBLE IN FIRST VIEWPORT) */}
-          {/* ============================================================ */}
-          <div className="pt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              
-              {/* Pillar 1: Student Services */}
-              <div 
-                onClick={() => onNavigate('/explore')}
-                className="group relative bg-white rounded-2xl p-5 border-2 border-slate-200 hover:border-[#061A4F] shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#061A4F] flex items-center justify-center group-hover:scale-110 transition duration-200">
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 2. THE FOUR PILLARS (OVERVIEW CARDS)                         */}
+      {/* ============================================================ */}
+      <section id="four-pillars-overview" className="py-14 sm:py-18 bg-slate-50/70 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200">
+              CORE PLATFORM ARCHITECTURE
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+              The Four Pillars of StudentCircle
+            </h2>
+            <p className="text-sm text-slate-600">
+              Engineered specifically for Olabisi Onabanjo University students, makers, vendors, and clients.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            
+            {/* Pillar 01: Student Services */}
+            <div 
+              id="pillar-card-1"
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-5 group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-400">01</span>
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold">
                     <Sparkles className="w-5 h-5 text-[#061A4F]" />
                   </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                      PILLAR 01
-                    </span>
-                    <h3 className="text-base font-black text-[#061A4F]">Student Services</h3>
-                    <p className="text-xs text-amber-700 font-bold mt-0.5">"Sell what you know."</p>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Hire verified OOU student graphic designers, web developers, writers, tutors, and technical specialists.
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-[#061A4F] uppercase tracking-wide">
+                    STUDENT SERVICES
+                  </h3>
+                  <p className="text-xs font-black text-[#F5B400] bg-amber-50 inline-block px-2 py-0.5 rounded mt-1">
+                    "Sell what you know."
                   </p>
                 </div>
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#061A4F] group-hover:text-blue-700">
-                  <span>Find Student Services</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
-                </div>
-              </div>
-
-              {/* Pillar 2: Marketplace */}
-              <div 
-                onClick={() => onNavigate('/marketplace')}
-                className="group relative bg-white rounded-2xl p-5 border-2 border-slate-200 hover:border-emerald-600 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 transition duration-200">
-                    <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                      PILLAR 02
-                    </span>
-                    <h3 className="text-base font-black text-slate-900">Marketplace</h3>
-                    <p className="text-xs text-emerald-700 font-bold mt-0.5">"Sell what you make."</p>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Shop student-made fashion, curated campus snacks, hostel essentials, textbooks, and electronic accessories.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
-                  <span>Shop Student Products</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
-                </div>
-              </div>
-
-              {/* Pillar 3: Jobs & Opportunities */}
-              <div 
-                onClick={() => onNavigate('/talent')}
-                className="group relative bg-white rounded-2xl p-5 border-2 border-slate-200 hover:border-amber-500 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:scale-110 transition duration-200">
-                    <Briefcase className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                      PILLAR 03
-                    </span>
-                    <h3 className="text-base font-black text-slate-900">Jobs & Gigs</h3>
-                    <p className="text-xs text-amber-700 font-bold mt-0.5">"Find work. Find talent."</p>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Clients post briefs and internships; verified students submit structured proposals with milestone protection.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-700 group-hover:text-amber-800">
-                  <span>Explore Opportunities</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
-                </div>
-              </div>
-
-              {/* Pillar 4: Campus Hub */}
-              <div 
-                onClick={() => onNavigate('/campus')}
-                className="group relative bg-white rounded-2xl p-5 border-2 border-slate-200 hover:border-[#061A4F] shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center group-hover:scale-110 transition duration-200">
-                    <Store className="w-5 h-5 text-indigo-600" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                      PILLAR 04
-                    </span>
-                    <h3 className="text-base font-black text-slate-900">Campus Hub</h3>
-                    <p className="text-xs text-indigo-700 font-bold mt-0.5">"Get services before you arrive."</p>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Upload documents online to Motion Ground business centers; pick up ready prints & binding with zero queueing.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#061A4F] group-hover:text-indigo-800">
-                  <span>Find Campus Services</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Student Connect Spotlight Banner */}
-          <div className="pt-4">
-            <div className="bg-gradient-to-r from-[#061A4F] via-[#0B2A6F] to-[#061A4F] rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-lg border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="space-y-2 max-w-xl text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5B400] text-[#061A4F] text-xs font-black">
-                  <Users className="w-3.5 h-3.5" />
-                  <span>NEW: STUDENT CONNECT</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight">
-                  Connect & Collaborate with OOU Peers
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-                  Discover peers across all 5 campuses by department, skills, and shared academic interests. Connect • Collaborate • Learn • Work • Grow.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Hire verified OOU student graphic designers, software engineers, academic tutors, copywriters, and multimedia creators.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <button
+                onClick={() => onNavigate('/explore')}
+                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Find Student Services</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Pillar 02: Marketplace */}
+            <div 
+              id="pillar-card-2"
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-5 group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-400">02</span>
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#061A4F] flex items-center justify-center font-bold">
+                    <ShoppingBag className="w-5 h-5 text-[#061A4F]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-[#061A4F] uppercase tracking-wide">
+                    MARKETPLACE
+                  </h3>
+                  <p className="text-xs font-black text-[#F5B400] bg-amber-50 inline-block px-2 py-0.5 rounded mt-1">
+                    "Sell what you make."
+                  </p>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Shop student-made campus fashion, snacks & pastries, hostel essentials, textbooks, tech accessories, and craft goods.
+                </p>
+              </div>
+
+              <button
+                onClick={() => onNavigate('/marketplace')}
+                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Shop Student Marketplace</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Pillar 03: Jobs & Opportunities */}
+            <div 
+              id="pillar-card-3"
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-5 group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-400">03</span>
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold">
+                    <Briefcase className="w-5 h-5 text-[#061A4F]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-[#061A4F] uppercase tracking-wide">
+                    JOBS & OPPORTUNITIES
+                  </h3>
+                  <p className="text-xs font-black text-[#F5B400] bg-amber-50 inline-block px-2 py-0.5 rounded mt-1">
+                    "Find work. Find talent."
+                  </p>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Browse client project briefs, campus freelancing gigs, SIWES industrial attachments, and remote internships with milestone protection.
+                </p>
+              </div>
+
+              <button
+                onClick={() => onNavigate('/opportunities')}
+                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Explore Opportunities</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Pillar 04: Campus Hub */}
+            <div 
+              id="pillar-card-4"
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-5 group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-400">04</span>
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#061A4F] flex items-center justify-center font-bold">
+                    <Store className="w-5 h-5 text-[#061A4F]" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-[#061A4F] uppercase tracking-wide">
+                    CAMPUS HUB
+                  </h3>
+                  <p className="text-xs font-black text-[#F5B400] bg-amber-50 inline-block px-2 py-0.5 rounded mt-1">
+                    "Get campus services before you arrive."
+                  </p>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Pre-order online document printing, thesis hardcover binding, JAMB screening, and passport photos at Motion Ground with zero queues.
+                </p>
+              </div>
+
+              <button
+                onClick={() => onNavigate('/campus')}
+                className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Find Campus Services</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 3. STUDENT CONNECT SECTION                                   */}
+      {/* ============================================================ */}
+      <section id="student-connect-section" className="py-14 sm:py-18 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="bg-[#061A4F] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl border border-[#061A4F]">
+            
+            <div className="max-w-3xl space-y-6 relative z-10">
+              
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-[#F5B400] text-xs font-black border border-white/10">
+                <Users className="w-4 h-4" />
+                <span>STUDENT CONNECT</span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                Meet your people across OOU.
+              </h2>
+
+              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed">
+                Connect with students across campuses, discover shared interests, collaborate on ideas and find people with the skills you need.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-1">
+                  <div className="text-[#F5B400] font-black text-sm">Discover Peers</div>
+                  <div className="text-xs text-slate-300">Filter by department, level, faculty, or creative hobbies.</div>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-1">
+                  <div className="text-[#F5B400] font-black text-sm">Skill Match</div>
+                  <div className="text-xs text-slate-300">Find co-founders, study partners, designers, and programmers.</div>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-1">
+                  <div className="text-[#F5B400] font-black text-sm">Cross-Campus</div>
+                  <div className="text-xs text-slate-300">Build friendships between Ago-Iwoye, Ibogun, Ayetoro, and Sagamu.</div>
+                </div>
+              </div>
+
+              <div className="pt-4">
                 <button
+                  id="student-connect-cta"
                   onClick={() => onNavigate('/student-connect')}
-                  className="px-6 py-3 bg-[#F5B400] hover:bg-[#E5A800] text-[#061A4F] text-xs sm:text-sm font-black rounded-xl transition shadow-md flex items-center gap-2"
+                  className="px-7 py-3.5 bg-[#F5B400] hover:bg-[#E5A800] text-[#061A4F] text-sm font-black rounded-xl transition shadow-md flex items-center gap-2"
                 >
                   <span>Explore Student Connect</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
+
             </div>
+
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 2: THE PROBLEM WE SOLVE                             */}
+      {/* 4. THE PROBLEM & THE SOLUTION                                */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
+      <section id="problem-solution-section" className="py-14 sm:py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              WHY STUDENTCIRCLE EXISTS
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200">
+              CAMPUS REALITY & OUR SOLUTION
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              Campus commerce was broken, scattered, and risky. We fixed it.
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
+              Real Campus Problems. Clear Digital Solutions.
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Before StudentCircle, students, businesses, and aspirants dealt with everyday bottlenecks across OOU.
+            <p className="text-sm sm:text-base text-slate-600">
+              How OOU StudentCircle eliminates friction for students, freelancers, vendors, and clients.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-black">
-                01
-              </div>
-              <h3 className="text-sm font-black text-slate-900">Untrusted WhatsApp Group Commerce</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Transactions on messy WhatsApp group chats led to unverified sellers, ghosting after payment, zero accountability, and lost student money.
-              </p>
-            </div>
+          <div className="space-y-4">
+            {problemItems.map((item, idx) => (
+              <div 
+                key={item.id}
+                className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs hover:border-[#061A4F]/40 transition-all"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                  
+                  {/* Left Column: Problem (Red/Amber tone) */}
+                  <div className="lg:col-span-5 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 text-xs font-black flex items-center justify-center">
+                        ✕
+                      </span>
+                      <span className="text-[11px] font-black uppercase tracking-wider text-rose-600">
+                        Problem {idx + 1}
+                      </span>
+                    </div>
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {item.problemDesc}
+                    </p>
+                  </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black">
-                02
-              </div>
-              <h3 className="text-sm font-black text-slate-900">Exhausting Motion Ground Queues</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Traveling all the way from hostels or Lagos only to stand in 3-hour lines at Motion Ground for screening documents, project binding, and photocopies.
-              </p>
-            </div>
+                  {/* Middle Arrow on Large Screens */}
+                  <div className="hidden lg:flex lg:col-span-1 justify-center">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 text-[#061A4F] flex items-center justify-center">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-black">
-                03
-              </div>
-              <h3 className="text-sm font-black text-slate-900">Student Skills Going Unmonetized</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Brilliant student developers, designers, and tutors had no credible, verified platform to showcase their work to paying clients and campus businesses.
-              </p>
-            </div>
+                  {/* Right Column: StudentCircle Solution (Navy/Gold tone) */}
+                  <div className="lg:col-span-6 bg-blue-50/60 p-4 sm:p-5 rounded-xl border border-blue-100/80 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#061A4F]" />
+                      <span className="text-[11px] font-black uppercase tracking-wider text-[#061A4F]">
+                        StudentCircle Solution
+                      </span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-black text-[#061A4F]">
+                      {item.solutionTitle}
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                      {item.solutionDesc}
+                    </p>
+                  </div>
 
+                </div>
+              </div>
+            ))}
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 3: HOW STUDENTCIRCLE WORKS                          */}
+      {/* 5. FOUR PILLARS (DEDICATED DETAILED SECTIONS)                */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      
+      {/* Dedicated Pillar 1: Student Services */}
+      <section id="dedicated-pillar-services" className="py-14 sm:py-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              SIMPLE, TRUSTED WORKFLOW
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              How OOU StudentCircle works in four clear steps
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-              <span className="text-xs font-black px-2.5 py-1 rounded-md bg-[#061A4F] text-[#F5B400]">
-                STEP 1
-              </span>
-              <h3 className="text-sm font-black text-slate-900">Discover or Post</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Browse verified student services, products, or campus business centers. Or post a custom project brief.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-              <span className="text-xs font-black px-2.5 py-1 rounded-md bg-[#061A4F] text-[#F5B400]">
-                STEP 2
-              </span>
-              <h3 className="text-sm font-black text-slate-900">Escrow Security</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Funds are held safely in escrow. The seller or shop begins work knowing the order is genuine and funded.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-              <span className="text-xs font-black px-2.5 py-1 rounded-md bg-[#061A4F] text-[#F5B400]">
-                STEP 3
-              </span>
-              <h3 className="text-sm font-black text-slate-900">Delivery or Pickup</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Digital files are delivered online, products handed over on campus, or documents collected with a secure pickup code.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-              <span className="text-xs font-black px-2.5 py-1 rounded-md bg-[#061A4F] text-[#F5B400]">
-                STEP 4
-              </span>
-              <h3 className="text-sm font-black text-slate-900">Release & Review</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Once satisfied, funds are released directly to the provider's Nigerian bank account and a verified rating is published.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 4: STUDENT SERVICES SHOWCASE                        */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-                STUDENT FREELANCE TALENT
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F] mt-1">
-                Hire verified student professionals
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 text-[#061A4F] text-xs font-black">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>PILLAR 01 • STUDENT SERVICES</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+                Sell What You Know.
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-                Real OOU students with proven skills in technology, media, design, writing, and academics.
+              <p className="text-sm text-slate-600 max-w-xl">
+                Verified OOU student freelancers delivering top-tier design, software, writing, tutoring, and technical services.
               </p>
             </div>
 
             <button
               onClick={() => onNavigate('/explore')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#061A4F] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0B2A6F] transition"
+              className="px-5 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center gap-2 self-start md:self-auto"
             >
-              <span>Browse All Services</span>
+              <span>Find Student Services</span>
               <ArrowRight className="w-4 h-4 text-[#F5B400]" />
             </button>
           </div>
 
-          {/* Skills Pills */}
-          <div className="flex flex-wrap gap-2">
-            {studentSkillsList.map((skill, index) => (
-              <span 
-                key={index}
-                onClick={() => onNavigate('/explore')}
-                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-[#061A4F] hover:text-[#061A4F] cursor-pointer transition shadow-2xs"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-
-          {/* Service Cards Grid */}
+          {/* Featured Services Preview Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredServices.map((srv) => (
+            {featuredServices.map(service => (
               <div
-                key={srv.id}
+                key={service.id}
                 onClick={() => onNavigate('/explore')}
-                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-[#061A4F] hover:shadow-md transition cursor-pointer overflow-hidden flex flex-col justify-between"
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md hover:border-[#061A4F] transition cursor-pointer flex flex-col justify-between"
               >
-                <div className="aspect-video w-full bg-slate-100 relative">
-                  <img
-                    src={srv.coverImage || srv.portfolioImages?.[0] || 'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=500&auto=format&fit=crop&q=80'}
-                    alt={srv.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#061A4F]/90 backdrop-blur-xs text-white text-[10px] font-bold">
-                    {srv.category}
+                <div>
+                  <div className="h-40 bg-slate-100 relative overflow-hidden">
+                    <img 
+                      src={service.coverImage} 
+                      alt={service.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded bg-[#061A4F]/85 text-white text-[10px] font-black uppercase backdrop-blur-xs">
+                      {service.category}
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <UserAvatar name={service.studentName} size="sm" />
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
+                          {service.studentName}
+                          <CheckCircle2 className="w-3 h-3 text-[#061A4F] flex-shrink-0" />
+                        </div>
+                        <div className="text-[10px] text-slate-500">{service.campus}</div>
+                      </div>
+                    </div>
+
+                    <h4 className="text-xs font-black text-[#061A4F] line-clamp-2 leading-snug">
+                      {service.title}
+                    </h4>
                   </div>
                 </div>
 
-                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <h3 className="text-xs font-bold text-slate-900 line-clamp-2">{srv.title}</h3>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                      <UserAvatar name={srv.studentName} photoUrl={srv.studentPhoto} size="xs" />
-                      <span className="truncate">{srv.studentName}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-amber-600">
-                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                      <span>{srv.rating || 5.0} ({srv.reviewsCount || 12})</span>
-                    </div>
-                    <span className="text-xs font-black text-[#061A4F]">
-                      From ₦{getServicePrice(srv).toLocaleString()}
-                    </span>
+                <div className="p-4 pt-0 border-t border-slate-100 flex items-center justify-between mt-2">
+                  <div className="text-[11px] text-slate-500 font-medium">Starting at</div>
+                  <div className="text-sm font-black text-[#061A4F]">
+                    {getServicePrice(service)}
                   </div>
                 </div>
               </div>
@@ -512,63 +695,71 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 5: MARKETPLACE SHOWCASE                             */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      {/* Dedicated Pillar 2: Marketplace */}
+      <section id="dedicated-pillar-marketplace" className="py-14 sm:py-20 bg-slate-50/70 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-700">
-                CAMPUS COMMERCE
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F] mt-1">
-                Student Product Marketplace
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-100 text-[#061A4F] text-xs font-black">
+                <ShoppingBag className="w-3.5 h-3.5 text-[#061A4F]" />
+                <span>PILLAR 02 • MARKETPLACE</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+                Sell What You Make.
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-                Buy handmade apparel, food & pastries, accessories, and hostel needs directly from student creators.
+              <p className="text-sm text-slate-600 max-w-xl">
+                Direct commerce for student artisans, fashion designers, bakers, gadget sellers, and book vendors across campus.
               </p>
             </div>
 
             <button
               onClick={() => onNavigate('/marketplace')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs hover:bg-emerald-800 transition"
+              className="px-5 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center gap-2 self-start md:self-auto"
             >
-              <span>Shop All Products</span>
+              <span>Shop Student Marketplace</span>
               <ArrowRight className="w-4 h-4 text-[#F5B400]" />
             </button>
           </div>
 
+          {/* Featured Products Preview Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featuredProducts.map((prod) => (
+            {featuredProducts.map(product => (
               <div
-                key={prod.id}
+                key={product.id}
                 onClick={() => onNavigate('/marketplace')}
-                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-emerald-600 hover:shadow-md transition cursor-pointer overflow-hidden flex flex-col justify-between"
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md hover:border-[#061A4F] transition cursor-pointer flex flex-col justify-between"
               >
-                <div className="aspect-square w-full bg-slate-100 relative">
-                  <img
-                    src={prod.images?.[0] || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&auto=format&fit=crop&q=80'}
-                    alt={prod.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-emerald-700 text-white text-[10px] font-bold">
-                    {prod.category}
+                <div>
+                  <div className="h-40 bg-slate-100 relative overflow-hidden">
+                    <img 
+                      src={product.images[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600'} 
+                      alt={product.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded bg-[#061A4F]/85 text-white text-[10px] font-black uppercase backdrop-blur-xs">
+                      {product.category}
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 space-y-2">
+                    <div className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-[#F5B400]" />
+                      {product.location}
+                    </div>
+
+                    <h4 className="text-xs font-black text-slate-900 line-clamp-2 leading-snug">
+                      {product.title}
+                    </h4>
                   </div>
                 </div>
 
-                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-900 line-clamp-1">{prod.title}</h3>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{prod.vendorStoreName || prod.vendorName} • {prod.location || 'Ago-Iwoye'}</p>
+                <div className="p-4 pt-0 border-t border-slate-100 flex items-center justify-between mt-2">
+                  <div className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                    In Stock ({product.quantity || 1})
                   </div>
-
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-black text-emerald-800">
-                      ₦{(prod.price || 0).toLocaleString()}
-                    </span>
-                    <span className="text-[11px] font-bold text-slate-500">In Stock</span>
+                  <div className="text-sm font-black text-[#061A4F]">
+                    ₦{product.price.toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -578,69 +769,63 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 6: JOBS & OPPORTUNITIES SHOWCASE                    */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      {/* Dedicated Pillar 3: Jobs & Opportunities */}
+      <section id="dedicated-pillar-jobs" className="py-14 sm:py-20 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-                CLIENT & ENTERPRISE PORTAL
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F] mt-1">
-                Post briefs. Hire top OOU talent.
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 text-[#061A4F] text-xs font-black">
+                <Briefcase className="w-3.5 h-3.5 text-[#061A4F]" />
+                <span>PILLAR 03 • JOBS & OPPORTUNITIES</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+                Find Work. Find Talent.
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-                Companies, alumni, faculty, and startups post tasks; students deliver verified excellence.
+              <p className="text-sm text-slate-600 max-w-xl">
+                Real client contracts, campus gigs, SIWES industrial placements, and remote projects backed by milestone escrow.
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
-                onClick={() => onNavigate('/client/jobs/new')}
-                className="px-4 py-2.5 bg-[#061A4F] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0B2A6F] transition"
+                onClick={() => onNavigate('/opportunities')}
+                className="px-5 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center gap-2"
               >
-                Post a Job Brief
-              </button>
-              <button
-                onClick={() => onNavigate('/talent')}
-                className="px-4 py-2.5 bg-white text-[#061A4F] border border-slate-200 text-xs font-bold rounded-xl hover:bg-slate-50 transition"
-              >
-                Browse Talent
+                <span>Explore Opportunities</span>
+                <ArrowRight className="w-4 h-4 text-[#F5B400]" />
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-[#061A4F] w-fit">
-                <Target className="w-5 h-5" />
+            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-white text-[#061A4F] flex items-center justify-center font-bold border border-slate-200">
+                <FileCheck2 className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-black text-slate-900">Custom Project Briefs</h3>
+              <h3 className="text-base font-black text-[#061A4F]">Milestone Escrow Protection</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Specify your exact requirements, budget range (Fixed or Hourly), deadlines, and required faculty department.
+                Clients fund project milestones before you write a single line of code or design a flyer. Get paid reliably upon client milestone sign-off.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 w-fit">
-                <ShieldCheck className="w-5 h-5" />
+            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-white text-[#061A4F] flex items-center justify-center font-bold border border-slate-200">
+                <Building2 className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-black text-slate-900">Milestone Escrow Protection</h3>
+              <h3 className="text-base font-black text-[#061A4F]">SIWES & Tech Internships</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Pay per milestone. Funds are released only after review and acceptance of completed deliverables.
+                Connect with verified businesses and alumni agencies seeking qualified students for IT attachments and career internships.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 w-fit">
-                <Users className="w-5 h-5" />
+            <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-white text-[#061A4F] flex items-center justify-center font-bold border border-slate-200">
+                <Send className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-black text-slate-900">Vetted Student Portfolios</h3>
+              <h3 className="text-base font-black text-[#061A4F]">Structured Proposals</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Review verified matriculation status, past client reviews, completed gigs, and student work samples before hiring.
+                Submit bids with delivery timelines, portfolio attachments, and clear milestones directly through the built-in proposal interface.
               </p>
             </div>
           </div>
@@ -648,625 +833,401 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION 7: CAMPUS HUB SHOWCASE                              */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      {/* Dedicated Pillar 4: Campus Hub */}
+      <section id="dedicated-pillar-campus" className="py-14 sm:py-20 bg-slate-50/70 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              PHYSICAL ON-CAMPUS SERVICES
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              Campus Hub: Send files before you arrive. Pick up without queues.
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600">
-              Connecting physical business centers at Motion Ground, Main Gate, and Faculty complexes to digital ordering.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {campusHubHighlights.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => onNavigate('/campus')}
-                className="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-[#061A4F] hover:bg-white shadow-2xs hover:shadow-md transition cursor-pointer space-y-3"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white shadow-2xs border border-slate-100 flex items-center justify-center">
-                  {item.icon}
-                </div>
-                <h3 className="text-sm font-black text-slate-900">{item.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-100 text-[#061A4F] text-xs font-black">
+                <Store className="w-3.5 h-3.5 text-[#061A4F]" />
+                <span>PILLAR 04 • CAMPUS HUB</span>
               </div>
-            ))}
-          </div>
-
-          <div className="bg-[#061A4F] text-white p-6 sm:p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
-            <div className="space-y-2 text-center md:text-left">
-              <span className="text-xs font-bold text-[#F5B400] uppercase tracking-wider">
-                FEATURED FLAGSHIP SHOP
-              </span>
-              <h3 className="text-lg sm:text-xl font-black">
-                Alhaja Biz Venture (Shop E6, Motion Ground)
-              </h3>
-              <p className="text-xs text-slate-300 max-w-xl">
-                Motion Ground's leading documentation center. Order project binding, photocopy packs, and screening forms online.
+              <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+                Get Campus Services Before You Arrive.
+              </h2>
+              <p className="text-sm text-slate-600 max-w-xl">
+                Upload slides, project reports, and screening documents to verified business centers at Motion Ground; pick up with zero queueing.
               </p>
             </div>
 
             <button
               onClick={() => onNavigate('/campus')}
-              className="px-6 py-3 bg-[#F5B400] hover:bg-amber-400 text-[#061A4F] font-black text-xs rounded-xl shadow-sm transition whitespace-nowrap"
+              className="px-5 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center gap-2 self-start md:self-auto"
             >
-              Order Documents Now
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 8: CAMPUS LOCATION ZONES                            */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-                CAMPUS LOCATION ZONES
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F] mt-1">
-                Find Services Across OOU
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                Whether you&apos;re at the Main Campus, Mini Campus, Ibogun, Ayetoro or Sagamu, discover participating student professionals, vendors and campus service providers around your location.
-              </p>
-            </div>
-
-            <button
-              onClick={() => onNavigate('/campus-zones')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#061A4F] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0B2A6F] transition flex-shrink-0"
-            >
-              <span>Explore All 5 Campuses</span>
+              <span>Find Campus Services</span>
               <ArrowRight className="w-4 h-4 text-[#F5B400]" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {campusLocations.map((loc) => {
-              const providersCount = CampusStore.getActiveProvidersCount(loc.id);
-              return (
-                <div
-                  key={loc.id}
-                  onClick={() => onNavigate('/campus-zones')}
-                  className="group bg-white rounded-3xl border border-slate-200 shadow-xs hover:border-[#061A4F] hover:shadow-md transition cursor-pointer overflow-hidden flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Campus Image */}
-                    <div className="aspect-16/9 w-full bg-slate-900 relative overflow-hidden">
-                      <img
-                        src={loc.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=80'}
-                        alt={loc.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex flex-col justify-between p-4">
-                        <span className="px-2.5 py-1 rounded-full bg-[#061A4F]/80 backdrop-blur-md text-[#F5B400] text-[10px] font-black uppercase tracking-wider self-start border border-[#F5B400]/30">
-                          {loc.location || 'Ago-Iwoye'}
-                        </span>
-                        <div>
-                          <span className="text-[11px] font-semibold text-slate-300 block">
-                            {loc.subTitle || loc.campusType}
-                          </span>
-                          <h3 className="text-base font-black text-white leading-snug">
-                            {loc.name}
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2">
+              <Printer className="w-6 h-6 text-[#061A4F]" />
+              <div className="text-sm font-black text-[#061A4F]">Online Document Printing</div>
+              <p className="text-xs text-slate-600">Send PDF slides and assignments from your hostel; collect ready prints at Motion Ground.</p>
+            </div>
 
-                    {/* Content */}
-                    <div className="p-5 space-y-3">
-                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                        {loc.description}
-                      </p>
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2">
+              <FileText className="w-6 h-6 text-[#061A4F]" />
+              <div className="text-sm font-black text-[#061A4F]">Hardcover Thesis Binding</div>
+              <p className="text-xs text-slate-600">Gold-foil thesis hardcover and spiral binding for final-year projects without waiting in line.</p>
+            </div>
 
-                      {/* Active Providers count / No service providers notice */}
-                      <div className="flex items-center gap-2">
-                        {providersCount > 0 ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
-                            <Store className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>{providersCount} Active {providersCount === 1 ? 'Provider' : 'Providers'}</span>
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-xs font-medium border border-slate-200">
-                            <Store className="w-3.5 h-3.5 text-slate-400" />
-                            <span>No service providers listed yet.</span>
-                          </div>
-                        )}
-                      </div>
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2">
+              <ShieldCheck className="w-6 h-6 text-[#061A4F]" />
+              <div className="text-sm font-black text-[#061A4F]">Screening Verification</div>
+              <p className="text-xs text-slate-600">JAMB slip reprints, portal screening verification, and student credential assistance.</p>
+            </div>
 
-                      {/* Popular Services Tags */}
-                      {loc.popularServices && loc.popularServices.length > 0 && (
-                        <div className="space-y-1.5 pt-1">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                            Popular Services
-                          </span>
-                          <div className="flex flex-wrap gap-1">
-                            {loc.popularServices.slice(0, 3).map((srv, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md text-[10px] font-medium"
-                              >
-                                {srv}
-                              </span>
-                            ))}
-                            {loc.popularServices.length > 3 && (
-                              <span className="px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded-md text-[10px] font-medium">
-                                +{loc.popularServices.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Explore Services Button */}
-                  <div className="p-5 pt-0">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onNavigate('/campus-zones');
-                      }}
-                      className="w-full py-2.5 px-4 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 group-hover:bg-[#061A4F] group-hover:text-white transition"
-                    >
-                      <span>Explore Services</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2">
+              <Award className="w-6 h-6 text-[#061A4F]" />
+              <div className="text-sm font-black text-[#061A4F]">Instant Passport Photos</div>
+              <p className="text-xs text-slate-600">Official passport photographs formatted to exact OOU faculty screening specifications.</p>
+            </div>
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 9: WHO STUDENTCIRCLE IS FOR                         */}
+      {/* 6. CAMPUS LOCATIONS (LOADED DYNAMICALLY)                     */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
+      <section id="campus-locations-section" className="py-14 sm:py-20 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              DESIGNED FOR THE ENTIRE COMMUNITY
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-slate-100 px-3.5 py-1 rounded-full border border-slate-200">
+              CAMPUS FOOTPRINT
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              Who StudentCircle is built for
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
+              Active Across All OOU Campuses
             </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              Connecting students, services, and commerce across our university campuses in Ogun State.
+            </p>
           </div>
 
-          <div className="flex justify-center border-b border-slate-200 pb-2">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setActiveAudienceTab('students')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition ${
-                  activeAudienceTab === 'students'
-                    ? 'bg-[#061A4F] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
+          {/* Dynamic Campus Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {campusLocations.map(loc => (
+              <div
+                key={loc.id}
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md hover:border-[#061A4F] transition-all flex flex-col justify-between"
               >
-                Student Freelancers
-              </button>
-              <button
-                onClick={() => setActiveAudienceTab('vendors')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition ${
-                  activeAudienceTab === 'vendors'
-                    ? 'bg-[#061A4F] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                Campus Vendors & Shops
-              </button>
-              <button
-                onClick={() => setActiveAudienceTab('clients')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition ${
-                  activeAudienceTab === 'clients'
-                    ? 'bg-[#061A4F] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                Enterprise & Clients
-              </button>
-              <button
-                onClick={() => setActiveAudienceTab('aspirants')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition ${
-                  activeAudienceTab === 'aspirants'
-                    ? 'bg-[#061A4F] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                Incoming Aspirants
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200 max-w-4xl mx-auto">
-            {activeAudienceTab === 'students' && (
-              <div className="space-y-4 animate-fade-in">
-                <h3 className="text-lg font-black text-[#061A4F]">For OOU Student Freelancers & Creators</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Turn your coding, design, writing, or tutoring skills into a legitimate income stream. Build a public portfolio verified by your university status, set your prices, receive guaranteed escrow payments, and graduate with genuine commercial experience.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Zero signup or listing fees
+                <div>
+                  <div className="h-44 bg-slate-100 relative overflow-hidden">
+                    <img 
+                      src={loc.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=800'} 
+                      alt={loc.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-[#061A4F] text-white text-[11px] font-black">
+                      {loc.code}
+                    </div>
+                    <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-white/95 text-slate-900 text-xs font-bold backdrop-blur-xs flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#F5B400]" />
+                      {loc.location}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Guaranteed escrow payouts to NUBAN bank accounts
+
+                  <div className="p-5 space-y-3">
+                    <div>
+                      <h3 className="text-base font-black text-[#061A4F]">{loc.name}</h3>
+                      <p className="text-xs text-slate-500 font-medium">{loc.campusType}</p>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                      {loc.description}
+                    </p>
+
+                    <div className="space-y-1 pt-1">
+                      <div className="text-[10px] font-black uppercase text-slate-400">Key Landmarks & Hubs:</div>
+                      <div className="text-xs text-slate-700 font-medium flex items-start gap-1">
+                        <Building2 className="w-3.5 h-3.5 text-[#061A4F] flex-shrink-0 mt-0.5" />
+                        <span>{loc.landmark}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {activeAudienceTab === 'vendors' && (
-              <div className="space-y-4 animate-fade-in">
-                <h3 className="text-lg font-black text-[#061A4F]">For Campus Vendors & Business Center Owners</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Expand your shop's reach across the entire campus. Receive pre-paid printing orders, sell student products, avoid cash-handling discrepancies, and manage daily sales through your dedicated shop dashboard.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Dedicated Motion Ground shop code (e.g. Shop E6)
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Live order tracker and customer messaging
-                  </div>
+                <div className="p-5 pt-0 border-t border-slate-100 mt-2">
+                  <button
+                    onClick={() => onNavigate('/campus')}
+                    className="w-full py-2.5 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5"
+                  >
+                    <span>View Campus Hubs</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-            )}
-
-            {activeAudienceTab === 'clients' && (
-              <div className="space-y-4 animate-fade-in">
-                <h3 className="text-lg font-black text-[#061A4F]">For Startups, Alumni & Corporate Clients</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Access motivated, highly skilled student talent at competitive rates. Every student freelancer is verified with legitimate campus matriculation. Pay only when work meets your specifications.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Milestone-based project contracts
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Direct chat and deliverable management
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeAudienceTab === 'aspirants' && (
-              <div className="space-y-4 animate-fade-in">
-                <h3 className="text-lg font-black text-[#061A4F]">For Incoming Aspirants & Freshers</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Prepare your screening, result printouts, and hostel essentials before arriving at OOU. Avoid scams, get authentic campus advice, and experience a stress-free transition into university life.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Verified screening document processing
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Pickup reference codes for instant on-campus collection
-                  </div>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 10: THE STUDENT JOURNEY                             */}
+      {/* 7. HOW IT WORKS (5 STEPS)                                    */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
+      <section id="how-it-works-section" className="py-14 sm:py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              CAREER & ECONOMIC PATHWAY
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200">
+              SIMPLE & SECURE PROCESS
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              The OOU Student Journey on StudentCircle
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
+              How StudentCircle Works
             </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              From discovery to verified escrow completion in five straightforward steps.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
-              <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-700 rounded uppercase">Phase 1</span>
-              <h3 className="text-sm font-black text-slate-900">Aspirant & 100L</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Order screening forms, find verified campus guides, buy essential hostel items, and settle smoothly into university life.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {howItWorksSteps.map((stepItem, idx) => (
+              <div 
+                key={stepItem.step}
+                className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-4 relative"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl font-black text-[#F5B400]">{stepItem.step}</span>
+                    <span className="px-2 py-0.5 rounded bg-blue-50 text-[#061A4F] text-[10px] font-black uppercase">
+                      {stepItem.name}
+                    </span>
+                  </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
-              <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-700 rounded uppercase">Phase 2</span>
-              <h3 className="text-sm font-black text-slate-900">200L - 300L</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Publish your first freelance gigs, launch a product brand, build client reviews, and earn steady supplementary income.
-              </p>
-            </div>
+                  <h3 className="text-sm font-black text-[#061A4F]">
+                    {stepItem.title}
+                  </h3>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
-              <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-700 rounded uppercase">Phase 3</span>
-              <h3 className="text-sm font-black text-slate-900">400L & Final Year</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Fast-track final year project printing & binding through Campus Hub; win high-paying corporate briefs and internships.
-              </p>
-            </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {stepItem.desc}
+                  </p>
+                </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
-              <span className="text-[10px] font-black px-2 py-0.5 bg-[#061A4F] text-[#F5B400] rounded uppercase">Phase 4</span>
-              <h3 className="text-sm font-black text-[#061A4F]">Graduation & Beyond</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Graduate not just with a degree, but with a verified work history, client references, financial autonomy, and market-ready skills.
-              </p>
-            </div>
-
+                <div className="pt-2 border-t border-slate-100 text-[10px] text-slate-400 font-bold flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span>Step {idx + 1} of 5</span>
+                </div>
+              </div>
+            ))}
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 11, 12, 13: AGENDA, MISSION & VISION               */}
+      {/* 8. AGENDA & BROADER MISSION                                  */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
+      <section id="agenda-mission-section" className="py-14 sm:py-20 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Agenda */}
-            <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#061A4F] text-[#F5B400] flex items-center justify-center">
-                <Target className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#061A4F]">Our Agenda</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                To transform OOU into the premier model for student economic empowerment in Nigeria, replacing informal insecurity with structured, verified, and protected digital commerce.
-              </p>
-            </div>
-
-            {/* Mission */}
-            <div className="p-8 rounded-3xl bg-[#061A4F] text-white space-y-4 shadow-md">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 text-[#F5B400] flex items-center justify-center">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-white">Our Mission</h3>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                {founderConfig.mission}
-              </p>
-            </div>
-
-            {/* Vision */}
-            <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#061A4F] text-[#F5B400] flex items-center justify-center">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#061A4F]">Our Vision</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {founderConfig.vision}
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 14: TRUST, SAFETY & VERIFICATION                   */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-700">
-              SAFETY BY DESIGN
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-slate-100 px-3.5 py-1 rounded-full border border-slate-200">
+              OUR STRATEGIC MISSION
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              Built on uncompromising campus trust & escrow security
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
+              The StudentCircle Agenda
             </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              Building a sustainable, high-impact peer economy that transforms student potential into lasting career success.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <Lock className="w-6 h-6 text-[#061A4F]" />
-              <h3 className="text-sm font-black text-slate-900">Escrow Security</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Money is held safely until client satisfaction is verified. Zero payment fraud.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agendaGoals.map((goal, idx) => (
+              <div 
+                key={goal.title}
+                className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200 hover:border-[#061A4F] transition-all space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-white text-[#061A4F] flex items-center justify-center font-bold border border-slate-200 shadow-2xs">
+                    {goal.icon}
+                  </div>
+                  <span className="text-xs font-black text-slate-400">0{idx + 1}</span>
+                </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <ShieldCheck className="w-6 h-6 text-emerald-600" />
-              <h3 className="text-sm font-black text-slate-900">Campus Verification</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Students and shops undergo matriculation and physical on-ground audit verification.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <Star className="w-6 h-6 text-amber-500" />
-              <h3 className="text-sm font-black text-slate-900">Authentic Reviews</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Only verified paying customers who completed an order can leave feedback.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <Building2 className="w-6 h-6 text-indigo-600" />
-              <h3 className="text-sm font-black text-slate-900">Direct NUBAN Payouts</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Fast automated payouts directly to all Nigerian commercial and microfinance banks.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* SECTION 15: FOUNDER SECTION                                 */}
-      {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xs flex flex-col md:flex-row items-center gap-8">
-            
-            <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl overflow-hidden bg-[#061A4F] border-4 border-white shadow-md flex-shrink-0">
-              <img
-                src={founderConfig.photoUrl}
-                alt={founderConfig.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80';
-                }}
-              />
-            </div>
-
-            <div className="space-y-4 text-center md:text-left flex-1">
-              <div>
-                <span className="text-[11px] font-black uppercase tracking-widest text-amber-700 block">
-                  MEET THE FOUNDER
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-[#061A4F] mt-0.5">
-                  {founderConfig.name}
+                <h3 className="text-base font-black text-[#061A4F]">
+                  {goal.title}
                 </h3>
-                <p className="text-xs text-slate-500 font-bold">
-                  {founderConfig.role} • {founderConfig.institution}
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {goal.desc}
                 </p>
               </div>
-
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                "{founderConfig.story[0]}"
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
-                <a
-                  href={founderConfig.whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp: {founderConfig.whatsapp}</span>
-                </a>
-                <a
-                  href={founderConfig.emailUrl}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold shadow-2xs transition"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{founderConfig.email}</span>
-                </a>
-              </div>
-            </div>
-
+            ))}
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 16: FREQUENTLY ASKED QUESTIONS                     */}
+      {/* 9. FOUNDER SECTION                                           */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <section id="founder-section" className="py-14 sm:py-20 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center space-y-2">
-            <span className="text-xs font-black uppercase tracking-widest text-[#061A4F]">
-              COMMON QUESTIONS
+          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+              
+              {/* Founder Image Column */}
+              <div className="md:col-span-5 flex flex-col items-center text-center">
+                <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border-4 border-[#061A4F]/10 shadow-md relative group">
+                  <img 
+                    src={founderConfig.photoUrl} 
+                    alt={founderConfig.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="mt-4 space-y-1">
+                  <h3 className="text-lg font-black text-[#061A4F]">
+                    {founderConfig.name}
+                  </h3>
+                  <p className="text-xs font-bold text-[#F5B400] bg-amber-50 px-2.5 py-0.5 rounded-full inline-block">
+                    {founderConfig.role}
+                  </p>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {founderConfig.department} • {founderConfig.level}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {founderConfig.institution}
+                  </p>
+                </div>
+              </div>
+
+              {/* Founder Story Column */}
+              <div className="md:col-span-7 space-y-4 text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#061A4F]/5 text-[#061A4F] text-xs font-black">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>FOUNDER'S STATEMENT</span>
+                </div>
+
+                <h4 className="text-xl sm:text-2xl font-black text-[#061A4F] leading-snug">
+                  "Empowering OOU students with authentic economic opportunities right from campus."
+                </h4>
+
+                <div className="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p>
+                    As a Computer Science student at Olabisi Onabanjo University, I witnessed firsthand the immense pool of untapped student talent across our campuses — graphic designers, web developers, content writers, tutors, and vendors struggling to connect with clients who actively needed their skills.
+                  </p>
+                  <p>
+                    I founded OOU StudentCircle to build a secure, verified, and campus-tailored marketplace. Our mission is to empower every skilled student to gain authentic work experience, build an unshakeable reputation, and earn sustainable income right from school.
+                  </p>
+                </div>
+
+                {/* Direct Connect Buttons */}
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <a
+                    href={founderConfig.whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition flex items-center gap-2 shadow-xs"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>WhatsApp Founder ({founderConfig.whatsapp})</span>
+                  </a>
+                  <a
+                    href={founderConfig.emailUrl}
+                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Email Founder</span>
+                  </a>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 10. FREQUENTLY ASKED QUESTIONS ACCORDION                     */}
+      {/* ============================================================ */}
+      <section id="faq-section" className="py-14 sm:py-20 bg-white border-b border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          
+          <div className="text-center space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-slate-100 px-3.5 py-1 rounded-full border border-slate-200">
+              FREQUENTLY ASKED QUESTIONS
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#061A4F]">
-              Frequently Asked Questions
+            <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
+              Everything You Need to Know
             </h2>
+            <p className="text-sm text-slate-600">
+              Clear answers to common questions about StudentCircle escrow, campus printing, and student freelancing.
+            </p>
           </div>
 
           <div className="space-y-3">
-            {faqs.map((faq, index) => {
-              const isOpen = openFaq === index;
-              return (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs transition"
+            {faqs.map((faq, index) => (
+              <div
+                key={faq.q}
+                className="border border-slate-200 rounded-2xl overflow-hidden transition-all bg-white shadow-2xs"
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full p-4 sm:p-5 text-left font-black text-sm text-[#061A4F] flex items-center justify-between hover:bg-slate-50 transition gap-4"
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleFaq(index)}
-                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-slate-900 hover:text-[#061A4F]"
-                  >
-                    <span>{faq.q}</span>
-                    {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 sm:px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                      {faq.a}
-                    </div>
+                  <span>{faq.q}</span>
+                  {openFaq === index ? (
+                    <ChevronUp className="w-4 h-4 text-[#F5B400] flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
                   )}
-                </div>
-              );
-            })}
+                </button>
+                {openFaq === index && (
+                  <div className="px-4 sm:px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 17: FINAL CALL TO ACTION                           */}
+      {/* 11. FINAL CTA SECTION                                        */}
       {/* ============================================================ */}
-      <section className="py-16 sm:py-24 bg-[#061A4F] text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#F5B400]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
+      <section id="final-cta-section" className="py-16 sm:py-24 bg-[#061A4F] text-white relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative z-10">
           
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#F5B400] text-xs font-black uppercase tracking-wider">
-            <span>GET STARTED IN SECONDS</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-[#F5B400] text-xs font-black border border-white/10">
+            <Sparkles className="w-4 h-4" />
+            <span>JOIN THE OOU STUDENT ECONOMY</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
-            Ready to join the official OOU student economy?
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight max-w-3xl mx-auto leading-snug">
+            Your campus is full of talent, ideas and opportunities. <br className="hidden sm:inline" />
+            <span className="text-[#F5B400]">StudentCircle brings them together.</span>
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-300 font-normal max-w-xl mx-auto leading-relaxed">
-            Create your account today as a student freelancer, campus vendor, hiring client, or incoming aspirant.
+          <p className="text-sm sm:text-base text-slate-200 max-w-xl mx-auto">
+            Whether you want to sell your skills, launch a campus storefront, find verified student talent, or pre-order printing services, StudentCircle is built for you.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
+              id="final-cta-join"
               onClick={() => onNavigate('/auth/register')}
-              className="px-6 py-3 bg-[#F5B400] hover:bg-amber-400 text-[#061A4F] font-black text-xs sm:text-sm rounded-xl shadow-lg transition flex items-center gap-2"
+              className="px-8 py-4 bg-[#F5B400] hover:bg-[#E5A800] text-[#061A4F] text-sm font-black rounded-xl shadow-lg transition-all flex items-center gap-2"
             >
-              <span>Create Free Account</span>
+              <span>Join StudentCircle</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
             <button
-              onClick={() => onNavigate('/campus/register-shop')}
-              className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border border-white/20 transition"
+              id="final-cta-explore"
+              onClick={() => onNavigate('/explore')}
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white text-sm font-bold rounded-xl border border-white/20 transition-all flex items-center gap-2"
             >
-              Register Campus Business
+              <span>Explore the Platform</span>
             </button>
           </div>
 

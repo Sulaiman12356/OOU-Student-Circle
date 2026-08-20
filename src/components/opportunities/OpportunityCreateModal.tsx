@@ -8,6 +8,7 @@ import {
 } from '../../types/opportunities';
 import { useAuth } from '../../context/AuthContext';
 import { OpportunityStore } from '../../services/opportunityStore';
+import { MediaUploader } from '../common/MediaUploader';
 import { 
   X, 
   Plus, 
@@ -390,7 +391,7 @@ export const OpportunityCreateModal: React.FC<OpportunityCreateModalProps> = ({
               </div>
 
               {/* Organization & Logo */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Organization / Department / Studio Name *</label>
                   <input
@@ -404,13 +405,15 @@ export const OpportunityCreateModal: React.FC<OpportunityCreateModalProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Organization Logo (Image URL)</label>
-                  <input
-                    type="url"
-                    value={organizationLogo}
-                    onChange={(e) => setOrganizationLogo(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                  <MediaUploader
+                    storagePathPrefix="opportunities/logos"
+                    images={organizationLogo ? [organizationLogo] : []}
+                    onChange={(imgs) => setOrganizationLogo(imgs[0] || '')}
+                    single={true}
+                    maxImages={1}
+                    label="Organization Logo / Banner"
+                    helperText="Upload official brand logo or department crest directly from device"
+                    aspectRatio="square"
                   />
                 </div>
               </div>

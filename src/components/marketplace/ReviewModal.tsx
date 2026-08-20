@@ -3,6 +3,7 @@ import { ProductItem, ProductReview } from '../../types/marketplace';
 import { MarketplaceStore } from '../../services/marketplaceStore';
 import { useAuth } from '../../context/AuthContext';
 import { Star, X, CheckCircle, AlertCircle, Upload, ShieldCheck } from 'lucide-react';
+import { MediaUploader } from '../common/MediaUploader';
 
 interface ReviewModalProps {
   product: ProductItem;
@@ -185,17 +186,17 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             />
           </div>
 
-          {/* Optional Image URL */}
+          {/* Review Photos from Device */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-              Product Photo URL (Optional)
-            </label>
-            <input 
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            <MediaUploader
+              storagePathPrefix={`reviews/${orderId || 'products'}`}
+              images={imageUrl ? [imageUrl] : []}
+              onChange={(imgs) => setImageUrl(imgs[0] || '')}
+              single={true}
+              maxImages={1}
+              label="Review Photo (Optional)"
+              helperText="Snap a photo of the received item or select from phone gallery"
+              aspectRatio="square"
             />
           </div>
 

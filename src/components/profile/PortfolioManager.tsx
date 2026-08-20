@@ -18,7 +18,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { PortfolioItem } from '../../types';
-import { optimizeImage, uploadMediaFile } from '../../services/storageService';
+import { MediaUploader } from '../common/MediaUploader';
 
 interface PortfolioManagerProps {
   portfolio: PortfolioItem[];
@@ -54,12 +54,7 @@ export const PortfolioManager: React.FC<PortfolioManagerProps> = ({
   const [projectUrl, setProjectUrl] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  
-  // Image upload in-progress state
-  const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const multiFileInputRef = useRef<HTMLInputElement>(null);
 
   // Image preview modal state
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -90,96 +85,6 @@ export const PortfolioManager: React.FC<PortfolioManagerProps> = ({
       : (item.imageUrl ? [item.imageUrl] : []);
     setUploadedImages(existingImages);
     setIsAdding(true);
-  };
-
-  const handleMultipleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setUploadError(null);
-    const fileList: File[] = Array.from(files);
-
-    if (uploadedImages.length + fileList.length > 8) {
-      setUploadError('You can upload a maximum of 8 images per portfolio project.');
-      return;
-    }
-
-    setIsUploadingImages(true);
-    setUploadProgress(10);
-
-    const newUrls: string[] = [];
-
-    try {
-      for (let i = 0; i < fileList.length; i++) {
-        const file = fileList[i];
-
-        // Format check
-        const validMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (!validMimes.includes(file.type.toLowerCase())) {
-          throw new Error(`File "${file.name}" is not a supported image (JPG, PNG, WEBP).`);
-        }
-
-        setUploadProgress(20 + Math.round((i / fileList.length) * 40));
-        const optimized = await optimizeImage(file, {
-          maxWidth: 1600,
-          maxHeight: 1200,
-          quality: 0.85,
-          format: 'image/webp'
-        });
-
-        setUploadProgress(60 + Math.round((i / fileList.length) * 35));
-        const storagePath = `users/${userId}/portfolio/proj_${Date.now()}_${i}.webp`;
-        const downloadUrl = await uploadMediaFile(storagePath, optimized.blob);
-
-        newUrls.push(downloadUrl || optimized.dataUrl);
-      }
-
-      setUploadedImages(prev => [...prev, ...newUrls]);
-      setUploadProgress(100);
-    } catch (err: any) {
-      setUploadError(err.message || 'Failed to upload one or more images.');
-    } finally {
-      setIsUploadingImages(false);
-      setUploadProgress(0);
-      if (multiFileInputRef.current) {
-        multiFileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleMoveImageLeft = (index: number) => {
-    if (index === 0) return;
-    setUploadedImages(prev => {
-      const copy = [...prev];
-      const temp = copy[index - 1];
-      copy[index - 1] = copy[index];
-      copy[index] = temp;
-      return copy;
-    });
-  };
-
-  const handleMoveImageRight = (index: number) => {
-    if (index === uploadedImages.length - 1) return;
-    setUploadedImages(prev => {
-      const copy = [...prev];
-      const temp = copy[index + 1];
-      copy[index + 1] = copy[index];
-      copy[index] = temp;
-      return copy;
-    });
-  };
-
-  const handleSetPrimaryImage = (index: number) => {
-    if (index === 0) return;
-    setUploadedImages(prev => {
-      const item = prev[index];
-      const rest = prev.filter((_, i) => i !== index);
-      return [item, ...rest];
-    });
   };
 
   const handleSaveProject = () => {
@@ -342,136 +247,17 @@ export const PortfolioManager: React.FC<PortfolioManagerProps> = ({
           </div>
 
           {/* Device Image Uploader */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="text-xs font-black text-[#061A4F] uppercase tracking-wider">
-                  Project Images ({uploadedImages.length}/8) *
-                </label>
-                <p className="text-[11px] text-slate-500">
-                  Upload multiple screenshots, drafts, or photos directly from your device. First image is the primary cover.
-                </p>
-              </div>
-
-              <input
-                ref={multiFileInputRef}
-                type="file"
-                multiple
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={handleMultipleFiles}
-                className="hidden"
-                id="portfolio-multi-file-input"
-              />
-
-              <button
-                type="button"
-                onClick={() => multiFileInputRef.current?.click()}
-                disabled={isUploadingImages || uploadedImages.length >= 8}
-                className="px-3.5 py-2 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 disabled:opacity-50"
-              >
-                {isUploadingImages ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#F5B400]" />
-                    <span>Uploading ({uploadProgress}%)...</span>
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-3.5 h-3.5 text-[#F5B400]" />
-                    <span>Upload Images</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Images Grid */}
-            {uploadedImages.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
-                {uploadedImages.map((imgUrl, index) => (
-                  <div 
-                    key={index}
-                    className="group relative bg-white rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-[#061A4F] shadow-xs flex flex-col justify-between"
-                  >
-                    <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
-                      <img
-                        src={imgUrl}
-                        alt={`Project media ${index + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                      />
-                      {index === 0 && (
-                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-[#061A4F] text-[#F5B400] text-[10px] font-black rounded-full shadow flex items-center gap-1">
-                          <Star className="w-2.5 h-2.5 fill-current" />
-                          <span>Cover</span>
-                        </div>
-                      )}
-                      
-                      {/* View full size button */}
-                      <button
-                        type="button"
-                        onClick={() => setPreviewImage(imgUrl)}
-                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-lg opacity-0 group-hover:opacity-100 transition"
-                        title="Preview Full Size"
-                      >
-                        <Eye className="w-3 h-3" />
-                      </button>
-                    </div>
-
-                    {/* Image Controls Bar */}
-                    <div className="p-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleMoveImageLeft(index)}
-                          disabled={index === 0}
-                          className="p-1 text-slate-500 hover:text-[#061A4F] hover:bg-slate-200 rounded disabled:opacity-30"
-                          title="Move Left / Reorder"
-                        >
-                          <ArrowLeft className="w-3 h-3" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleMoveImageRight(index)}
-                          disabled={index === uploadedImages.length - 1}
-                          className="p-1 text-slate-500 hover:text-[#061A4F] hover:bg-slate-200 rounded disabled:opacity-30"
-                          title="Move Right / Reorder"
-                        >
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                        {index !== 0 && (
-                          <button
-                            type="button"
-                            onClick={() => handleSetPrimaryImage(index)}
-                            className="px-1.5 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 rounded hover:bg-amber-100"
-                            title="Make this the cover image"
-                          >
-                            Set Cover
-                          </button>
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(index)}
-                        className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded"
-                        title="Delete image"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div 
-                onClick={() => multiFileInputRef.current?.click()}
-                className="p-8 border-2 border-dashed border-slate-300 hover:border-[#061A4F] rounded-2xl bg-white text-center cursor-pointer space-y-2 transition"
-              >
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#061A4F] flex items-center justify-center mx-auto">
-                  <Upload className="w-5 h-5" />
-                </div>
-                <p className="text-xs font-bold text-slate-800">Click to upload project photos from your device</p>
-                <p className="text-[11px] text-slate-400">JPG, JPEG, PNG, WEBP supported (Multiple files allowed)</p>
-              </div>
-            )}
+          <div className="pt-2">
+            <MediaUploader
+              storagePathPrefix={`users/${userId}/portfolio`}
+              images={uploadedImages}
+              onChange={(imgs) => setUploadedImages(imgs)}
+              maxImages={8}
+              maxFileSizeMB={15}
+              label="Project Images & Work Samples"
+              helperText="Direct device upload. Select multiple files. Reorder and set primary project cover."
+              aspectRatio="video"
+            />
           </div>
 
           {/* Form Error Notice */}
