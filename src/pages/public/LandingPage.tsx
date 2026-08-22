@@ -445,6 +445,51 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </button>
             </div>
 
+            {/* MOBILE & TABLET FLOATING ECOSYSTEM FLOW (Interactive on touch devices) */}
+            <div className="lg:hidden pt-4">
+              <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-2 px-1">
+                <div 
+                  onClick={() => onNavigate('/explore')}
+                  className="interactive-card-subtle flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs flex items-center gap-2 animate-float-slow cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-blue-50 text-[#061A4F] flex items-center justify-center">
+                    <GraduationCap className="w-3 h-3" />
+                  </div>
+                  <span className="text-[11px] font-bold text-[#061A4F] whitespace-nowrap">Student Professional</span>
+                </div>
+
+                <div 
+                  onClick={() => onNavigate('/campus')}
+                  className="interactive-card-subtle flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs flex items-center gap-2 animate-float-medium cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-amber-50 text-[#061A4F] flex items-center justify-center">
+                    <Printer className="w-3 h-3" />
+                  </div>
+                  <span className="text-[11px] font-bold text-[#061A4F] whitespace-nowrap">Motion Ground Hub</span>
+                </div>
+
+                <div 
+                  onClick={() => onNavigate('/marketplace')}
+                  className="interactive-card-subtle flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs flex items-center gap-2 animate-float-reverse cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center">
+                    <Store className="w-3 h-3" />
+                  </div>
+                  <span className="text-[11px] font-bold text-[#061A4F] whitespace-nowrap">Campus Vendor</span>
+                </div>
+
+                <div 
+                  onClick={() => onNavigate('/opportunities')}
+                  className="interactive-card-subtle flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs flex items-center gap-2 animate-float-organic cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                    <Briefcase className="w-3 h-3" />
+                  </div>
+                  <span className="text-[11px] font-bold text-[#061A4F] whitespace-nowrap">New Opportunity</span>
+                </div>
+              </div>
+            </div>
+
             {/* ============================================================ */}
             {/* FOUR IMMEDIATE ENTRY POINTS (VISIBLE IN FIRST VIEWPORT)       */}
             {/* ============================================================ */}
