@@ -27,6 +27,22 @@ service cloud.firestore {
       );
     }
 
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com' && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin')
+      );
+    }
+
+    // ADMINS COLLECTION (RBAC & Access Control)
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSuperAdmin();
+      allow update: if isSuperAdmin() || (isAdmin() && request.auth.uid == adminId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'permissions', 'status']));
+      allow delete: if isSuperAdmin() && adminId != request.auth.uid;
+    }
+
     // USERS COLLECTION
     match /users/{userId} {
       allow get: if isSignedIn();

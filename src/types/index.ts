@@ -680,4 +680,5 @@ export * from './campus';
 export * from './opportunities';
 export * from './transaction';
 export * from './trustSafety';
+export * from './admin';
 

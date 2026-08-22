@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -53,6 +54,13 @@ import { AdminActivityPage } from './pages/admin/AdminActivityPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminCampusLocationsPage } from './pages/admin/AdminCampusLocationsPage';
 import { AdminMediaModerationPage } from './pages/admin/AdminMediaModerationPage';
+import { AdminLoginPage } from './pages/admin/AdminLoginPage';
+import { AdminManagementPage } from './pages/admin/AdminManagementPage';
+import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
+import { AdminDisputesPage } from './pages/admin/AdminDisputesPage';
+import { AdminProductsPage } from './pages/admin/AdminProductsPage';
+import { AdminShopsPage } from './pages/admin/AdminShopsPage';
+import { AdminSecurityTestPage } from './pages/admin/AdminSecurityTestPage';
 
 // Shared Pages
 import { MessagesPage } from './pages/common/MessagesPage';
@@ -79,8 +87,11 @@ import { StudentConnectPage } from './pages/connect/StudentConnectPage';
 // Opportunities & Jobs
 import { OpportunitiesBrowse } from './components/opportunities/OpportunitiesBrowse';
 
+import { ShieldAlert } from 'lucide-react';
+
 const AppContent: React.FC = () => {
   const { currentUser, role, updateUser } = useAuth();
+  const { isAdminAuthenticated, adminProfile } = useAdminAuth();
   const [currentPath, setCurrentPath] = useState<string>('/');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -193,10 +204,60 @@ const AppContent: React.FC = () => {
       );
     }
 
-    // 4. Admin Workspace routes (Wrapped in DashboardLayout)
-    if (currentPath.startsWith('/admin/')) {
+    // 4. Admin Workspace routes
+    if (currentPath === '/admin/login') {
+      return <AdminLoginPage onNavigate={navigate} />;
+    }
+
+    if (currentPath === '/admin' || currentPath.startsWith('/admin/')) {
+      const isAuthorized = isAdminAuthenticated || currentUser?.role === 'admin';
+      
+      if (!isAuthorized) {
+        return (
+          <div className="min-h-screen bg-[#040E29] text-white flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-[#061A4F] p-8 rounded-3xl border border-rose-500/40 shadow-2xl text-center space-y-6">
+              <div className="w-16 h-16 bg-rose-500/20 rounded-2xl flex items-center justify-center mx-auto border border-rose-500/40 text-rose-400">
+                <ShieldAlert className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black">Admin Access Denied</h2>
+                <p className="text-xs text-slate-300">
+                  The requested administrative workspace requires verified administrator credentials.
+                </p>
+              </div>
+              <div className="space-y-3 pt-2">
+                <button
+                  onClick={() => navigate('/admin/login')}
+                  className="w-full py-3 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] font-black rounded-xl transition text-xs shadow-lg cursor-pointer"
+                >
+                  Sign In as Administrator
+                </button>
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-slate-300 font-bold rounded-xl transition text-xs border border-white/10 cursor-pointer"
+                >
+                  Return to Student Marketplace
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       let content = <AdminDashboardPage onNavigate={navigate} />;
-      if (currentPath === '/admin/locations') {
+      if (currentPath === '/admin/analytics') {
+        content = <AdminAnalyticsPage />;
+      } else if (currentPath === '/admin/settings/administrators' || currentPath === '/admin/administrators') {
+        content = <AdminManagementPage onNavigate={navigate} />;
+      } else if (currentPath === '/admin/security-test' || currentPath === '/admin/security') {
+        content = <AdminSecurityTestPage />;
+      } else if (currentPath === '/admin/products') {
+        content = <AdminProductsPage />;
+      } else if (currentPath === '/admin/shops') {
+        content = <AdminShopsPage />;
+      } else if (currentPath === '/admin/disputes') {
+        content = <AdminDisputesPage />;
+      } else if (currentPath === '/admin/locations') {
         content = <AdminCampusLocationsPage />;
       } else if (currentPath === '/admin/media') {
         content = <AdminMediaModerationPage />;
@@ -210,13 +271,13 @@ const AppContent: React.FC = () => {
         content = <AdminJobsPage />;
       } else if (currentPath === '/admin/categories') {
         content = <AdminCategoriesPage />;
-      } else if (currentPath === '/admin/transactions') {
+      } else if (currentPath === '/admin/transactions' || currentPath === '/admin/orders') {
         content = <AdminTransactionsPage />;
       } else if (currentPath === '/admin/reports') {
         content = <AdminReportsPage />;
       } else if (currentPath === '/admin/trust-test' || currentPath === '/admin/trust-safety' || currentPath === '/admin/test-trust-safety') {
         content = <TrustAndSafetyTestPage />;
-      } else if (currentPath === '/admin/activity') {
+      } else if (currentPath === '/admin/activity' || currentPath === '/admin/activity-logs') {
         content = <AdminActivityPage />;
       } else if (currentPath === '/admin/settings') {
         content = <AdminSettingsPage />;
@@ -424,7 +485,9 @@ const AppContent: React.FC = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <AdminAuthProvider>
+        <AppContent />
+      </AdminAuthProvider>
     </AuthProvider>
   );
 }

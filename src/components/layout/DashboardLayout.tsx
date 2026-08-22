@@ -115,18 +115,19 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   // Admin Links
   const adminNavItems: NavItem[] = [
     { label: 'Admin Overview', path: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'Opportunities Moderation', path: '/admin/jobs', icon: FolderKanban, highlight: true },
-    { label: 'Campus Locations', path: '/admin/locations', icon: MapPin },
-    { label: 'Media Moderation', path: '/admin/media', icon: ShieldCheck },
-    { label: 'Campus Services Hub', path: '/campus', icon: MapPin },
-    { label: 'Marketplace Management', path: '/admin/marketplace', icon: Store },
+    { label: 'Platform Analytics', path: '/admin/analytics', icon: DollarSign, highlight: true },
     { label: 'User Management', path: '/admin/users', icon: Users },
     { label: 'Student Verification', path: '/admin/verification', icon: ShieldCheck },
+    { label: 'Opportunities Moderation', path: '/admin/jobs', icon: FolderKanban },
+    { label: 'Service Moderation', path: '/admin/services', icon: Sparkles },
+    { label: 'Marketplace Management', path: '/admin/marketplace', icon: Store },
+    { label: 'Campus Locations', path: '/admin/locations', icon: MapPin },
     { label: 'Reports & Disputes', path: '/admin/reports', icon: AlertTriangle },
     { label: 'Trust & Safety Lab', path: '/admin/trust-test', icon: Shield },
-    { label: 'Service Moderation', path: '/admin/services', icon: Sparkles },
+    { label: 'Media Moderation', path: '/admin/media', icon: ShieldCheck },
     { label: 'Activity Logs', path: '/admin/activity', icon: FileText },
     { label: 'Platform Settings', path: '/admin/settings', icon: Sliders },
+    { label: 'Admin Staff RBAC', path: '/admin/settings/administrators', icon: Users },
   ];
 
   const getNavItems = () => {

@@ -481,17 +481,32 @@ export const ExploreServicesPage: React.FC<ExploreServicesPageProps> = ({
             {filteredServices.length === 0 ? (
               <div className="p-12 text-center bg-white rounded-2xl border border-gray-200 space-y-3">
                 <Zap className="w-10 h-10 text-gray-300 mx-auto" />
-                <h3 className="text-base font-bold text-gray-900">No Services Found</h3>
+                <h3 className="text-base font-bold text-gray-900">
+                  {allServices.length === 0 ? 'No services have been listed yet' : 'No Services Match Your Filters'}
+                </h3>
                 <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                  Try clearing some filters or searching for different keywords to find available student talent.
+                  {allServices.length === 0 
+                    ? 'Be the first student to publish a service profile and monetize your skills across OOU.'
+                    : 'Try clearing some filters or searching for different keywords to find available student talent.'
+                  }
                 </p>
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="px-4 py-2 rounded-xl bg-[#061A4F] text-white text-xs font-bold"
-                >
-                  Clear All Filters
-                </button>
+                {allServices.length === 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/auth/register')}
+                    className="px-5 py-2.5 rounded-xl bg-[#061A4F] text-white text-xs font-bold hover:bg-[#0B2A6F] transition cursor-pointer"
+                  >
+                    List Your Service
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="px-4 py-2 rounded-xl bg-[#061A4F] text-white text-xs font-bold hover:bg-[#0B2A6F] transition cursor-pointer"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
