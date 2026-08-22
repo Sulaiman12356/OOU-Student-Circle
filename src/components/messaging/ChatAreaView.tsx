@@ -196,7 +196,7 @@ export const ChatAreaView: React.FC<ChatAreaViewProps> = ({
         senderName: currentUser.fullName,
         senderRole: currentUser.role,
         senderPhoto: currentUser.profilePhoto,
-        text: `Official Quote: ${title} — ₦${amount.toLocaleString()} (${delivery})`,
+        text: `Official Quote: ${title} : ₦${amount.toLocaleString()} (${delivery})`,
         quoteData: {
           quoteId,
           title,

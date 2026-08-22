@@ -89,7 +89,7 @@ export const MessagingTestHarness: React.FC<MessagingTestHarnessProps> = ({
 
   const handleDispatchNotification = async () => {
     const notif = await MessagingStore.dispatchSampleNotification(currentUser.id, selectedNotifType);
-    setActiveTestResult(`🔔 Dispatched Notification: "${notif.title}" — Check your notification bell and Notifications Center!`);
+    setActiveTestResult(`🔔 Dispatched Notification: "${notif.title}" : Check your notification bell and Notifications Center!`);
   };
 
   return (
@@ -245,7 +245,7 @@ export const MessagingTestHarness: React.FC<MessagingTestHarnessProps> = ({
           >
             {all15NotificationTypes.map((n) => (
               <option key={n.type} value={n.type}>
-                {n.label} — {n.desc}
+                {n.label} : {n.desc}
               </option>
             ))}
           </select>

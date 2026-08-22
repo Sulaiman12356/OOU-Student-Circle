@@ -582,12 +582,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       STUDENT CONNECT
                     </h3>
                     <div className="text-xs font-bold text-[#061A4F] mt-1">
-                      Connect across OOU campuses.
+                      Connect across OOU.
                     </div>
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Discover peers by faculty, department, level, creative interests, and technical skills across Ago-Iwoye, Ibogun, Ayetoro, and Sagamu.
+                    Meet and connect with students across OOU. Discover people with similar interests, skills and goals.
                   </p>
                 </div>
 
@@ -595,7 +595,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('/student-connect')}
                   className="interactive-btn w-full py-3 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Connect with Students</span>
+                  <span>Connect With Students</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -620,12 +620,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       STUDENT SERVICES
                     </h3>
                     <div className="text-xs font-bold text-[#061A4F] mt-1">
-                      Discover student professionals.
+                      Skills and freelance services.
                     </div>
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Hire verified student graphic designers, developers, academic typists, tutors, and technicians with clear milestone protection.
+                    Find students who can help with real services, or create a profile and offer your own skills.
                   </p>
                 </div>
 
@@ -633,7 +633,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('/explore')}
                   className="interactive-btn w-full py-3 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Find Student Services</span>
+                  <span>Find a Service</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -658,12 +658,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       MARKETPLACE
                     </h3>
                     <div className="text-xs font-bold text-[#061A4F] mt-1">
-                      Discover products from student vendors.
+                      Campus buying and selling.
                     </div>
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Shop student-crafted campus fashion, tech accessories, snacks, pastries, course materials, and hostel essentials from verified makers.
+                    Buy and sell products from student vendors around your campus.
                   </p>
                 </div>
 
@@ -696,12 +696,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       CAMPUS HUB
                     </h3>
                     <div className="text-xs font-bold text-[#061A4F] mt-1">
-                      Find campus businesses before arriving.
+                      Motion Ground and local shops.
                     </div>
                   </div>
 
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Pre-order online document printing, thesis hardcover binding, screening assistance, and passport photography at Motion Ground.
+                    Find campus shops and everyday services before you get there.
                   </p>
                 </div>
 
@@ -709,7 +709,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('/campus')}
                   className="interactive-btn w-full py-3 px-4 bg-slate-50 hover:bg-[#061A4F] text-[#061A4F] hover:text-white text-xs font-black rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Find Campus Hubs</span>
+                  <span>Register Your Shop</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -756,23 +756,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     <ul className="space-y-2.5">
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 flex-shrink-0" />
-                        <span><strong>Students have skills</strong> — but lack professional discovery.</span>
+                        <span><strong>Students have skills</strong>, but lack an easy way to be discovered.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 flex-shrink-0" />
-                        <span><strong>Students run businesses</strong> — but rely on fading WhatsApp statuses.</span>
+                        <span><strong>Students run businesses</strong>, but rely on short-lived status updates.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 flex-shrink-0" />
-                        <span><strong>Campus shops provide essential services</strong> — but students wait in long physical lines.</span>
+                        <span><strong>Campus shops provide essential services</strong>, but students wait in long physical lines.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 flex-shrink-0" />
-                        <span><strong>Clients need student talent</strong> — but worry about quality and upfront deposits.</span>
+                        <span><strong>Clients need student talent</strong>, but worry about reliability and upfront deposits.</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 flex-shrink-0" />
-                        <span><strong>Aspirants need reliable campus services</strong> — but arrive without verified local guidance.</span>
+                        <span><strong>Aspirants need reliable campus services</strong>, but arrive without verified local guidance.</span>
                       </li>
                     </ul>
                   </div>
@@ -1689,7 +1689,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       The idea for StudentCircle started from observing the everyday reality of campus life at OOU. Students with skills in graphic design, web development, video editing, baking, crafting, and document printing were scattered across WhatsApp status updates and word of mouth.
                     </p>
                     <p>
-                      The problem was never a lack of student talent or hard work — the problem was discovery. We created StudentCircle to bring Student Connect, Freelance Services, Campus Marketplace, and Motion Ground shops into one connected, verified ecosystem.
+                      The problem was never a lack of student talent or hard work. The problem was discovery and trust. We created StudentCircle to bring Student Connect, Student Services, Campus Marketplace, and Campus Hub into one connected platform.
                     </p>
                   </div>
 

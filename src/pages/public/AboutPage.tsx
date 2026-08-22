@@ -65,7 +65,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         <div className="bg-slate-50/90 rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-200 shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            {/* Founder Image Column — Original Photo */}
+            {/* Founder Image Column */}
             <div className="lg:col-span-5 flex flex-col items-center text-center space-y-5">
               <div className="relative group">
                 <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-slate-200 relative">
@@ -117,7 +117,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#061A4F] text-[#F5B400] text-xs font-black">
                 <Quote className="w-3.5 h-3.5" />
-                <span>FOUNDER MANIFESTO</span>
+                <span>FOUNDER PERSPECTIVE</span>
               </div>
 
               <div className="relative p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-xs">
@@ -127,16 +127,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 </p>
                 <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500">
                   <span className="w-2 h-2 rounded-full bg-[#F5B400]"></span>
-                  <span>— {founderConfig.name}, Founder</span>
+                  <span>{founderConfig.name}, Founder</span>
                 </div>
               </div>
 
               <div className="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
                 <p>
-                  "I didn't start StudentCircle to build a corporate software product. I started it because I am a student living through the very problems we are solving every single day. I saw brilliant graphic designers, coders, writers, campus bakers, craftspeople, and print shops operating in total isolation."
+                  "I did not start StudentCircle to build another corporate app. I started it because I am an OOU student experiencing the exact disconnects we are solving. I saw talented graphic designers, coders, writers, bakers, craftspeople, and print shops operating in isolation."
                 </p>
                 <p>
-                  "StudentCircle exists to eliminate the walls between talent and discovery, giving every hardworking student an honest, verified platform to thrive."
+                  "StudentCircle exists to connect student skills with real opportunities, giving hardworking students a clear, trusted place to be discovered."
                 </p>
               </div>
 
@@ -203,7 +203,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                         </span>
                         {ch.subtitle && (
                           <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
-                            — {ch.subtitle}
+                            : {ch.subtitle}
                           </span>
                         )}
                       </div>
