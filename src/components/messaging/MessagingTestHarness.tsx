@@ -87,8 +87,8 @@ export const MessagingTestHarness: React.FC<MessagingTestHarnessProps> = ({
     }
   };
 
-  const handleDispatchNotification = () => {
-    const notif = MessagingStore.dispatchSampleNotification(currentUser.id, selectedNotifType);
+  const handleDispatchNotification = async () => {
+    const notif = await MessagingStore.dispatchSampleNotification(currentUser.id, selectedNotifType);
     setActiveTestResult(`🔔 Dispatched Notification: "${notif.title}" — Check your notification bell and Notifications Center!`);
   };
 

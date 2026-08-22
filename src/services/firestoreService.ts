@@ -162,12 +162,17 @@ export class FirestoreService {
 
   // CONVERSATIONS & MESSAGES
   static subscribeToConversations(userId: string, callback: (conversations: Conversation[]) => void) {
-    if (!db) return () => {};
+    if (!db || !userId) return () => {};
     try {
       const colRef = collection(db, 'conversations');
       const q = query(colRef, where('participants', 'array-contains', userId));
       return onSnapshot(q, (snapshot) => {
-        const convos = snapshot.docs.map(d => d.data() as Conversation);
+        const convos = snapshot.docs.map(d => ({
+          id: d.id,
+          ...d.data()
+        } as Conversation));
+        // Sort in memory by lastMessageTimestamp descending
+        convos.sort((a, b) => new Date(b.lastMessageTimestamp || b.updatedAt || 0).getTime() - new Date(a.lastMessageTimestamp || a.updatedAt || 0).getTime());
         callback(convos);
       }, (err) => {
         console.warn('Conversations subscription notice:', err);
@@ -179,12 +184,15 @@ export class FirestoreService {
   }
 
   static subscribeToMessages(conversationId: string, callback: (messages: ChatMessage[]) => void) {
-    if (!db) return () => {};
+    if (!db || !conversationId) return () => {};
     try {
       const colRef = collection(db, `conversations/${conversationId}/messages`);
       const q = query(colRef, orderBy('timestamp', 'asc'));
       return onSnapshot(q, (snapshot) => {
-        const msgs = snapshot.docs.map(d => d.data() as ChatMessage);
+        const msgs = snapshot.docs.map(d => ({
+          id: d.id,
+          ...d.data()
+        } as ChatMessage));
         callback(msgs);
       }, (err) => {
         console.warn('Messages subscription notice:', err);
@@ -195,17 +203,28 @@ export class FirestoreService {
     }
   }
 
-  static async sendMessage(conversationId: string, message: ChatMessage): Promise<void> {
+  static async sendMessage(conversationId: string, message: ChatMessage, otherParticipantIds: string[] = []): Promise<void> {
     if (!db) return;
     try {
       const msgDocRef = doc(db, `conversations/${conversationId}/messages`, message.id);
       await setDoc(msgDocRef, message);
       
       const convoDocRef = doc(db, 'conversations', conversationId);
-      await updateDoc(convoDocRef, {
-        lastMessage: message.text,
-        lastMessageTimestamp: message.timestamp
+      const updatePayload: Record<string, any> = {
+        lastMessage: message.text || (message.images?.length ? 'Sent an image' : 'Sent an attachment'),
+        lastMessageTimestamp: message.timestamp,
+        lastMessageSenderId: message.senderId,
+        updatedAt: message.timestamp
+      };
+
+      // Increment unread count for other participants
+      otherParticipantIds.forEach(pId => {
+        if (pId !== message.senderId) {
+          updatePayload[`unreadCounts.${pId}`] = (updatePayload[`unreadCounts.${pId}`] || 0) + 1;
+        }
       });
+
+      await setDoc(convoDocRef, updatePayload, { merge: true });
     } catch (err) {
       console.warn('sendMessage notice:', err);
     }
@@ -221,37 +240,63 @@ export class FirestoreService {
     }
   }
 
-  // REVIEWS
-  static async getReviews(): Promise<ReviewItem[]> {
-    if (!db) return [];
+  static async markConversationAsRead(conversationId: string, userId: string): Promise<void> {
+    if (!db || !conversationId || !userId) return;
     try {
-      const colRef = collection(db, 'reviews');
-      const snap = await getDocs(colRef);
-      return snap.docs.map(d => d.data() as ReviewItem);
-    } catch (err) {
-      console.warn('getReviews notice:', err);
-      return [];
-    }
-  }
+      const convoDocRef = doc(db, 'conversations', conversationId);
+      await setDoc(convoDocRef, {
+        unreadCounts: {
+          [userId]: 0
+        }
+      }, { merge: true });
 
-  static async saveReview(review: ReviewItem): Promise<void> {
-    if (!db) return;
-    try {
-      const docRef = doc(db, 'reviews', review.id);
-      await setDoc(docRef, review);
+      // Mark unread messages in subcollection
+      const colRef = collection(db, `conversations/${conversationId}/messages`);
+      const q = query(colRef, where('read', '==', false));
+      const snap = await getDocs(q);
+      const updates = snap.docs
+        .filter(d => d.data().senderId !== userId)
+        .map(d => updateDoc(doc(db, `conversations/${conversationId}/messages`, d.id), { read: true }));
+      await Promise.all(updates);
     } catch (err) {
-      console.warn('saveReview notice:', err);
+      console.warn('markConversationAsRead notice:', err);
     }
   }
 
   // NOTIFICATIONS
+  static subscribeToNotifications(userId: string, callback: (notifications: AppNotification[]) => void) {
+    if (!db || !userId) return () => {};
+    try {
+      const colRef = collection(db, 'notifications');
+      const q = query(colRef, where('userId', '==', userId));
+      return onSnapshot(q, (snapshot) => {
+        const notifs = snapshot.docs.map(d => ({
+          id: d.id,
+          ...d.data()
+        } as AppNotification));
+        notifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        callback(notifs);
+      }, (err) => {
+        console.warn('Notifications subscription notice:', err);
+      });
+    } catch (err) {
+      console.warn('subscribeToNotifications error:', err);
+      return () => {};
+    }
+  }
+
   static async getNotifications(userId: string): Promise<AppNotification[]> {
-    if (!db) return [];
+    if (!db || !userId) return [];
     try {
       const colRef = collection(db, 'notifications');
       const q = query(colRef, where('userId', '==', userId));
       const snap = await getDocs(q);
-      return snap.docs.map(d => d.data() as AppNotification);
+      const notifs = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      } as AppNotification));
+      notifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return notifs;
     } catch (err) {
       console.warn('getNotifications notice:', err);
       return [];
@@ -262,9 +307,41 @@ export class FirestoreService {
     if (!db) return;
     try {
       const docRef = doc(db, 'notifications', notification.id);
-      await setDoc(docRef, notification);
+      await setDoc(docRef, notification, { merge: true });
     } catch (err) {
       console.warn('saveNotification notice:', err);
+    }
+  }
+
+  static async markNotificationAsRead(notificationId: string): Promise<void> {
+    if (!db || !notificationId) return;
+    try {
+      const docRef = doc(db, 'notifications', notificationId);
+      await updateDoc(docRef, { read: true });
+    } catch (err) {
+      console.warn('markNotificationAsRead notice:', err);
+    }
+  }
+
+  static async markAllNotificationsAsRead(userId: string): Promise<void> {
+    if (!db || !userId) return;
+    try {
+      const colRef = collection(db, 'notifications');
+      const q = query(colRef, where('userId', '==', userId), where('read', '==', false));
+      const snap = await getDocs(q);
+      const updates = snap.docs.map(d => updateDoc(doc(db, 'notifications', d.id), { read: true }));
+      await Promise.all(updates);
+    } catch (err) {
+      console.warn('markAllNotificationsAsRead notice:', err);
+    }
+  }
+
+  static async deleteNotification(notificationId: string): Promise<void> {
+    if (!db || !notificationId) return;
+    try {
+      await deleteDoc(doc(db, 'notifications', notificationId));
+    } catch (err) {
+      console.warn('deleteNotification notice:', err);
     }
   }
 

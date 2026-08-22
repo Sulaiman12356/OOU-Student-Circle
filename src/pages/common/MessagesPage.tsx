@@ -49,6 +49,11 @@ export const MessagesPage: React.FC<MessagesPageProps> = ({
   };
 
   useEffect(() => {
+    if (!effectiveUser?.id) return;
+
+    // Initialize real-time synchronization with Firestore
+    const cleanupSync = MessagingStore.initializeUserSync(effectiveUser.id);
+
     // Initial fetch of conversations for current user
     const userConvs = MessagingStore.getConversationsForUser(effectiveUser.id);
     setConversations(userConvs);
@@ -61,10 +66,18 @@ export const MessagesPage: React.FC<MessagesPageProps> = ({
     const unsubscribe = MessagingStore.subscribeConversations((allConvs) => {
       const filtered = allConvs.filter(c => c.participants.includes(effectiveUser.id));
       setConversations(filtered);
+      if (selectedConvId && !filtered.some(c => c.id === selectedConvId)) {
+        if (filtered.length > 0) {
+          setSelectedConvId(filtered[0].id);
+        }
+      }
     });
 
-    return () => unsubscribe();
-  }, [effectiveUser.id]);
+    return () => {
+      cleanupSync();
+      unsubscribe();
+    };
+  }, [effectiveUser.id, selectedConvId]);
 
   const selectedConversation = selectedConvId 
     ? MessagingStore.getConversationById(selectedConvId, effectiveUser.id)

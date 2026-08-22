@@ -68,12 +68,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   });
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser?.id) return;
+
+    // Initialize user sync for live Firestore unread counters and badge updates
+    const cleanupSync = MessagingStore.initializeUserSync(currentUser.id);
+
     const unsubscribe = MessagingStore.subscribeUnreadBadges(currentUser.id, ({ messages, notifications }) => {
       setUnreadMessagesCount(messages);
       setUnreadNotifs(notifications);
     });
-    return () => unsubscribe();
+
+    return () => {
+      cleanupSync();
+      unsubscribe();
+    };
   }, [currentUser?.id]);
 
   // Student Links

@@ -38,6 +38,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const [testType, setTestType] = useState<NotificationType>('connection_accepted');
 
   useEffect(() => {
+    if (!currentUser?.id) return;
+
+    // Initialize user sync for live Firestore notifications
+    const cleanupSync = MessagingStore.initializeUserSync(currentUser.id);
+
     // Initial fetch
     setNotifications(MessagingStore.getNotifications(currentUser.id));
 
@@ -46,7 +51,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       setNotifications(allNotifs.filter(n => n.userId === currentUser.id));
     });
 
-    return () => unsubscribe();
+    return () => {
+      cleanupSync();
+      unsubscribe();
+    };
   }, [currentUser.id]);
 
   const handleMarkAllRead = () => {

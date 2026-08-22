@@ -145,61 +145,68 @@ export const ChatAreaView: React.FC<ChatAreaViewProps> = ({
   const otherParticipantId = conversation.participants.find(id => id !== currentUser.id) || conversation.participants[0];
   const otherParticipant = conversation.participantDetails[otherParticipantId] || { name: 'StudentCircle Member', role: 'student' };
 
-  const handleSendMessage = (e?: React.FormEvent) => {
+  const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim() && selectedImages.length === 0 && selectedAttachments.length === 0) return;
 
     try {
-      MessagingStore.sendMessage({
-        conversationId: conversation.id,
-        senderId: currentUser.id,
-        senderName: currentUser.fullName,
-        senderRole: currentUser.role,
-        senderPhoto: currentUser.profilePhoto,
-        text: inputText.trim(),
-        images: selectedImages.length > 0 ? selectedImages : undefined,
-        attachments: selectedAttachments.length > 0 ? selectedAttachments : undefined
-      });
+      const textToSend = inputText.trim();
+      const imagesToSend = selectedImages.length > 0 ? [...selectedImages] : undefined;
+      const attachmentsToSend = selectedAttachments.length > 0 ? [...selectedAttachments] : undefined;
 
       setInputText('');
       setSelectedImages([]);
       setSelectedAttachments([]);
       setIsAttachmentMenuOpen(false);
-    } catch (err: any) {
-      alert(err.message || 'Could not send message');
-    }
-  };
 
-  const handleSendQuote = () => {
-    if (!quoteTitle.trim() || !quoteAmount || Number(quoteAmount) <= 0) {
-      alert('Please specify a valid quote scope title and price in Naira.');
-      return;
-    }
-
-    try {
-      const quoteId = `squote-${Date.now()}`;
-      MessagingStore.sendMessage({
+      await MessagingStore.sendMessage({
         conversationId: conversation.id,
         senderId: currentUser.id,
         senderName: currentUser.fullName,
         senderRole: currentUser.role,
         senderPhoto: currentUser.profilePhoto,
-        text: `Official Quote: ${quoteTitle.trim()} — ₦${Number(quoteAmount).toLocaleString()} (${quoteDelivery})`,
-        quoteData: {
-          quoteId,
-          title: quoteTitle.trim(),
-          amount: Number(quoteAmount),
-          deliveryTime: quoteDelivery,
-          status: 'pending'
-        }
+        text: textToSend,
+        images: imagesToSend,
+        attachments: attachmentsToSend
       });
+    } catch (err: any) {
+      console.warn('Could not send message:', err);
+    }
+  };
+
+  const handleSendQuote = async () => {
+    if (!quoteTitle.trim() || !quoteAmount || Number(quoteAmount) <= 0) {
+      return;
+    }
+
+    try {
+      const quoteId = `squote-${Date.now()}`;
+      const title = quoteTitle.trim();
+      const amount = Number(quoteAmount);
+      const delivery = quoteDelivery;
 
       setIsQuoteModalOpen(false);
       setQuoteTitle('');
       setQuoteAmount('');
       setIsAttachmentMenuOpen(false);
+
+      await MessagingStore.sendMessage({
+        conversationId: conversation.id,
+        senderId: currentUser.id,
+        senderName: currentUser.fullName,
+        senderRole: currentUser.role,
+        senderPhoto: currentUser.profilePhoto,
+        text: `Official Quote: ${title} — ₦${amount.toLocaleString()} (${delivery})`,
+        quoteData: {
+          quoteId,
+          title,
+          amount,
+          deliveryTime: delivery,
+          status: 'pending'
+        }
+      });
     } catch (err: any) {
-      alert(err.message || 'Could not send quote');
+      console.warn('Could not send quote:', err);
     }
   };
 

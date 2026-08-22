@@ -90,18 +90,67 @@
     },
     "ChatMessage": {
       "title": "ChatMessage",
-      "description": "A direct message between a student and a client.",
+      "description": "A direct message in a conversation between authenticated users.",
       "type": "object",
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
         "conversationId": { "type": "string", "maxLength": 128 },
         "senderId": { "type": "string", "maxLength": 128 },
         "senderName": { "type": "string", "maxLength": 120 },
-        "text": { "type": "string", "maxLength": 2000 },
+        "senderRole": { "type": "string", "enum": ["student", "client", "admin"] },
+        "senderPhoto": { "type": "string", "maxLength": 2048 },
+        "text": { "type": "string", "maxLength": 5000 },
         "timestamp": { "type": "string" },
-        "read": { "type": "boolean" }
+        "read": { "type": "boolean" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "attachments": { "type": "array", "items": { "type": "object" } },
+        "quoteData": { "type": "object" },
+        "orderData": { "type": "object" }
       },
       "required": ["id", "conversationId", "senderId", "text", "timestamp"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Real-time conversation thread between two or more authenticated users.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["student_connect", "service", "marketplace", "campus_service", "job", "direct"] },
+        "title": { "type": "string", "maxLength": 200 },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "participantDetails": { "type": "object" },
+        "context": { "type": "object" },
+        "lastMessage": { "type": "string", "maxLength": 5000 },
+        "lastMessageTimestamp": { "type": "string" },
+        "lastMessageSenderId": { "type": "string", "maxLength": 128 },
+        "unreadCounts": { "type": "object" },
+        "isPinned": { "type": "boolean" },
+        "isArchived": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "participants", "lastMessage", "lastMessageTimestamp", "createdAt", "updatedAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "Real-time user notification for platform events (messages, orders, requests, verifications, etc.).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "actorName": { "type": "string", "maxLength": 120 },
+        "actorPhoto": { "type": "string", "maxLength": 2048 },
+        "title": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "type": { "type": "string", "maxLength": 80 },
+        "category": { "type": "string", "enum": ["orders_escrow", "messages", "jobs_proposals", "social_campus", "system_security"] },
+        "link": { "type": "string", "maxLength": 500 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["id", "userId", "title", "message", "type", "read", "createdAt"]
     },
     "ReviewItem": {
       "title": "ReviewItem",
@@ -416,9 +465,17 @@
       "schema": { "$ref": "JobProposal" },
       "description": "Stores proposals submitted by students for jobs."
     },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "Conversation" },
+      "description": "Direct and contextual conversation threads between authenticated users."
+    },
     "/conversations/{conversationId}/messages/{messageId}": {
       "schema": { "$ref": "ChatMessage" },
-      "description": "Direct message threads between students and clients."
+      "description": "Direct message threads between students, clients, and campus vendors."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "AppNotification" },
+      "description": "User notification records for live events, messages, orders, and status changes."
     },
     "/reviews/{reviewId}": {
       "schema": { "$ref": "ReviewItem" },

@@ -19,6 +19,7 @@ import {
   ShoppingBag,
   Target,
   Compass,
+  Quote,
   Zap,
   Building2,
   Lock,
@@ -1626,27 +1627,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       <section id="founder-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <ScrollReveal direction="up" delay={0}>
-            <div className="bg-slate-50/90 rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-2xs max-w-5xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <ScrollReveal direction="up" delay={0} className="text-center max-w-3xl mx-auto space-y-3 mb-10">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
+              FOUNDER STORY
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
+              Meet the Founder Behind StudentCircle
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Built from a simple observation: student talent exists everywhere, but the connection between talent, services, and opportunity was missing.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal direction="up" delay={50}>
+            <div className="bg-slate-50/90 rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-200 shadow-2xs max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
                 
                 {/* Founder Image Column (ORIGINAL UNALTERED IMAGE) */}
                 <div className="md:col-span-5 flex flex-col items-center text-center">
-                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl overflow-hidden border-4 border-white shadow-md relative group">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl overflow-hidden border-4 border-white shadow-md relative group bg-slate-200">
                     <img 
                       src={founderConfig.photoUrl} 
                       alt={founderConfig.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top transition duration-500 group-hover:scale-105"
                     />
+                    <div className="absolute -bottom-2 -right-2 bg-[#061A4F] text-white px-3 py-1 rounded-full border-2 border-white shadow-xs flex items-center gap-1 text-[11px] font-black">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#F5B400]" />
+                      <span>Founder</span>
+                    </div>
                   </div>
+                  
                   <div className="mt-4 space-y-1">
-                    <h3 className="text-lg font-black text-[#061A4F]">
+                    <h3 className="text-xl font-black text-[#061A4F]">
                       {founderConfig.name}
                     </h3>
                     <p className="text-xs font-bold text-[#061A4F] bg-blue-100/70 px-2.5 py-0.5 rounded-full inline-block">
                       {founderConfig.role}
                     </p>
-                    <p className="text-xs text-slate-500 font-medium">
+                    <p className="text-xs text-slate-500 font-medium pt-0.5">
                       {founderConfig.department} • {founderConfig.level}
                     </p>
                     <p className="text-xs text-slate-400">
@@ -1655,46 +1673,45 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
-                {/* Founder Story Column */}
-                <div className="md:col-span-7 space-y-4 text-left">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#061A4F]/5 text-[#061A4F] text-xs font-black">
-                    <GraduationCap className="w-3.5 h-3.5" />
-                    <span>FOUNDER'S PERSPECTIVE</span>
+                {/* Founder Story Preview Column */}
+                <div className="md:col-span-7 space-y-5 text-left">
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                    <div className="flex items-start gap-2">
+                      <Quote className="w-6 h-6 text-[#F5B400] flex-shrink-0 mt-0.5" />
+                      <p className="text-xs sm:text-sm font-bold text-[#061A4F] leading-relaxed italic">
+                        "{founderConfig.quote}"
+                      </p>
+                    </div>
                   </div>
 
-                  <h4 className="text-xl sm:text-2xl font-black text-[#061A4F] leading-snug">
-                    "Empowering OOU students with authentic economic opportunities right from campus."
-                  </h4>
-
-                  <div className="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <div className="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
                     <p>
-                      As a Computer Science student at Olabisi Onabanjo University, I witnessed firsthand the immense pool of untapped student talent across our campuses — graphic designers, web developers, content writers, tutors, and vendors struggling to connect with clients who actively needed their skills.
+                      The idea for StudentCircle started from observing the everyday reality of campus life at OOU. Students with skills in graphic design, web development, video editing, baking, crafting, and document printing were scattered across WhatsApp status updates and word of mouth.
                     </p>
                     <p>
-                      Traditional freelancing platforms present high entry barriers, steep foreign currency hurdles, and lack local campus trust. Meanwhile, campus businesses, local organizations, and fellow students struggle to find affordable, dependable service providers nearby.
-                    </p>
-                    <p>
-                      I founded OOU StudentCircle to build a secure, verified, and campus-tailored marketplace. Our mission is to empower every skilled student to gain authentic work experience, build an unshakeable reputation, and earn sustainable income right from school.
+                      The problem was never a lack of student talent or hard work — the problem was discovery. We created StudentCircle to bring Student Connect, Freelance Services, Campus Marketplace, and Motion Ground shops into one connected, verified ecosystem.
                     </p>
                   </div>
 
-                  {/* Direct Connect Buttons */}
+                  {/* CTA & Connect Buttons */}
                   <div className="pt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => onNavigate('/about')}
+                      className="interactive-btn px-5 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs font-black rounded-xl transition flex items-center gap-2 shadow-xs cursor-pointer"
+                    >
+                      <span>Read the Full Founder Story</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#F5B400]" />
+                    </button>
+
                     <a
                       href={founderConfig.whatsappUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="interactive-btn px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl transition flex items-center gap-2 shadow-xs cursor-pointer"
+                      className="interactive-btn px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+                      title="Open direct WhatsApp chat with Onifade Sulaiman"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>WhatsApp Founder ({founderConfig.whatsappFormatted})</span>
-                    </a>
-                    <a
-                      href={founderConfig.emailUrl}
-                      className="interactive-btn px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 transition flex items-center gap-2 cursor-pointer"
-                    >
-                      <Mail className="w-4 h-4 text-[#061A4F]" />
-                      <span>Email Founder</span>
+                      <span>WhatsApp Founder</span>
                     </a>
                   </div>
 
@@ -1716,26 +1733,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             
             {/* Mission */}
             <ScrollReveal direction="right" delay={50}>
-              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold border border-blue-100">
-                  <Target className="w-5 h-5 text-[#061A4F]" />
+              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold border border-blue-100">
+                    <Target className="w-5 h-5 text-[#061A4F]" />
+                  </div>
+                  <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Mission</div>
+                  <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+                    "{founderConfig.mission}"
+                  </p>
                 </div>
-                <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Mission</div>
-                <p className="text-sm font-bold text-slate-800 leading-relaxed">
-                  "To make student talent easier to discover, student businesses easier to access, campus services easier to find and opportunities easier to reach."
+                <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">
+                  Making student talent and campus enterprises immediately accessible and rewarding.
                 </p>
               </div>
             </ScrollReveal>
 
             {/* Vision */}
             <ScrollReveal direction="left" delay={100}>
-              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 text-[#061A4F] flex items-center justify-center font-bold border border-amber-100">
-                  <Compass className="w-5 h-5 text-[#061A4F]" />
+              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 text-[#061A4F] flex items-center justify-center font-bold border border-amber-100">
+                    <Compass className="w-5 h-5 text-[#061A4F]" />
+                  </div>
+                  <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Vision</div>
+                  <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+                    "{founderConfig.vision}"
+                  </p>
                 </div>
-                <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Vision</div>
-                <p className="text-sm font-bold text-slate-800 leading-relaxed">
-                  "To build the digital infrastructure that connects student talent, commerce and opportunities across Nigerian tertiary institutions."
+                <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">
+                  Building a permanent bridge between student learning and lifelong economic opportunities.
                 </p>
               </div>
             </ScrollReveal>

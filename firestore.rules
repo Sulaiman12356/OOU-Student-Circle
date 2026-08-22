@@ -100,16 +100,34 @@ service cloud.firestore {
 
     // CONVERSATIONS & MESSAGES
     match /conversations/{conversationId} {
-      allow read: if isSignedIn() && request.auth.uid in resource.data.participants;
-      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participants;
-      allow update: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow read: if isSignedIn() && (request.auth.uid in resource.data.participants || isAdmin());
+      allow create: if isSignedIn() 
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.participants.size() >= 2
+        && request.resource.data.participants.size() <= 10;
+      allow update: if isSignedIn() && (
+        (request.auth.uid in resource.data.participants && request.resource.data.participants == resource.data.participants)
+        || isAdmin()
+      );
+      allow delete: if isAdmin();
 
       match /messages/{messageId} {
-        allow read: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+        allow read: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants ||
+          isAdmin()
+        );
         allow create: if isSignedIn() 
           && request.resource.data.senderId == request.auth.uid
-          && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
-        allow update: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+          && (
+            request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants ||
+            isAdmin()
+          )
+          && request.resource.data.text is string && request.resource.data.text.size() <= 5000;
+        allow update: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants ||
+          isAdmin()
+        );
+        allow delete: if isAdmin();
       }
     }
 
@@ -124,10 +142,12 @@ service cloud.firestore {
 
     // NOTIFICATIONS
     match /notifications/{notificationId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn();
-      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() 
+        && request.resource.data.userId is string
+        && request.resource.data.title is string && request.resource.data.title.size() <= 200;
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // VERIFICATION REQUESTS
