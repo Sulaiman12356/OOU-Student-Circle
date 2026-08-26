@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { OouLogo } from '../brand/OouLogo';
-import { Mail, MapPin, Send, CheckCircle2, MessageCircle } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle2, MessageCircle, ShieldCheck, KeyRound, Lock, Sparkles, ShieldAlert, Cpu } from 'lucide-react';
 import { founderConfig } from '../../config/founder';
+import { SUPER_ADMIN_EMAIL } from '../../types/admin';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
@@ -22,8 +23,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
   return (
     <footer className="bg-white border-t border-slate-200 text-slate-700 pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        {/* Main Columns Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-10 border-b border-slate-100">
           
           {/* Brand Col */}
           <div className="lg:col-span-2 space-y-4">
@@ -34,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <OouLogo size="md" />
             </div>
             <p className="text-sm text-slate-600 max-w-sm leading-relaxed">
-              Connecting student talent, businesses and opportunities around the OOU community.
+              Connecting student talent, businesses and opportunities around the OOU community across all 4 campuses.
             </p>
             <p className="text-xs text-slate-500">
               <strong className="text-[#061A4F]">Founder:</strong> {founderConfig.name}, {founderConfig.role}
@@ -76,49 +79,49 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <button onClick={() => onNavigate('/')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Home
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/student-connect')} className="text-slate-600 hover:text-[#061A4F] transition font-bold text-[#061A4F] flex items-center gap-1">
+                <button onClick={() => onNavigate('/student-connect')} className="text-slate-600 hover:text-[#061A4F] transition font-bold text-[#061A4F] flex items-center gap-1 cursor-pointer">
                   <span>Student Connect</span>
                   <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#F5B400] text-[#061A4F] font-black">HOT</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/about')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/about')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   About
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/explore')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/explore')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Services
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/marketplace')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/marketplace')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Marketplace
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/talent')} className="text-slate-600 hover:text-[#061A4F] transition">
-                  Jobs
+                <button onClick={() => onNavigate('/talent')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
+                  Jobs & Freelance
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/campus')} className="text-slate-600 hover:text-[#061A4F] transition font-bold text-[#061A4F] flex items-center gap-1">
+                <button onClick={() => onNavigate('/campus')} className="text-slate-600 hover:text-[#061A4F] transition font-bold text-[#061A4F] flex items-center gap-1 cursor-pointer">
                   <span>Campus Hub</span>
                   <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-[#F5B400] text-[#061A4F] font-black">NEW</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/contact')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/contact')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Contact
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/faq')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/faq')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   FAQ
                 </button>
               </li>
@@ -128,26 +131,26 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* For Students & Legal */}
           <div>
             <h4 className="text-sm font-bold text-[#061A4F] uppercase tracking-wider mb-4">
-              For Students
+              Students & Community
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <button onClick={() => onNavigate('/explore')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/explore')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Student Services
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/talent')} className="text-slate-600 hover:text-[#061A4F] transition">
+                <button onClick={() => onNavigate('/talent')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
                   Find Jobs
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/auth/register')} className="text-slate-600 hover:text-[#061A4F] transition font-semibold text-[#061A4F]">
-                  Create Profile
+                <button onClick={() => onNavigate('/auth/register')} className="text-slate-600 hover:text-[#061A4F] transition font-semibold text-[#061A4F] cursor-pointer">
+                  Create Student Profile
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/auth/register-aspirant')} className="text-amber-800 hover:text-[#061A4F] transition font-bold flex items-center gap-1">
+                <button onClick={() => onNavigate('/auth/register-aspirant')} className="text-amber-800 hover:text-[#061A4F] transition font-bold flex items-center gap-1 cursor-pointer">
                   <span>Aspirants Document Hub</span>
                 </button>
               </li>
@@ -158,48 +161,78 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <button onClick={() => onNavigate('/safety')} className="text-slate-600 hover:text-[#061A4F] transition font-medium flex items-center gap-1.5">
+                <button onClick={() => onNavigate('/safety')} className="text-slate-600 hover:text-[#061A4F] transition font-medium flex items-center gap-1.5 cursor-pointer">
                   <span>Safety & Escrow Guide</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/terms')} className="text-slate-600 hover:text-[#061A4F] transition font-medium">
+                <button onClick={() => onNavigate('/terms')} className="text-slate-600 hover:text-[#061A4F] transition font-medium cursor-pointer">
                   Terms of Service
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/privacy')} className="text-slate-600 hover:text-[#061A4F] transition font-medium">
+                <button onClick={() => onNavigate('/privacy')} className="text-slate-600 hover:text-[#061A4F] transition font-medium cursor-pointer">
                   Privacy Policy
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* For Businesses */}
-          <div className="lg:col-span-1">
-            <h4 className="text-sm font-bold text-[#061A4F] uppercase tracking-wider mb-4">
-              For Businesses
-            </h4>
-            <ul className="space-y-2.5 text-sm">
-              <li>
-                <button onClick={() => onNavigate('/client/discover')} className="text-slate-600 hover:text-[#061A4F] transition">
-                  Find Student Talent
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('/auth/register')} className="text-slate-600 hover:text-[#061A4F] transition">
-                  Post a Job
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('/campus/register-shop')} className="text-slate-600 hover:text-[#061A4F] transition font-semibold text-[#061A4F]">
-                  Register Your Shop
-                </button>
-              </li>
-            </ul>
+          {/* For Businesses & Admin Governance */}
+          <div className="lg:col-span-1 space-y-6">
+            <div>
+              <h4 className="text-sm font-bold text-[#061A4F] uppercase tracking-wider mb-4">
+                Businesses & Shops
+              </h4>
+              <ul className="space-y-2.5 text-sm">
+                <li>
+                  <button onClick={() => onNavigate('/client/discover')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
+                    Find Student Talent
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => onNavigate('/auth/register')} className="text-slate-600 hover:text-[#061A4F] transition cursor-pointer">
+                    Post a Client Job
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => onNavigate('/campus/register-shop')} className="text-slate-600 hover:text-[#061A4F] transition font-semibold text-[#061A4F] cursor-pointer">
+                    Register Campus Shop
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Governance quick links */}
+            <div>
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F5B400]" />
+                <span>Governance & Admin</span>
+              </h4>
+              <ul className="space-y-1.5 text-xs">
+                <li>
+                  <button onClick={() => onNavigate('/admin/login')} className="text-[#061A4F] hover:underline font-bold flex items-center gap-1.5 cursor-pointer">
+                    <KeyRound className="w-3 h-3 text-[#F5B400]" />
+                    <span>Admin Setup & Login</span>
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => onNavigate('/admin/superadmin')} className="text-slate-600 hover:text-[#061A4F] transition flex items-center gap-1.5 cursor-pointer">
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <span>SuperAdmin Console</span>
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => onNavigate('/admin/security-test')} className="text-slate-500 hover:text-[#061A4F] transition flex items-center gap-1.5 cursor-pointer">
+                    <Cpu className="w-3 h-3 text-slate-400" />
+                    <span>RBAC Security Suite</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
 
             {/* Newsletter */}
-            <div className="mt-6">
+            <div>
               <form onSubmit={handleSubscribe} className="space-y-2">
                 <label className="text-[11px] font-semibold text-slate-700 block">
                   Campus Updates
@@ -215,7 +248,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   />
                   <button
                     type="submit"
-                    className="px-3 py-2 bg-[#061A4F] text-white text-xs font-bold rounded-lg hover:bg-[#0B2A6F] transition flex-shrink-0"
+                    className="px-3 py-2 bg-[#061A4F] text-white text-xs font-bold rounded-lg hover:bg-[#0B2A6F] transition flex-shrink-0 cursor-pointer"
                   >
                     <Send className="w-3 h-3" />
                   </button>
@@ -232,14 +265,76 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         </div>
 
+        {/* Dedicated Admin Setup & Registration Banner Card */}
+        <div className="bg-linear-to-r from-[#040E29] to-[#061A4F] rounded-3xl p-6 sm:p-8 text-white border border-[#F5B400]/30 shadow-xl relative overflow-hidden">
+          <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-[#F5B400]/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+            
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#F5B400] text-xs font-black border border-white/10">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>PLATFORM GOVERNANCE & ADMIN ONBOARDING</span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-white">
+                Admin Setup & SuperAdmin Control Center
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Appointed university moderators and StudentCircle administrators can access the Control Center, manage verification queues, handle disputes, and configure RBAC roles.
+              </p>
+              <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+                <span>• Root SuperAdmin: <strong className="text-white">{SUPER_ADMIN_EMAIL}</strong></span>
+                <span>• Zero-Trust Role-Based Access Control</span>
+                <span>• Immutable Firestore Audit Logging</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto flex-shrink-0">
+              <button
+                id="footer-admin-login-btn"
+                onClick={() => onNavigate('/admin/login')}
+                className="w-full sm:w-auto px-5 py-3 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] text-xs font-black rounded-xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <KeyRound className="w-4 h-4 text-[#061A4F]" />
+                <span>Admin Login & Setup</span>
+              </button>
+
+              <button
+                id="footer-superadmin-btn"
+                onClick={() => onNavigate('/admin/superadmin')}
+                className="w-full sm:w-auto px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-[#F5B400]" />
+                <span>SuperAdmin Center</span>
+              </button>
+
+              <button
+                id="footer-security-test-btn"
+                onClick={() => onNavigate('/admin/security-test')}
+                className="w-full sm:w-auto px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>RBAC Test Lab</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
         {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} OOU StudentCircle. All rights reserved. Founded by {founderConfig.name} ({founderConfig.alias}).</p>
           <div className="flex items-center space-x-6">
+            <button onClick={() => onNavigate('/admin/login')} className="text-slate-400 hover:text-[#061A4F] transition text-[11px] flex items-center gap-1 cursor-pointer">
+              <Lock className="w-3 h-3" />
+              <span>Admin Portal</span>
+            </button>
             <span className="text-slate-400">One Platform. Four Ways to Move Forward.</span>
           </div>
         </div>
+
       </div>
     </footer>
   );
 };
+
