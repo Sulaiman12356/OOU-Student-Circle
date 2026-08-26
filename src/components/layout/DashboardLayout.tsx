@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { OouLogo } from '../brand/OouLogo';
 import { DataStore } from '../../services/dataStore';
 import { MessagingStore } from '../../services/messagingStore';
@@ -55,7 +56,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onNavigate
 }) => {
   const { currentUser, logout } = useAuth();
+  const { adminProfile, isSuperAdmin, logoutAdmin, isAdminAuthenticated } = useAdminAuth();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const isAdminRoute = currentPath === '/admin' || currentPath.startsWith('/admin/');
 
   // Reactive unread notifications & messages
   const [unreadNotifs, setUnreadNotifs] = useState<number>(() => 
@@ -120,10 +124,65 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { label: 'Settings', path: '/client/settings', icon: Settings },
   ];
 
+  // Aspirant Links
+  const aspirantNavItems: NavItem[] = [
+    { label: 'Aspirant Portal', path: '/aspirant/dashboard', icon: LayoutDashboard },
+    { label: 'Campus Services Hub', path: '/campus', icon: MapPin },
+    { label: 'Motion Ground Printing', path: '/campus', icon: Store },
+    { label: 'Connect With Mentors', path: '/connect', icon: Users },
+    { label: 'Campus Locations', path: '/campus/locations', icon: MapPin },
+    { label: 'Campus Marketplace', path: '/marketplace', icon: ShoppingBag },
+    { label: 'Orders & Receipts', path: '/orders', icon: FileText },
+    { label: 'Messages', path: '/student/messages', icon: MessageSquare, badge: unreadMessagesCount },
+    { label: 'Notifications', path: '/student/notifications', icon: Bell, badge: unreadNotifs },
+    { label: 'Settings', path: '/settings', icon: Settings },
+  ];
+
+  // Service Provider Links
+  const providerNavItems: NavItem[] = [
+    { label: 'Provider Studio', path: '/provider/dashboard', icon: LayoutDashboard },
+    { label: 'Orders & Escrow', path: '/orders', icon: ShoppingBag, highlight: true },
+    { label: 'My Services', path: '/student/services', icon: Sparkles },
+    { label: 'Client Requests & Quotes', path: '/orders', icon: Send },
+    { label: 'Browse Jobs', path: '/student/jobs', icon: Briefcase },
+    { label: 'Student Connect', path: '/connect', icon: Users },
+    { label: 'Campus Services Hub', path: '/campus', icon: MapPin },
+    { label: 'Marketplace', path: '/marketplace', icon: Store },
+    { label: 'Client Reviews', path: '/student/reviews', icon: Star },
+    { label: 'Earnings & Wallet', path: '/student/earnings', icon: Wallet },
+    { label: 'Messages', path: '/student/messages', icon: MessageSquare, badge: unreadMessagesCount },
+    { label: 'Notifications', path: '/student/notifications', icon: Bell, badge: unreadNotifs },
+    { label: 'Settings', path: '/student/settings', icon: Settings },
+  ];
+
+  // Campus Shop Links
+  const campusShopNavItems: NavItem[] = [
+    { label: 'Shop Dashboard', path: '/campus/shop-dashboard', icon: LayoutDashboard },
+    { label: 'Print Jobs & Orders', path: '/campus/shop-dashboard', icon: ShoppingBag, highlight: true },
+    { label: 'Campus Services Hub', path: '/campus', icon: MapPin },
+    { label: 'Campus Marketplace', path: '/marketplace', icon: Store },
+    { label: 'Messages', path: '/student/messages', icon: MessageSquare, badge: unreadMessagesCount },
+    { label: 'Notifications', path: '/student/notifications', icon: Bell, badge: unreadNotifs },
+    { label: 'Settings', path: '/settings', icon: Settings },
+  ];
+
+  // Market Vendor Links
+  const vendorNavItems: NavItem[] = [
+    { label: 'Vendor Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
+    { label: 'Product Catalog', path: '/vendor/dashboard', icon: ShoppingBag },
+    { label: 'Customer Orders', path: '/vendor/dashboard', icon: FileText, highlight: true },
+    { label: 'Campus Marketplace', path: '/marketplace', icon: Store },
+    { label: 'Campus Services Hub', path: '/campus', icon: MapPin },
+    { label: 'Messages', path: '/student/messages', icon: MessageSquare, badge: unreadMessagesCount },
+    { label: 'Notifications', path: '/student/notifications', icon: Bell, badge: unreadNotifs },
+    { label: 'Settings', path: '/settings', icon: Settings },
+  ];
+
   // Admin Links
   const adminNavItems: NavItem[] = [
+    ...(isSuperAdmin ? [{ label: 'SuperAdmin Center', path: '/admin/superadmin', icon: ShieldCheck, highlight: true }] : []),
     { label: 'Admin Overview', path: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'Platform Analytics', path: '/admin/analytics', icon: DollarSign, highlight: true },
+    { label: 'Platform Analytics', path: '/admin/analytics', icon: DollarSign },
     { label: 'User Management', path: '/admin/users', icon: Users },
     { label: 'Student Verification', path: '/admin/verification', icon: ShieldCheck },
     { label: 'Opportunities Moderation', path: '/admin/jobs', icon: FolderKanban },
@@ -135,29 +194,69 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { label: 'Media Moderation', path: '/admin/media', icon: ShieldCheck },
     { label: 'Activity Logs', path: '/admin/activity', icon: FileText },
     { label: 'Platform Settings', path: '/admin/settings', icon: Sliders },
-    { label: 'Admin Staff RBAC', path: '/admin/settings/administrators', icon: Users },
+    ...(isSuperAdmin ? [{ label: 'Staff Provisioning (RBAC)', path: '/admin/superadmin/admins', icon: Users }] : []),
   ];
 
   const getNavItems = () => {
-    if (currentUser?.role === 'admin') return adminNavItems;
-    if (currentUser?.role === 'client') return clientNavItems;
+    if (isAdminRoute || currentUser?.role === 'admin' || currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') {
+      return adminNavItems;
+    }
+    const roleLower = (currentUser?.role || '').toLowerCase();
+    if (roleLower === 'client') return clientNavItems;
+    if (roleLower === 'aspirant') return aspirantNavItems;
+    if (roleLower === 'service_provider') return providerNavItems;
+    if (roleLower === 'campus_shop_owner' || roleLower === 'shop_owner') return campusShopNavItems;
+    if (roleLower === 'market_vendor' || roleLower === 'vendor') return vendorNavItems;
     return studentNavItems;
   };
 
   const navItems = getNavItems();
 
   const getRoleBadge = () => {
-    if (currentUser?.role === 'admin') {
+    if (isAdminRoute || currentUser?.role === 'admin' || currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') {
       return (
-        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 text-purple-900 border border-purple-200">
-          Admin Portal
+        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${
+          isSuperAdmin 
+            ? 'bg-[#F5B400]/20 text-[#F5B400] border-[#F5B400]/40' 
+            : 'bg-purple-100 text-purple-900 border-purple-200'
+        }`}>
+          {isSuperAdmin ? 'SUPER_ADMIN' : 'ADMIN STAFF'}
         </span>
       );
     }
-    if (currentUser?.role === 'client') {
+    const roleLower = (currentUser?.role || '').toLowerCase();
+    if (roleLower === 'client') {
       return (
         <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-200">
           Client Account
+        </span>
+      );
+    }
+    if (roleLower === 'aspirant') {
+      return (
+        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-900 border border-indigo-200">
+          OOU Aspirant
+        </span>
+      );
+    }
+    if (roleLower === 'service_provider') {
+      return (
+        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-900 border border-blue-200">
+          Service Provider
+        </span>
+      );
+    }
+    if (roleLower === 'campus_shop_owner' || roleLower === 'shop_owner') {
+      return (
+        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-orange-100 text-orange-900 border border-orange-200">
+          Campus Shop Owner
+        </span>
+      );
+    }
+    if (roleLower === 'market_vendor' || roleLower === 'vendor') {
+      return (
+        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-teal-100 text-teal-900 border border-teal-200">
+          Market Vendor
         </span>
       );
     }
@@ -168,6 +267,28 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       </span>
     );
   };
+
+  const handleSignOut = async () => {
+    if (isAdminRoute || isAdminAuthenticated) {
+      await logoutAdmin();
+      onNavigate('/admin/login');
+    } else {
+      logout();
+      onNavigate('/');
+    }
+  };
+
+  const activePhoto = isAdminRoute && adminProfile 
+    ? (adminProfile.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')
+    : (currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80');
+
+  const activeDisplayName = isAdminRoute && adminProfile
+    ? adminProfile.name
+    : (currentUser?.fullName || 'Guest User');
+
+  const activeSubtitle = isAdminRoute && adminProfile
+    ? (adminProfile.department || adminProfile.email)
+    : (currentUser?.department || currentUser?.businessName || currentUser?.role);
 
   return (
     <div className="min-h-screen bg-[#F7F9FC] flex flex-col md:flex-row text-slate-800">
@@ -192,16 +313,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         {/* Current User Snapshot */}
         <div className="p-4 border-b border-[#0B2A6F] bg-[#0B2A6F]/40 flex items-center gap-3">
           <img 
-            src={currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} 
-            alt={currentUser?.fullName || 'User'} 
+            src={activePhoto} 
+            alt={activeDisplayName} 
             className="w-10 h-10 rounded-full object-cover border-2 border-[#F5B400]"
           />
           <div className="min-w-0 flex-1">
             <div className="font-bold text-sm text-white truncate">
-              {currentUser?.fullName || 'Guest User'}
+              {activeDisplayName}
             </div>
             <div className="text-[11px] text-slate-300 truncate">
-              {currentUser?.department || currentUser?.businessName || currentUser?.role}
+              {activeSubtitle}
             </div>
             <div className="mt-1">
               {getRoleBadge()}
@@ -265,11 +386,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           )}
 
           <button
-            onClick={() => {
-              logout();
-              onNavigate('/');
-            }}
-            className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-300 hover:text-rose-400 transition hover:bg-white/5 rounded-lg"
+            onClick={handleSignOut}
+            className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-300 hover:text-rose-400 transition hover:bg-white/5 rounded-lg cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -284,7 +402,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onNavigate(currentUser?.role === 'admin' ? '/admin/notifications' : currentUser?.role === 'client' ? '/client/notifications' : '/student/notifications')}
+            onClick={() => onNavigate(isAdminRoute ? '/admin/notifications' : currentUser?.role === 'client' ? '/client/notifications' : '/student/notifications')}
             className="p-1.5 text-slate-300 hover:text-white relative"
           >
             <Bell className="w-5 h-5" />
@@ -308,13 +426,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#0B2A6F]">
               <div className="flex items-center gap-3">
                 <img 
-                  src={currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} 
-                  alt="Avatar" 
+                  src={activePhoto} 
+                  alt={activeDisplayName} 
                   className="w-9 h-9 rounded-full object-cover border-2 border-[#F5B400]" 
                 />
                 <div>
-                  <div className="font-bold text-sm">{currentUser?.fullName}</div>
-                  <div className="text-xs text-slate-300">{currentUser?.department || currentUser?.role}</div>
+                  <div className="font-bold text-sm">{activeDisplayName}</div>
+                  <div className="text-xs text-slate-300">{activeSubtitle}</div>
                 </div>
               </div>
               <button 
@@ -367,11 +485,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               </button>
               <button
                 onClick={() => {
-                  logout();
                   setMobileSidebarOpen(false);
-                  onNavigate('/');
+                  handleSignOut();
                 }}
-                className="text-xs text-rose-400 hover:text-rose-300 font-semibold"
+                className="text-xs text-rose-400 hover:text-rose-300 font-semibold cursor-pointer"
               >
                 Sign Out
               </button>
@@ -398,7 +515,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <div className="flex items-center space-x-4">
             {/* Notifications link */}
             <button
-              onClick={() => onNavigate(currentUser?.role === 'admin' ? '/admin/notifications' : currentUser?.role === 'client' ? '/client/notifications' : '/student/notifications')}
+              onClick={() => onNavigate(isAdminRoute ? '/admin/notifications' : currentUser?.role === 'client' ? '/client/notifications' : '/student/notifications')}
               className="p-2 text-slate-500 hover:text-[#061A4F] hover:bg-slate-100 rounded-lg relative transition"
               title="Notifications"
             >
@@ -410,7 +527,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             {/* Messages link */}
             <button
-              onClick={() => onNavigate(currentUser?.role === 'admin' ? '/admin' : currentUser?.role === 'client' ? '/client/messages' : '/student/messages')}
+              onClick={() => onNavigate(isAdminRoute ? '/admin/messages' : currentUser?.role === 'client' ? '/client/messages' : '/student/messages')}
               className="p-2 text-slate-500 hover:text-[#061A4F] hover:bg-slate-100 rounded-lg relative transition"
               title="Messages"
             >
@@ -422,17 +539,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             {/* User pill */}
             <div 
-              onClick={() => onNavigate(currentUser?.role === 'admin' ? '/admin/settings' : currentUser?.role === 'client' ? '/client/profile' : '/student/profile')}
+              onClick={() => onNavigate(isAdminRoute ? (isSuperAdmin ? '/admin/superadmin' : '/admin/dashboard') : currentUser?.role === 'client' ? '/client/profile' : '/student/profile')}
               className="flex items-center gap-2 pl-3 border-l border-slate-200 cursor-pointer hover:opacity-80 transition"
             >
               <img 
-                src={currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} 
-                alt="Avatar" 
+                src={activePhoto} 
+                alt={activeDisplayName} 
                 className="w-8 h-8 rounded-full object-cover border border-slate-200" 
               />
               <div className="text-left leading-none hidden lg:block">
-                <div className="text-xs font-bold text-slate-800">{currentUser?.fullName}</div>
-                <div className="text-[10px] text-slate-400 capitalize mt-0.5">{currentUser?.role}</div>
+                <div className="text-xs font-bold text-slate-800">{activeDisplayName}</div>
+                <div className="text-[10px] text-slate-400 capitalize mt-0.5">{isAdminRoute ? (isSuperAdmin ? 'Super Administrator' : 'Administrator') : currentUser?.role}</div>
               </div>
             </div>
           </div>

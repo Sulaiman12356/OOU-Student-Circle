@@ -5,21 +5,24 @@ import {
   getDocs, 
   setDoc, 
   updateDoc, 
+  deleteDoc,
   query, 
   where, 
   orderBy, 
   limit, 
-  serverTimestamp,
-  addDoc
+  serverTimestamp
 } from 'firebase/firestore';
-import { db, auth } from './firebase';
+import { db } from './firebase';
 import { 
   AdminProfile, 
   AdminRole, 
   AdminStatus, 
   AdminPermission, 
   AdminActivityLog, 
+  SecurityEvent,
   ALL_ADMIN_PERMISSIONS, 
+  SUPER_ADMIN_PERMISSIONS,
+  DEFAULT_ADMIN_PERMISSIONS,
   SUPER_ADMIN_EMAIL 
 } from '../types/admin';
 import { DataStore } from './dataStore';
@@ -46,12 +49,11 @@ export interface PlatformLiveStats {
 }
 
 export class AdminService {
-  // 1. GET ADMIN PROFILE
+  // 1. GET ADMIN PROFILE FROM FIRESTORE
   static async getAdminProfile(uid: string): Promise<AdminProfile | null> {
     if (!db) {
-      // Fallback local memory for offline/demo if DB unavailable
-      const stored = localStorage.getItem(`oou_admin_profile_${uid}`);
-      return stored ? JSON.parse(stored) : null;
+      console.warn('Firestore db not initialized in getAdminProfile');
+      return null;
     }
 
     try {
@@ -59,35 +61,33 @@ export class AdminService {
       const snap = await getDoc(docRef);
       if (snap.exists()) {
         const data = snap.data() as AdminProfile;
-        localStorage.setItem(`oou_admin_profile_${uid}`, JSON.stringify(data));
         return data;
       }
       return null;
     } catch (err) {
-      console.warn('AdminService.getAdminProfile notice:', err);
-      const stored = localStorage.getItem(`oou_admin_profile_${uid}`);
-      return stored ? JSON.parse(stored) : null;
+      console.error('AdminService.getAdminProfile error:', err);
+      return null;
     }
   }
 
-  // 2. BOOTSTRAP SUPER ADMIN
+  // 2. BOOTSTRAP SUPER ADMIN ACCOUNT IN FIRESTORE
   static async bootstrapSuperAdmin(user: { uid: string; email: string; name?: string }): Promise<AdminProfile> {
     const isSuperAdminEmail = user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
-    const allPerms: AdminPermission[] = ALL_ADMIN_PERMISSIONS.map(p => p.key);
+    const cleanEmail = user.email.toLowerCase();
 
     const adminProfile: AdminProfile = {
       uid: user.uid,
-      name: user.name || (isSuperAdminEmail ? 'Sulaiman Ipesola (Super Admin)' : 'OOU Administrator'),
-      email: user.email.toLowerCase(),
-      role: isSuperAdminEmail ? 'super_admin' : 'admin',
+      name: user.name || (isSuperAdminEmail ? 'Sulaiman Ipesola' : 'OOU Administrator'),
+      email: cleanEmail,
+      role: isSuperAdminEmail ? 'SUPER_ADMIN' : 'ADMIN',
       status: 'active',
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
       createdBy: 'system_bootstrap',
-      permissions: allPerms,
+      permissions: isSuperAdminEmail ? SUPER_ADMIN_PERMISSIONS : DEFAULT_ADMIN_PERMISSIONS,
       lastActivityAt: new Date().toISOString(),
       profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-      department: 'Platform Governance'
+      department: isSuperAdminEmail ? 'Platform Governance & Executive Direction' : 'Campus Operations'
     };
 
     if (db) {
@@ -95,99 +95,115 @@ export class AdminService {
         const docRef = doc(db, 'admins', user.uid);
         await setDoc(docRef, adminProfile, { merge: true });
         
-        // Also update users collection role
+        // Also update users collection for role synchronization
         const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { role: 'admin', updatedAt: new Date().toISOString() }, { merge: true });
+        await setDoc(userDocRef, {
+          id: user.uid,
+          email: cleanEmail,
+          fullName: adminProfile.name,
+          role: isSuperAdminEmail ? 'SUPER_ADMIN' : 'ADMIN',
+          status: 'active',
+          isVerified: true,
+          verificationStatus: 'verified',
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        // Record security audit
+        await this.recordSecurityEvent({
+          type: 'superadmin_bootstrap',
+          severity: 'high',
+          userId: user.uid,
+          email: cleanEmail,
+          description: `Super Administrator bootstrap verified for ${cleanEmail}`
+        });
+
       } catch (err) {
-        console.warn('AdminService.bootstrapSuperAdmin write notice:', err);
+        console.error('AdminService.bootstrapSuperAdmin error:', err);
       }
     }
 
-    // Save locally
-    localStorage.setItem(`oou_admin_profile_${user.uid}`, JSON.stringify(adminProfile));
-
-    // Record audit log
+    // Record immutable audit log
     await this.logActivity({
       adminId: user.uid,
-      adminEmail: user.email,
-      action: 'SYSTEM_BOOTSTRAP_SUPER_ADMIN',
+      adminEmail: cleanEmail,
+      adminName: adminProfile.name,
+      action: 'BOOTSTRAP_SUPERADMIN_ACCOUNT',
       targetType: 'admin',
       targetId: user.uid,
-      description: `Super Administrator initialized via secure bootstrap for ${user.email}`
+      description: `Super Administrator account bootstrapped for ${cleanEmail}`
     });
 
     return adminProfile;
   }
 
-  // 3. CREATE NEW ADMINISTRATOR (Super Admin only)
+  // 3. CREATE NEW ADMINISTRATOR (SuperAdmin Only)
   static async createAdministrator(
     creatorAdmin: AdminProfile,
     data: {
       uid: string;
       name: string;
       email: string;
-      role: AdminRole;
+      role: 'SUPER_ADMIN' | 'ADMIN' | 'super_admin' | 'admin';
       permissions: AdminPermission[];
       department?: string;
     }
   ): Promise<AdminProfile> {
-    if (creatorAdmin.role !== 'super_admin') {
-      throw new Error('Only the Super Administrator can provision new administrator accounts.');
+    const isSuper = creatorAdmin.role === 'SUPER_ADMIN' || creatorAdmin.role === 'super_admin';
+    if (!isSuper) {
+      throw new Error('Access Denied: Only Super Administrators can provision new administrator accounts.');
     }
+
+    const cleanEmail = data.email.toLowerCase().trim();
+    const normalizedRole = (data.role === 'SUPER_ADMIN' || data.role === 'super_admin') ? 'SUPER_ADMIN' : 'ADMIN';
 
     const newAdmin: AdminProfile = {
       uid: data.uid,
-      name: data.name,
-      email: data.email.toLowerCase(),
-      role: data.role,
+      name: data.name.trim(),
+      email: cleanEmail,
+      role: normalizedRole,
       status: 'active',
       createdAt: new Date().toISOString(),
-      lastLoginAt: 'Never',
+      lastLoginAt: 'Never logged in',
       createdBy: creatorAdmin.uid,
-      permissions: data.permissions,
+      permissions: normalizedRole === 'SUPER_ADMIN' ? SUPER_ADMIN_PERMISSIONS : data.permissions,
       lastActivityAt: new Date().toISOString(),
-      department: data.department || 'Campus Moderation'
+      department: data.department || 'Campus Operations & Moderation'
     };
 
     if (db) {
-      try {
-        const docRef = doc(db, 'admins', newAdmin.uid);
-        await setDoc(docRef, newAdmin);
+      const docRef = doc(db, 'admins', newAdmin.uid);
+      await setDoc(docRef, newAdmin);
 
-        // Ensure users collection reflects admin role
-        const userDocRef = doc(db, 'users', newAdmin.uid);
-        await setDoc(userDocRef, {
-          id: newAdmin.uid,
-          email: newAdmin.email,
-          fullName: newAdmin.name,
-          role: 'admin',
-          status: 'active',
-          isVerified: true,
-          verificationStatus: 'verified',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (err) {
-        console.warn('AdminService.createAdministrator write notice:', err);
-      }
+      // Sync role in users collection
+      const userDocRef = doc(db, 'users', newAdmin.uid);
+      await setDoc(userDocRef, {
+        id: newAdmin.uid,
+        email: cleanEmail,
+        fullName: newAdmin.name,
+        role: normalizedRole,
+        status: 'active',
+        isVerified: true,
+        verificationStatus: 'verified',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
     }
-
-    localStorage.setItem(`oou_admin_profile_${newAdmin.uid}`, JSON.stringify(newAdmin));
 
     // Audit log
     await this.logActivity({
       adminId: creatorAdmin.uid,
       adminEmail: creatorAdmin.email,
-      action: 'CREATE_ADMINISTRATOR',
+      adminName: creatorAdmin.name,
+      action: 'CREATE_ADMIN_ACCOUNT',
       targetType: 'admin',
       targetId: newAdmin.uid,
-      description: `Created administrator ${newAdmin.name} (${newAdmin.email}) with ${newAdmin.permissions.length} permissions.`
+      description: `SuperAdmin ${creatorAdmin.name} created admin account for ${newAdmin.name} (${newAdmin.email}) with ${newAdmin.permissions.length} permissions.`
     });
 
     return newAdmin;
   }
 
-  // 4. LIST ALL ADMINISTRATORS
+  // 4. LIST ALL ADMINISTRATORS FROM FIRESTORE
   static async listAdministrators(): Promise<AdminProfile[]> {
     if (db) {
       try {
@@ -197,47 +213,36 @@ export class AdminService {
           return snap.docs.map(d => d.data() as AdminProfile);
         }
       } catch (err) {
-        console.warn('AdminService.listAdministrators notice:', err);
+        console.error('AdminService.listAdministrators error:', err);
       }
     }
-
-    // Default return super admin if local
-    const fallback: AdminProfile[] = [
-      {
-        uid: 'super-admin-1',
-        name: 'Sulaiman Ipesola (Super Admin)',
-        email: SUPER_ADMIN_EMAIL,
-        role: 'super_admin',
-        status: 'active',
-        createdAt: '2026-08-01T00:00:00Z',
-        lastLoginAt: new Date().toISOString(),
-        createdBy: 'system_bootstrap',
-        permissions: ALL_ADMIN_PERMISSIONS.map(p => p.key),
-        department: 'Platform Governance & Safety'
-      }
-    ];
-    return fallback;
+    return [];
   }
 
-  // 5. UPDATE ADMINISTRATOR (Status or Permissions)
+  // 5. UPDATE ADMINISTRATOR (SuperAdmin Only)
   static async updateAdministrator(
     editorAdmin: AdminProfile,
     targetUid: string,
-    updates: Partial<Pick<AdminProfile, 'status' | 'permissions' | 'role' | 'name'>>
+    updates: Partial<Pick<AdminProfile, 'status' | 'permissions' | 'role' | 'name' | 'department'>>
   ): Promise<void> {
-    if (editorAdmin.role !== 'super_admin') {
-      throw new Error('Only Super Administrators can modify administrator privileges or status.');
+    const isSuper = editorAdmin.role === 'SUPER_ADMIN' || editorAdmin.role === 'super_admin';
+    if (!isSuper) {
+      throw new Error('Access Denied: Only Super Administrators can modify administrator permissions or status.');
     }
 
     if (db) {
-      try {
-        const docRef = doc(db, 'admins', targetUid);
-        await updateDoc(docRef, {
-          ...updates,
-          lastActivityAt: new Date().toISOString()
-        });
-      } catch (err) {
-        console.warn('AdminService.updateAdministrator write notice:', err);
+      const docRef = doc(db, 'admins', targetUid);
+      await updateDoc(docRef, {
+        ...updates,
+        lastActivityAt: new Date().toISOString()
+      });
+
+      if (updates.role) {
+        const userDocRef = doc(db, 'users', targetUid);
+        await updateDoc(userDocRef, {
+          role: updates.role,
+          updatedAt: new Date().toISOString()
+        }).catch(() => null);
       }
     }
 
@@ -245,17 +250,65 @@ export class AdminService {
     await this.logActivity({
       adminId: editorAdmin.uid,
       adminEmail: editorAdmin.email,
-      action: 'UPDATE_ADMINISTRATOR',
+      adminName: editorAdmin.name,
+      action: 'UPDATE_ADMIN_ACCOUNT',
       targetType: 'admin',
       targetId: targetUid,
-      description: `Updated admin ${targetUid}: ${JSON.stringify(updates)}`
+      description: `SuperAdmin ${editorAdmin.name} updated admin ${targetUid}: ${JSON.stringify(updates)}`
     });
   }
 
-  // 6. RECORD AUDIT LOG (Append-only)
+  // 6. DEACTIVATE ADMINISTRATOR
+  static async deactivateAdministrator(editorAdmin: AdminProfile, targetUid: string, targetEmail: string): Promise<void> {
+    if (targetEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+      throw new Error('Root Super Administrator cannot be deactivated.');
+    }
+    await this.updateAdministrator(editorAdmin, targetUid, { status: 'deactivated' });
+    await this.recordSecurityEvent({
+      type: 'admin_status_change',
+      severity: 'high',
+      userId: targetUid,
+      email: targetEmail,
+      description: `Admin ${targetEmail} deactivated by SuperAdmin ${editorAdmin.email}`
+    });
+  }
+
+  // 7. REACTIVATE ADMINISTRATOR
+  static async reactivateAdministrator(editorAdmin: AdminProfile, targetUid: string, targetEmail: string): Promise<void> {
+    await this.updateAdministrator(editorAdmin, targetUid, { status: 'active' });
+    await this.recordSecurityEvent({
+      type: 'admin_status_change',
+      severity: 'medium',
+      userId: targetUid,
+      email: targetEmail,
+      description: `Admin ${targetEmail} reactivated by SuperAdmin ${editorAdmin.email}`
+    });
+  }
+
+  // 8. CHANGE ADMIN PERMISSIONS
+  static async updateAdminPermissions(
+    editorAdmin: AdminProfile,
+    targetUid: string,
+    targetName: string,
+    newPermissions: AdminPermission[]
+  ): Promise<void> {
+    await this.updateAdministrator(editorAdmin, targetUid, { permissions: newPermissions });
+    await this.logActivity({
+      adminId: editorAdmin.uid,
+      adminEmail: editorAdmin.email,
+      adminName: editorAdmin.name,
+      action: 'CHANGE_ADMIN_PERMISSIONS',
+      targetType: 'admin',
+      targetId: targetUid,
+      description: `Updated permissions for ${targetName} to [${newPermissions.join(', ')}]`
+    });
+  }
+
+  // 9. RECORD IMMUTABLE AUDIT LOG IN FIRESTORE
   static async logActivity(log: {
     adminId: string;
     adminEmail: string;
+    adminName?: string;
     action: string;
     targetType: AdminActivityLog['targetType'];
     targetId: string;
@@ -266,6 +319,7 @@ export class AdminService {
       id: `audit-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       adminId: log.adminId,
       adminEmail: log.adminEmail,
+      adminName: log.adminName || log.adminEmail,
       action: log.action,
       targetType: log.targetType,
       targetId: log.targetId,
@@ -280,15 +334,15 @@ export class AdminService {
         const docRef = doc(db, 'adminLogs', entry.id);
         await setDoc(docRef, entry);
       } catch (err) {
-        console.warn('AdminService.logActivity Firestore write notice:', err);
+        console.error('AdminService.logActivity error:', err);
       }
     }
 
-    // Also persist in local store for fallback auditing
+    // Sync in DataStore for UI responsiveness
     DataStore.logAdminAction(log.action, log.targetType, log.targetId, log.description);
   }
 
-  // 7. GET AUDIT LOGS
+  // 10. GET AUDIT LOGS FROM FIRESTORE
   static async getAuditLogs(maxCount: number = 100): Promise<AdminActivityLog[]> {
     if (db) {
       try {
@@ -299,25 +353,48 @@ export class AdminService {
           return snap.docs.map(d => d.data() as AdminActivityLog);
         }
       } catch (err) {
-        console.warn('AdminService.getAuditLogs notice:', err);
+        console.error('AdminService.getAuditLogs error:', err);
       }
     }
-
-    // Fallback from DataStore
-    const localLogs = DataStore.getAdminLogs();
-    return localLogs.map(l => ({
-      id: l.id,
-      adminId: l.adminId,
-      adminEmail: l.adminEmail,
-      action: l.action,
-      targetType: l.targetType as AdminActivityLog['targetType'] || 'system',
-      targetId: l.targetId,
-      description: l.details,
-      timestamp: l.timestamp
-    }));
+    return [];
   }
 
-  // 8. REAL CALCULATED PLATFORM STATS (Firestore Live Aggregation)
+  // 11. RECORD SECURITY EVENT
+  static async recordSecurityEvent(event: Omit<SecurityEvent, 'id' | 'timestamp'>): Promise<void> {
+    const entry: SecurityEvent = {
+      ...event,
+      id: `sec-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      timestamp: new Date().toISOString()
+    };
+
+    if (db) {
+      try {
+        const docRef = doc(db, 'securityEvents', entry.id);
+        await setDoc(docRef, entry);
+      } catch (err) {
+        console.error('AdminService.recordSecurityEvent error:', err);
+      }
+    }
+  }
+
+  // 12. GET SECURITY EVENTS
+  static async getSecurityEvents(maxCount: number = 50): Promise<SecurityEvent[]> {
+    if (db) {
+      try {
+        const colRef = collection(db, 'securityEvents');
+        const q = query(colRef, orderBy('timestamp', 'desc'), limit(maxCount));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          return snap.docs.map(d => d.data() as SecurityEvent);
+        }
+      } catch (err) {
+        console.error('AdminService.getSecurityEvents error:', err);
+      }
+    }
+    return [];
+  }
+
+  // 13. LIVE AGGREGATED PLATFORM STATS
   static async getLivePlatformStats(): Promise<PlatformLiveStats> {
     let usersCount = 0;
     let activeUsersCount = 0;
@@ -332,7 +409,6 @@ export class AdminService {
 
     if (db) {
       try {
-        // Query real collections from Firestore
         const [
           usersSnap,
           servicesSnap,
@@ -356,8 +432,8 @@ export class AdminService {
         if (usersSnap && !usersSnap.empty) {
           const usersList = usersSnap.docs.map(d => d.data());
           usersCount = usersList.length;
-          activeUsersCount = usersList.filter(u => u.status !== 'suspended').length;
-          studentProfCount = usersList.filter(u => u.role === 'student' || u.skills?.length > 0).length;
+          activeUsersCount = usersList.filter(u => u.status !== 'suspended' && u.status !== 'deactivated').length;
+          studentProfCount = usersList.filter(u => u.role === 'student' || u.role === 'STUDENT' || (u.skills && u.skills.length > 0)).length;
         }
 
         if (servicesSnap) servicesCount = servicesSnap.size;
@@ -373,11 +449,10 @@ export class AdminService {
         if (disputesSnap) disputesCount = disputesSnap.size;
 
       } catch (err) {
-        console.warn('AdminService.getLivePlatformStats Firestore query notice:', err);
+        console.error('AdminService.getLivePlatformStats error:', err);
       }
     }
 
-    // Blend with DataStore / Marketplace stores if live Firestore returned 0 or initial state
     const allLocalUsers = DataStore.getUsers();
     const finalUsers = Math.max(usersCount, allLocalUsers.length);
     const finalActive = Math.max(activeUsersCount, allLocalUsers.filter(u => u.status === 'active').length);

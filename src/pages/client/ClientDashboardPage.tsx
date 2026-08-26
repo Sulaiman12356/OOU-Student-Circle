@@ -93,7 +93,7 @@ export const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({ onNavi
             </div>
           </div>
           <div className="text-2xl font-extrabold text-emerald-700">
-            {activeContracts.length || 1}
+            {activeContracts.length}
           </div>
           <div className="text-[11px] text-emerald-600 font-semibold">
             In progress with OOU students
@@ -108,7 +108,7 @@ export const ClientDashboardPage: React.FC<ClientDashboardPageProps> = ({ onNavi
             </div>
           </div>
           <div className="text-2xl font-extrabold text-[#061A4F]">
-            ₦{(currentUser?.totalSpent || 55000).toLocaleString()}
+            ₦{(currentUser?.totalSpent || 0).toLocaleString()}
           </div>
           <div className="text-[11px] text-purple-600 font-semibold">
             Empowering student talent

@@ -113,11 +113,11 @@ export const StudentDashboardPage: React.FC<StudentDashboardPageProps> = ({ onNa
             </div>
           </div>
           <div className="text-2xl font-extrabold text-[#061A4F]">
-            ₦{(currentUser?.totalEarnings || 45000).toLocaleString()}
+            ₦{(currentUser?.totalEarnings || 0).toLocaleString()}
           </div>
           <div className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
             <TrendingUp className="w-3 h-3" />
-            <span>Available for withdrawal: ₦{(currentUser?.totalEarnings || 45000).toLocaleString()}</span>
+            <span>Available for withdrawal: ₦{(currentUser?.totalEarnings || 0).toLocaleString()}</span>
           </div>
         </div>
 
@@ -162,11 +162,11 @@ export const StudentDashboardPage: React.FC<StudentDashboardPageProps> = ({ onNa
             </div>
           </div>
           <div className="text-2xl font-extrabold text-[#061A4F] flex items-center gap-1.5">
-            <span>{currentUser?.rating?.toFixed(1) || '5.0'}</span>
+            <span>{currentUser?.rating ? currentUser.rating.toFixed(1) : '0.0'}</span>
             <span className="text-xs text-slate-400 font-normal">/ 5.0</span>
           </div>
           <div className="text-[11px] text-slate-500">
-            Based on {currentUser?.reviewsCount || myReviews.length || 3} client reviews
+            Based on {currentUser?.reviewsCount || myReviews.length || 0} client reviews
           </div>
         </div>
 

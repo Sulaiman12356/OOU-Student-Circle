@@ -1778,17 +1778,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             
             {/* Mission */}
             <ScrollReveal direction="right" delay={50}>
-              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full flex flex-col justify-between">
+              <div className="interactive-card bg-[#061A4F] text-white p-7 sm:p-8 rounded-3xl border border-[#0B2A6F] shadow-xl space-y-3 h-full flex flex-col justify-between">
                 <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold border border-blue-100">
-                    <Target className="w-5 h-5 text-[#061A4F]" />
+                  <div className="w-10 h-10 rounded-2xl bg-[#0B2A6F] text-[#F5B400] flex items-center justify-center font-bold border border-white/10 shadow-inner">
+                    <Target className="w-5 h-5 text-[#F5B400]" />
                   </div>
-                  <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Mission</div>
-                  <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+                  <div className="text-xs font-black uppercase tracking-wider text-[#F5B400]">Our Mission</div>
+                  <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
                     "{founderConfig.mission}"
                   </p>
                 </div>
-                <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">
+                <p className="text-xs text-slate-300 pt-2 border-t border-[#0B2A6F]">
                   Making student talent and campus enterprises immediately accessible and rewarding.
                 </p>
               </div>

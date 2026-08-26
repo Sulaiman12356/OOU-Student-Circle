@@ -1,4 +1,79 @@
-export type UserRole = 'student' | 'client' | 'admin';
+export type UserRole = 
+  | 'SUPER_ADMIN' 
+  | 'ADMIN' 
+  | 'STUDENT' 
+  | 'CLIENT' 
+  | 'ASPIRANT' 
+  | 'CAMPUS_SHOP_OWNER' 
+  | 'MARKET_VENDOR' 
+  | 'SERVICE_PROVIDER'
+  | 'student' 
+  | 'client' 
+  | 'admin'
+  | 'super_admin'
+  | 'aspirant'
+  | 'campus_shop_owner'
+  | 'market_vendor'
+  | 'service_provider';
+
+export const USER_ROLES = [
+  'SUPER_ADMIN',
+  'ADMIN',
+  'STUDENT',
+  'CLIENT',
+  'ASPIRANT',
+  'CAMPUS_SHOP_OWNER',
+  'MARKET_VENDOR',
+  'SERVICE_PROVIDER'
+] as const;
+
+export type AccountStatus = 
+  | 'ACTIVE' 
+  | 'PENDING_VERIFICATION' 
+  | 'SUSPENDED' 
+  | 'DEACTIVATED' 
+  | 'REJECTED'
+  | 'active' 
+  | 'pending' 
+  | 'suspended' 
+  | 'deactivated' 
+  | 'rejected';
+
+export function normalizeUserRole(role?: string): UserRole {
+  if (!role) return 'STUDENT';
+  const upper = role.toUpperCase();
+  if (upper === 'SUPER_ADMIN' || upper === 'SUPERADMIN') return 'SUPER_ADMIN';
+  if (upper === 'ADMIN') return 'ADMIN';
+  if (upper === 'CLIENT') return 'CLIENT';
+  if (upper === 'ASPIRANT') return 'ASPIRANT';
+  if (upper === 'CAMPUS_SHOP_OWNER' || upper === 'SHOP_OWNER' || upper === 'CAMPUS_SHOP') return 'CAMPUS_SHOP_OWNER';
+  if (upper === 'MARKET_VENDOR' || upper === 'VENDOR' || upper === 'SELLER') return 'MARKET_VENDOR';
+  if (upper === 'SERVICE_PROVIDER' || upper === 'STUDENT_PROVIDER' || upper === 'FREELANCER') return 'SERVICE_PROVIDER';
+  return 'STUDENT';
+}
+
+export function getRoleDashboardPath(role?: string, userProfile?: UserProfile | null): string {
+  const norm = normalizeUserRole(role);
+  switch (norm) {
+    case 'SUPER_ADMIN':
+      return '/admin/superadmin';
+    case 'ADMIN':
+      return '/admin/dashboard';
+    case 'CLIENT':
+      return '/client/dashboard';
+    case 'ASPIRANT':
+      return '/aspirant/dashboard';
+    case 'CAMPUS_SHOP_OWNER':
+      return '/campus/shop-dashboard';
+    case 'MARKET_VENDOR':
+      return '/vendor/dashboard';
+    case 'SERVICE_PROVIDER':
+      return '/provider/dashboard';
+    case 'STUDENT':
+    default:
+      return '/student/dashboard';
+  }
+}
 
 export type StudentLevel = '100L' | '200L' | '300L' | '400L' | '500L' | 'Postgraduate' | 'Alumni';
 
@@ -172,6 +247,7 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
   status: 'active' | 'suspended' | 'pending';
+  accountStatus?: AccountStatus;
   isVerified: boolean;
   
   // Student Specific
@@ -195,18 +271,51 @@ export interface UserProfile {
   verificationNotes?: string;
 
   // Aspirant Specific
-  userType?: 'student' | 'aspirant' | 'client' | 'guest' | 'shop_owner';
+  userType?: 'student' | 'aspirant' | 'client' | 'guest' | 'shop_owner' | 'vendor' | 'service_provider';
   isAspirant?: boolean;
   jambRegNumber?: string;
   intendedCourse?: string;
+  preferredCampus?: string;
   entrySession?: string;
 
   // Client Specific
   businessName?: string;
+  clientType?: string;
   businessCategory?: string;
   businessDescription?: string;
   jobsPostedCount?: number;
   totalSpent?: number;
+
+  // Campus Shop Owner Specific
+  ownerName?: string;
+  shopName?: string;
+  shopCode?: string;
+  shopCategory?: string;
+  servicesOffered?: string[];
+  openingHours?: string;
+  openingInfo?: string;
+  shopDescription?: string;
+  shopPhotos?: string[];
+  shopContactPhone?: string;
+  shopWhatsapp?: string;
+  shopAddress?: string;
+  shopVerificationStatus?: VerificationStatus;
+
+  // Student Market Vendor Specific
+  storeName?: string;
+  storeDescription?: string;
+  productCategories?: string[];
+  vendorBusinessInfo?: string;
+  vendorPhone?: string;
+  vendorWhatsapp?: string;
+
+  // Student Service Provider Specific
+  providerTitle?: string;
+  services?: string[];
+  portfolioImages?: string[];
+  pricingInfo?: string;
+  availability?: string;
+  serviceCategories?: string[];
 }
 
 export type User = UserProfile;

@@ -4,7 +4,6 @@ import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { DashboardLayout } from './components/layout/DashboardLayout';
-import { DemoRoleSwitcher } from './components/common/DemoRoleSwitcher';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 
 // Public Pages
@@ -61,6 +60,7 @@ import { AdminDisputesPage } from './pages/admin/AdminDisputesPage';
 import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminShopsPage } from './pages/admin/AdminShopsPage';
 import { AdminSecurityTestPage } from './pages/admin/AdminSecurityTestPage';
+import { AdminSuperAdminPage } from './pages/admin/AdminSuperAdminPage';
 
 // Shared Pages
 import { MessagesPage } from './pages/common/MessagesPage';
@@ -80,6 +80,8 @@ import { CampusLocationZonesPage } from './pages/campus/CampusLocationZonesPage'
 import { RegisterShopPage } from './pages/campus/RegisterShopPage';
 import { ShopDashboardPage } from './pages/campus/ShopDashboardPage';
 import { AspirantRegisterPage } from './pages/auth/AspirantRegisterPage';
+import { AspirantDashboardPage } from './pages/aspirant/AspirantDashboardPage';
+import { ProviderDashboardPage } from './pages/provider/ProviderDashboardPage';
 
 // Student Connect Pages
 import { StudentConnectPage } from './pages/connect/StudentConnectPage';
@@ -91,7 +93,7 @@ import { ShieldAlert } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const { currentUser, role, updateUser } = useAuth();
-  const { isAdminAuthenticated, adminProfile } = useAdminAuth();
+  const { isAdminAuthenticated, adminProfile, isSuperAdmin } = useAdminAuth();
   const [currentPath, setCurrentPath] = useState<string>('/');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -126,10 +128,10 @@ const AppContent: React.FC = () => {
   // Determine view rendering
   const renderRoute = () => {
     // 1. Auth routes (No navbar/footer chrome)
-    if (currentPath === '/auth/login') {
+    if (currentPath === '/auth' || currentPath === '/login' || currentPath === '/auth/login') {
       return <LoginPage onNavigate={navigate} />;
     }
-    if (currentPath === '/auth/register') {
+    if (currentPath === '/register' || currentPath === '/auth/register') {
       return <RegisterPage onNavigate={navigate} />;
     }
     if (currentPath === '/auth/register-aspirant') {
@@ -245,7 +247,34 @@ const AppContent: React.FC = () => {
       }
 
       let content = <AdminDashboardPage onNavigate={navigate} />;
-      if (currentPath === '/admin/analytics') {
+      if (currentPath === '/admin/superadmin' || currentPath.startsWith('/admin/superadmin/')) {
+        if (!isSuperAdmin) {
+          content = (
+            <div className="p-8 max-w-lg mx-auto text-center space-y-4 bg-white rounded-3xl border border-rose-200 shadow-sm mt-8">
+              <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto text-rose-600 border border-rose-100">
+                <ShieldAlert className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h2 className="text-lg font-black text-[#061A4F]">Access denied. SuperAdmin permission required.</h2>
+                <p className="text-xs text-slate-500">
+                  This governance section is exclusively accessible to the platform Super Administrator.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/admin/dashboard')}
+                className="px-5 py-2 bg-[#061A4F] text-white text-xs font-bold rounded-xl cursor-pointer"
+              >
+                Return to Admin Dashboard
+              </button>
+            </div>
+          );
+        } else {
+          let initialTab: 'admins' | 'permissions' | 'security' | 'governance' = 'admins';
+          if (currentPath === '/admin/superadmin/permissions') initialTab = 'permissions';
+          else if (currentPath === '/admin/superadmin/security') initialTab = 'security';
+          content = <AdminSuperAdminPage onNavigate={navigate} initialTab={initialTab} />;
+        }
+      } else if (currentPath === '/admin/analytics') {
         content = <AdminAnalyticsPage />;
       } else if (currentPath === '/admin/settings/administrators' || currentPath === '/admin/administrators') {
         content = <AdminManagementPage onNavigate={navigate} />;
@@ -309,7 +338,7 @@ const AppContent: React.FC = () => {
     }
 
     // 5. Vendor Hub Route (Embedded in DashboardLayout if logged in or standalone)
-    if (currentPath.startsWith('/vendor/')) {
+    if (currentPath === '/vendor' || currentPath.startsWith('/vendor/')) {
       if (currentUser) {
         return (
           <DashboardLayout currentPath={currentPath} onNavigate={navigate}>
@@ -322,6 +351,58 @@ const AppContent: React.FC = () => {
           <Navbar currentPath={currentPath} onNavigate={navigate} onOpenSearch={() => setIsSearchOpen(true)} />
           <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
             <VendorDashboard onNavigate={navigate} />
+          </main>
+          <Footer onNavigate={navigate} />
+        </div>
+      );
+    }
+
+    // Aspirant Workspace routes
+    if (currentPath === '/aspirant' || currentPath.startsWith('/aspirant/')) {
+      if (currentUser) {
+        return (
+          <DashboardLayout currentPath={currentPath} onNavigate={navigate}>
+            <AspirantDashboardPage onNavigate={navigate} />
+          </DashboardLayout>
+        );
+      }
+      return (
+        <div className="min-h-screen flex flex-col bg-[#F7F9FC]">
+          <Navbar currentPath={currentPath} onNavigate={navigate} onOpenSearch={() => setIsSearchOpen(true)} />
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <AspirantDashboardPage onNavigate={navigate} />
+          </main>
+          <Footer onNavigate={navigate} />
+        </div>
+      );
+    }
+
+    // Service Provider Workspace routes
+    if (currentPath === '/provider' || currentPath.startsWith('/provider/')) {
+      if (currentUser) {
+        return (
+          <DashboardLayout currentPath={currentPath} onNavigate={navigate}>
+            <ProviderDashboardPage onNavigate={navigate} />
+          </DashboardLayout>
+        );
+      }
+      return <LoginPage onNavigate={navigate} />;
+    }
+
+    // Campus Shop Dashboard routes
+    if (currentPath === '/campus/shop-dashboard' || currentPath === '/campus/shop/dashboard') {
+      if (currentUser) {
+        return (
+          <DashboardLayout currentPath={currentPath} onNavigate={navigate}>
+            <ShopDashboardPage onNavigate={navigate} />
+          </DashboardLayout>
+        );
+      }
+      return (
+        <div className="min-h-screen flex flex-col bg-[#F7F9FC]">
+          <Navbar currentPath={currentPath} onNavigate={navigate} onOpenSearch={() => setIsSearchOpen(true)} />
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <ShopDashboardPage onNavigate={navigate} />
           </main>
           <Footer onNavigate={navigate} />
         </div>
@@ -477,7 +558,6 @@ const AppContent: React.FC = () => {
         onClose={() => setIsSearchOpen(false)}
         onNavigate={navigate}
       />
-      <DemoRoleSwitcher onNavigate={navigate} />
     </div>
   );
 };

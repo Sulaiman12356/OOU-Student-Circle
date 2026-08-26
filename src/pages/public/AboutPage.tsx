@@ -286,15 +286,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* MISSION & VISION                                             */}
         {/* ============================================================ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="p-8 sm:p-10 bg-white rounded-3xl border border-slate-200 shadow-2xs space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold border border-blue-100">
-              <Target className="w-6 h-6 text-[#061A4F]" />
+          <div className="p-8 sm:p-10 bg-[#061A4F] text-white rounded-3xl border border-[#0B2A6F] shadow-xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#0B2A6F] text-[#F5B400] flex items-center justify-center font-bold border border-white/10 shadow-inner">
+              <Target className="w-6 h-6 text-[#F5B400]" />
             </div>
-            <div className="text-xs font-black uppercase tracking-widest text-[#061A4F]">Our Mission</div>
-            <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+            <div className="text-xs font-black uppercase tracking-widest text-[#F5B400]">Our Mission</div>
+            <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
               "{founderConfig.mission}"
             </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed pt-2 border-t border-[#0B2A6F]">
               Focusing on verified identity, friction-free transactions, and localized discovery so student skills are rewarded with immediate, fair value.
             </p>
           </div>
@@ -307,7 +307,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
               "{founderConfig.vision}"
             </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed pt-2 border-t border-slate-100">
               Building a dependable bridge that connects campus learning to lifelong economic opportunities across tertiary institutions.
             </p>
           </div>

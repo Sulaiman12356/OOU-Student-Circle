@@ -33,13 +33,13 @@ export const ShopDashboardPage: React.FC<ShopDashboardPageProps> = ({ onNavigate
   const { currentUser } = useAuth();
   const shops = CampusStore.getShops();
 
-  // Find owned shop or default to primary Alhaja Biz Venture Shop E6
-  const activeShop = shops.find(s => s.ownerId === currentUser?.id) || shops[0];
-  const [shop, setShop] = useState<CampusShop>(activeShop);
+  // Find owned shop or default to first available
+  const activeShop = shops.find(s => s.ownerId === currentUser?.id) || (shops.length > 0 ? shops[0] : null);
+  const [shop, setShop] = useState<CampusShop | null>(activeShop);
 
-  const [orders, setOrders] = useState<CampusOrder[]>(() => CampusStore.getOrdersByShop(shop.id));
-  const [services, setServices] = useState<CampusService[]>(() => CampusStore.getServicesByShop(shop.id));
-  const [reviews, setReviews] = useState(() => CampusStore.getReviewsByShop(shop.id));
+  const [orders, setOrders] = useState<CampusOrder[]>(() => shop ? CampusStore.getOrdersByShop(shop.id) : []);
+  const [services, setServices] = useState<CampusService[]>(() => shop ? CampusStore.getServicesByShop(shop.id) : []);
+  const [reviews, setReviews] = useState(() => shop ? CampusStore.getReviewsByShop(shop.id) : []);
 
   // Dashboard Tabs
   const [activeTab, setActiveTab] = useState<'orders' | 'services' | 'settings' | 'reviews'>('orders');
@@ -63,6 +63,55 @@ export const ShopDashboardPage: React.FC<ShopDashboardPageProps> = ({ onNavigate
   const [newServicePricingType, setNewServicePricingType] = useState<any>('fixed');
   const [newServiceTurnaround, setNewServiceTurnaround] = useState('30 minutes');
   const [newServiceDesc, setNewServiceDesc] = useState('');
+
+  if (!shop) {
+    return (
+      <div className="space-y-8">
+        <div className="bg-[#061A4F] text-white p-8 rounded-3xl border border-[#F5B400]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <span className="px-3 py-1 rounded-full bg-[#F5B400] text-[#061A4F] text-xs font-black uppercase">
+              Campus Commerce Hub
+            </span>
+            <h1 className="text-2xl font-black">Campus Shop & Kiosk Dashboard</h1>
+            <p className="text-xs text-slate-300 max-w-xl">
+              Connect your physical store, cybercafe, or printing kiosk at Motion Ground, Main Campus, or Satellite Campuses to receive pre-orders from OOU students and aspirants.
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('/campus/register-shop')}
+            className="px-5 py-3 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] font-black text-xs rounded-xl transition shadow-lg flex items-center gap-2 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Register Your Campus Shop</span>
+          </button>
+        </div>
+
+        <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-4 max-w-lg mx-auto">
+          <div className="w-16 h-16 bg-blue-50 text-[#061A4F] rounded-2xl flex items-center justify-center mx-auto">
+            <Store className="w-8 h-8" />
+          </div>
+          <h2 className="text-lg font-black text-[#061A4F]">No Campus Shop Registered Yet</h2>
+          <p className="text-xs text-slate-500">
+            You do not currently have an accredited campus shop linked to this account ({currentUser?.email}). Register your business to start receiving direct print jobs and orders.
+          </p>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => onNavigate('/campus/register-shop')}
+              className="w-full sm:w-auto px-6 py-2.5 bg-[#061A4F] hover:bg-[#0B2A6F] text-white text-xs font-bold rounded-xl transition cursor-pointer"
+            >
+              Register Campus Shop
+            </button>
+            <button
+              onClick={() => onNavigate('/campus')}
+              className="w-full sm:w-auto px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+            >
+              Explore Campus Hub
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Status Switcher
   const handleSetOverride = (status: 'auto' | 'open' | 'busy' | 'closed') => {

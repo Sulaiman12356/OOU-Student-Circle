@@ -48,6 +48,129 @@ export class FirestoreService {
     }
   }
 
+  static async getUserByEmail(email: string): Promise<UserProfile | null> {
+    if (!db || !email) return null;
+    try {
+      const cleanEmail = email.trim().toLowerCase();
+      const colRef = collection(db, 'users');
+      const q = query(colRef, where('email', '==', cleanEmail), limit(1));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        return snap.docs[0].data() as UserProfile;
+      }
+      return null;
+    } catch (err) {
+      console.warn('Firestore getUserByEmail notice:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Comprehensive duplicate account check across Firestore
+   */
+  static async checkDuplicateAccount(params: {
+    email?: string;
+    phoneNumber?: string;
+    matricNumber?: string;
+    jambRegNumber?: string;
+    shopCode?: string;
+    excludeUserId?: string;
+  }): Promise<{ isDuplicate: boolean; field?: string; message?: string }> {
+    if (!db) return { isDuplicate: false };
+
+    try {
+      const colRef = collection(db, 'users');
+
+      // 1. Email check
+      if (params.email) {
+        const cleanEmail = params.email.trim().toLowerCase();
+        const qEmail = query(colRef, where('email', '==', cleanEmail), limit(2));
+        const snapEmail = await getDocs(qEmail);
+        const dupEmail = snapEmail.docs.find(d => d.id !== params.excludeUserId);
+        if (dupEmail) {
+          return {
+            isDuplicate: true,
+            field: 'email',
+            message: 'An account with this email address already exists. Please log in instead.'
+          };
+        }
+      }
+
+      // 2. Phone number check
+      if (params.phoneNumber) {
+        const cleanPhone = params.phoneNumber.trim().replace(/[^0-9+]/g, '');
+        if (cleanPhone.length >= 10) {
+          const qPhone = query(colRef, where('phoneNumber', '==', cleanPhone), limit(2));
+          const snapPhone = await getDocs(qPhone);
+          const dupPhone = snapPhone.docs.find(d => d.id !== params.excludeUserId);
+          if (dupPhone) {
+            return {
+              isDuplicate: true,
+              field: 'phoneNumber',
+              message: 'This phone number is already associated with an existing account.'
+            };
+          }
+        }
+      }
+
+      // 3. Matric Number check (for students)
+      if (params.matricNumber) {
+        const cleanMatric = params.matricNumber.trim().toUpperCase();
+        if (cleanMatric.length >= 4) {
+          const qMatric = query(colRef, where('matricNumber', '==', cleanMatric), limit(2));
+          const snapMatric = await getDocs(qMatric);
+          const dupMatric = snapMatric.docs.find(d => d.id !== params.excludeUserId);
+          if (dupMatric) {
+            return {
+              isDuplicate: true,
+              field: 'matricNumber',
+              message: `Matriculation number ${cleanMatric} is already registered on StudentCircle.`
+            };
+          }
+        }
+      }
+
+      // 4. JAMB Registration Number check (for aspirants)
+      if (params.jambRegNumber) {
+        const cleanJamb = params.jambRegNumber.trim().toUpperCase();
+        if (cleanJamb.length >= 6) {
+          const qJamb = query(colRef, where('jambRegNumber', '==', cleanJamb), limit(2));
+          const snapJamb = await getDocs(qJamb);
+          const dupJamb = snapJamb.docs.find(d => d.id !== params.excludeUserId);
+          if (dupJamb) {
+            return {
+              isDuplicate: true,
+              field: 'jambRegNumber',
+              message: `JAMB Registration number ${cleanJamb} is already linked to an existing aspirant account.`
+            };
+          }
+        }
+      }
+
+      // 5. Shop Code check (for campus shop owners)
+      if (params.shopCode) {
+        const cleanShopCode = params.shopCode.trim().toUpperCase();
+        if (cleanShopCode.length >= 2) {
+          const qShop = query(colRef, where('shopCode', '==', cleanShopCode), limit(2));
+          const snapShop = await getDocs(qShop);
+          const dupShop = snapShop.docs.find(d => d.id !== params.excludeUserId);
+          if (dupShop) {
+            return {
+              isDuplicate: true,
+              field: 'shopCode',
+              message: `Shop Code ${cleanShopCode} is already registered to another campus shop.`
+            };
+          }
+        }
+      }
+
+      return { isDuplicate: false };
+    } catch (err: any) {
+      console.warn('Duplicate check warning:', err.message);
+      return { isDuplicate: false };
+    }
+  }
+
   static async saveUserProfile(user: UserProfile): Promise<void> {
     if (!db) return;
     try {
