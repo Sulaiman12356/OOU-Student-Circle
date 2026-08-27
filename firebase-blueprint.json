@@ -446,6 +446,24 @@
         "createdAt": { "type": "string" }
       },
       "required": ["id", "orderId", "reviewerId", "sellerId", "rating", "comment", "isVerifiedTransaction", "createdAt"]
+    },
+    "SecurityEvent": {
+      "title": "SecurityEvent",
+      "description": "Stores platform security audit events, authorization checks, and login attempts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "maxLength": 100 },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "userId": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "ipAddress": { "type": "string", "maxLength": 64 },
+        "userAgent": { "type": "string", "maxLength": 512 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "metadata": { "type": "object" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "type", "severity", "description", "timestamp"]
     }
   },
   "firestore": {
@@ -540,6 +558,10 @@
     "/unifiedReviews/{reviewId}": {
       "schema": { "$ref": "UnifiedReview" },
       "description": "Stores verified post-completion reviews."
+    },
+    "/securityEvents/{eventId}": {
+      "schema": { "$ref": "SecurityEvent" },
+      "description": "Stores authentication and RBAC security event logs."
     }
   }
 }

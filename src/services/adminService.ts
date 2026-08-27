@@ -12,7 +12,13 @@ import {
   limit, 
   serverTimestamp
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile
+} from 'firebase/auth';
+import { db, auth } from './firebase';
 import { 
   AdminProfile, 
   AdminRole, 
@@ -49,6 +55,36 @@ export interface PlatformLiveStats {
 }
 
 export class AdminService {
+  // 0. CHECK IF ACTIVE SUPER ADMIN ALREADY EXISTS IN FIRESTORE
+  static async checkSuperAdminExists(): Promise<{ exists: boolean; email?: string; name?: string }> {
+    if (!db) return { exists: false };
+
+    try {
+      const colRef = collection(db, 'admins');
+      const q = query(colRef, where('role', 'in', ['SUPER_ADMIN', 'super_admin']));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        const superAdmins = snap.docs.map(d => d.data() as AdminProfile);
+        const active = superAdmins.find(a => a.status === 'active');
+        if (active) {
+          return { exists: true, email: active.email, name: active.name };
+        }
+      }
+
+      // Check root super admin doc
+      const rootDoc = await getDoc(doc(db, 'admins', 'superadmin'));
+      if (rootDoc.exists() && rootDoc.data()?.status === 'active') {
+        return { exists: true, email: rootDoc.data()?.email, name: rootDoc.data()?.name };
+      }
+
+      return { exists: false };
+    } catch (err) {
+      console.warn('AdminService.checkSuperAdminExists notice:', err);
+      return { exists: false };
+    }
+  }
+
   // 1. GET ADMIN PROFILE FROM FIRESTORE
   static async getAdminProfile(uid: string): Promise<AdminProfile | null> {
     if (!db) {
@@ -70,7 +106,110 @@ export class AdminService {
     }
   }
 
-  // 2. BOOTSTRAP SUPER ADMIN ACCOUNT IN FIRESTORE
+  // 2. BOOTSTRAP / FIRST-TIME SUPER ADMIN SETUP
+  static async setupFirstSuperAdmin(params: {
+    fullName: string;
+    email: string;
+    password: string;
+    profilePhoto?: string;
+    verificationCode?: string;
+  }): Promise<{ success: boolean; profile?: AdminProfile; error?: string }> {
+    const cleanEmail = params.email.trim().toLowerCase();
+    
+    // Check if another SuperAdmin is already initialized
+    const existingCheck = await this.checkSuperAdminExists();
+    if (existingCheck.exists && existingCheck.email?.toLowerCase() !== cleanEmail) {
+      return {
+        success: false,
+        error: `Setup is locked: A Super Administrator (${existingCheck.email}) is already configured. Only an existing SuperAdmin can create additional administrators.`
+      };
+    }
+
+    if (!auth) {
+      return { success: false, error: 'Authentication service is not initialized.' };
+    }
+
+    try {
+      let uid = '';
+      
+      // Attempt real Firebase Auth registration
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, cleanEmail, params.password);
+        uid = cred.user.uid;
+        await updateProfile(cred.user, {
+          displayName: params.fullName.trim(),
+          photoURL: params.profilePhoto || undefined
+        });
+      } catch (authErr: any) {
+        if (authErr.code === 'auth/email-already-in-use') {
+          // If auth account exists, attempt sign in with provided password
+          const cred = await signInWithEmailAndPassword(auth, cleanEmail, params.password);
+          uid = cred.user.uid;
+        } else {
+          throw authErr;
+        }
+      }
+
+      const adminProfile: AdminProfile = {
+        uid,
+        name: params.fullName.trim(),
+        email: cleanEmail,
+        role: 'SUPER_ADMIN',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        createdBy: 'bootstrap_setup',
+        permissions: SUPER_ADMIN_PERMISSIONS,
+        lastActivityAt: new Date().toISOString(),
+        profilePhoto: params.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+        department: 'Platform Governance & Executive Direction'
+      };
+
+      if (db) {
+        const docRef = doc(db, 'admins', uid);
+        await setDoc(docRef, adminProfile, { merge: true });
+
+        const userDocRef = doc(db, 'users', uid);
+        await setDoc(userDocRef, {
+          id: uid,
+          email: cleanEmail,
+          fullName: adminProfile.name,
+          role: 'SUPER_ADMIN',
+          status: 'active',
+          isVerified: true,
+          verificationStatus: 'verified',
+          profilePhoto: adminProfile.profilePhoto,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      }
+
+      await this.recordSecurityEvent({
+        type: 'superadmin_bootstrap',
+        severity: 'high',
+        userId: uid,
+        email: cleanEmail,
+        description: `Primary Super Administrator (${cleanEmail}) account created and initialized.`
+      });
+
+      await this.logActivity({
+        adminId: uid,
+        adminEmail: cleanEmail,
+        adminName: adminProfile.name,
+        action: 'BOOTSTRAP_SUPERADMIN_ACCOUNT',
+        targetType: 'admin',
+        targetId: uid,
+        description: `Super Administrator created via initial setup for ${cleanEmail}`
+      });
+
+      return { success: true, profile: adminProfile };
+    } catch (err: any) {
+      console.error('AdminService.setupFirstSuperAdmin error:', err);
+      return { success: false, error: err.message || 'Failed to initialize Super Administrator.' };
+    }
+  }
+
+  // 2b. BOOTSTRAP SUPER ADMIN ACCOUNT IN FIRESTORE FOR AUTHENTICATED USER
   static async bootstrapSuperAdmin(user: { uid: string; email: string; name?: string }): Promise<AdminProfile> {
     const isSuperAdminEmail = user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
     const cleanEmail = user.email.toLowerCase();
@@ -140,33 +279,42 @@ export class AdminService {
   static async createAdministrator(
     creatorAdmin: AdminProfile,
     data: {
-      uid: string;
+      uid?: string;
       name: string;
       email: string;
+      phoneNumber?: string;
+      password?: string;
+      profilePhoto?: string;
       role: 'SUPER_ADMIN' | 'ADMIN' | 'super_admin' | 'admin';
+      status?: AdminStatus;
       permissions: AdminPermission[];
       department?: string;
+      sendInvitation?: boolean;
     }
   ): Promise<AdminProfile> {
     const isSuper = creatorAdmin.role === 'SUPER_ADMIN' || creatorAdmin.role === 'super_admin';
     if (!isSuper) {
-      throw new Error('Access Denied: Only Super Administrators can provision new administrator accounts.');
+      throw new Error('Access Denied: SuperAdmin permission required.');
     }
 
     const cleanEmail = data.email.toLowerCase().trim();
     const normalizedRole = (data.role === 'SUPER_ADMIN' || data.role === 'super_admin') ? 'SUPER_ADMIN' : 'ADMIN';
+    const adminUid = data.uid || `admin-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const adminStatus: AdminStatus = data.status || (data.sendInvitation ? 'invited' : 'active');
 
     const newAdmin: AdminProfile = {
-      uid: data.uid,
+      uid: adminUid,
       name: data.name.trim(),
       email: cleanEmail,
+      phoneNumber: data.phoneNumber?.trim() || '',
       role: normalizedRole,
-      status: 'active',
+      status: adminStatus,
       createdAt: new Date().toISOString(),
       lastLoginAt: 'Never logged in',
       createdBy: creatorAdmin.uid,
       permissions: normalizedRole === 'SUPER_ADMIN' ? SUPER_ADMIN_PERMISSIONS : data.permissions,
       lastActivityAt: new Date().toISOString(),
+      profilePhoto: data.profilePhoto || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80',
       department: data.department || 'Campus Operations & Moderation'
     };
 
@@ -180,8 +328,9 @@ export class AdminService {
         id: newAdmin.uid,
         email: cleanEmail,
         fullName: newAdmin.name,
+        phoneNumber: newAdmin.phoneNumber,
         role: normalizedRole,
-        status: 'active',
+        status: adminStatus === 'active' ? 'active' : 'pending',
         isVerified: true,
         verificationStatus: 'verified',
         createdAt: new Date().toISOString(),
@@ -189,7 +338,16 @@ export class AdminService {
       }, { merge: true });
     }
 
-    // Audit log
+    // Send invitation / password reset email if requested or available
+    if (data.sendInvitation && auth) {
+      try {
+        await sendPasswordResetEmail(auth, cleanEmail);
+      } catch (inviteErr) {
+        console.warn('Admin invitation email trigger notice:', inviteErr);
+      }
+    }
+
+    // Audit log: SuperAdmin created an Admin account
     await this.logActivity({
       adminId: creatorAdmin.uid,
       adminEmail: creatorAdmin.email,
@@ -197,7 +355,22 @@ export class AdminService {
       action: 'CREATE_ADMIN_ACCOUNT',
       targetType: 'admin',
       targetId: newAdmin.uid,
-      description: `SuperAdmin ${creatorAdmin.name} created admin account for ${newAdmin.name} (${newAdmin.email}) with ${newAdmin.permissions.length} permissions.`
+      description: `SuperAdmin ${creatorAdmin.name} created an Admin account for ${newAdmin.name} (${newAdmin.email}) with ${newAdmin.permissions.length} permissions.`,
+      details: {
+        createdBy: creatorAdmin.email,
+        adminId: newAdmin.uid,
+        adminName: newAdmin.name,
+        timestamp: new Date().toISOString(),
+        permissions: newAdmin.permissions
+      }
+    });
+
+    await this.recordSecurityEvent({
+      type: 'admin_status_change',
+      severity: 'medium',
+      userId: newAdmin.uid,
+      email: cleanEmail,
+      description: `Administrator account provisioned for ${cleanEmail} (${normalizedRole}) by ${creatorAdmin.email}`
     });
 
     return newAdmin;
@@ -223,11 +396,11 @@ export class AdminService {
   static async updateAdministrator(
     editorAdmin: AdminProfile,
     targetUid: string,
-    updates: Partial<Pick<AdminProfile, 'status' | 'permissions' | 'role' | 'name' | 'department'>>
+    updates: Partial<Pick<AdminProfile, 'status' | 'permissions' | 'role' | 'name' | 'department' | 'phoneNumber' | 'profilePhoto'>>
   ): Promise<void> {
     const isSuper = editorAdmin.role === 'SUPER_ADMIN' || editorAdmin.role === 'super_admin';
     if (!isSuper) {
-      throw new Error('Access Denied: Only Super Administrators can modify administrator permissions or status.');
+      throw new Error('Access denied. SuperAdmin permission required.');
     }
 
     if (db) {
@@ -237,12 +410,13 @@ export class AdminService {
         lastActivityAt: new Date().toISOString()
       });
 
-      if (updates.role) {
+      if (updates.role || updates.status || updates.name) {
         const userDocRef = doc(db, 'users', targetUid);
-        await updateDoc(userDocRef, {
-          role: updates.role,
-          updatedAt: new Date().toISOString()
-        }).catch(() => null);
+        const userUpdates: Record<string, any> = { updatedAt: new Date().toISOString() };
+        if (updates.role) userUpdates.role = updates.role;
+        if (updates.status) userUpdates.status = updates.status;
+        if (updates.name) userUpdates.fullName = updates.name;
+        await updateDoc(userDocRef, userUpdates).catch(() => null);
       }
     }
 
@@ -302,6 +476,72 @@ export class AdminService {
       targetId: targetUid,
       description: `Updated permissions for ${targetName} to [${newPermissions.join(', ')}]`
     });
+  }
+
+  // 8b. RESET ADMIN ACCESS (Send Password Reset Email)
+  static async sendPasswordResetForAdmin(editorAdmin: AdminProfile, targetEmail: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    const isSuper = editorAdmin.role === 'SUPER_ADMIN' || editorAdmin.role === 'super_admin';
+    if (!isSuper) {
+      return { success: false, error: 'Access denied. SuperAdmin permission required.' };
+    }
+
+    if (!auth) {
+      return { success: false, error: 'Authentication provider is not available.' };
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, targetEmail.trim());
+      await this.logActivity({
+        adminId: editorAdmin.uid,
+        adminEmail: editorAdmin.email,
+        adminName: editorAdmin.name,
+        action: 'SEND_ADMIN_PASSWORD_RESET',
+        targetType: 'admin',
+        targetId: targetEmail,
+        description: `Sent password reset / invitation link to ${targetEmail}`
+      });
+      return { success: true, message: `Password reset / access link sent to ${targetEmail}` };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to send reset link.' };
+    }
+  }
+
+  // 8c. SAFE DELETE / REMOVE ADMINISTRATOR
+  static async removeAdministrator(editorAdmin: AdminProfile, targetUid: string, targetEmail: string): Promise<{ success: boolean; error?: string }> {
+    const isSuper = editorAdmin.role === 'SUPER_ADMIN' || editorAdmin.role === 'super_admin';
+    if (!isSuper) {
+      return { success: false, error: 'Access denied. SuperAdmin permission required.' };
+    }
+
+    if (targetEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || targetUid === editorAdmin.uid) {
+      return { success: false, error: 'Root Super Administrator cannot be removed.' };
+    }
+
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'admins', targetUid));
+        // Update user status
+        await updateDoc(doc(db, 'users', targetUid), {
+          role: 'STUDENT',
+          updatedAt: new Date().toISOString()
+        }).catch(() => null);
+
+        await this.logActivity({
+          adminId: editorAdmin.uid,
+          adminEmail: editorAdmin.email,
+          adminName: editorAdmin.name,
+          action: 'REMOVE_ADMIN_ACCOUNT',
+          targetType: 'admin',
+          targetId: targetUid,
+          description: `SuperAdmin ${editorAdmin.name} removed admin record for ${targetEmail}`
+        });
+
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message || 'Failed to remove admin document.' };
+      }
+    }
+    return { success: false, error: 'Database not initialized.' };
   }
 
   // 9. RECORD IMMUTABLE AUDIT LOG IN FIRESTORE
@@ -394,7 +634,7 @@ export class AdminService {
     return [];
   }
 
-  // 13. LIVE AGGREGATED PLATFORM STATS
+  // 13. LIVE AGGREGATED PLATFORM STATS FROM ACTUAL FIRESTORE COLLECTIONS
   static async getLivePlatformStats(): Promise<PlatformLiveStats> {
     let usersCount = 0;
     let activeUsersCount = 0;
@@ -496,3 +736,4 @@ export class AdminService {
     };
   }
 }
+

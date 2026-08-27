@@ -77,7 +77,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
     totalUsers: allUsers.length,
     activeUsers: activeUsers.length,
     studentProfessionals: students.length,
-    vendors: MarketplaceStore.getAllVendors().length || 3,
+    vendors: MarketplaceStore.getAllVendors().length,
     campusShops: CampusStore.getShops().length,
     services: DataStore.getServices().length,
     products: MarketplaceStore.getAllProducts().length,

@@ -61,6 +61,7 @@ import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminShopsPage } from './pages/admin/AdminShopsPage';
 import { AdminSecurityTestPage } from './pages/admin/AdminSecurityTestPage';
 import { AdminSuperAdminPage } from './pages/admin/AdminSuperAdminPage';
+import { AdminSetupPage } from './pages/admin/AdminSetupPage';
 
 // Shared Pages
 import { MessagesPage } from './pages/common/MessagesPage';
@@ -207,6 +208,10 @@ const AppContent: React.FC = () => {
     }
 
     // 4. Admin Workspace routes
+    if (currentPath === '/admin/setup') {
+      return <AdminSetupPage onNavigate={navigate} />;
+    }
+
     if (currentPath === '/admin/login') {
       return <AdminLoginPage onNavigate={navigate} />;
     }

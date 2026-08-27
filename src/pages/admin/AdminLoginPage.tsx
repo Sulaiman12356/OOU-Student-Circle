@@ -163,7 +163,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            OOU StudentCircle Admin Portal
+            OOU StudentCircle Administration
           </h1>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
             Authorized personnel gateway for platform governance, identity verification, and financial arbitration.
@@ -192,10 +192,10 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Email Input */}
+            {/* Email Address */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-200">
-                Administrator Email
+                Email Address
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -210,7 +210,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
               </div>
             </div>
 
-            {/* Password Input */}
+            {/* Password */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-bold text-slate-200">
@@ -247,7 +247,19 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center justify-between text-xs pt-1">
+              <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="rounded border-slate-700 bg-[#040E29] text-[#F5B400] focus:ring-[#F5B400]"
+                />
+                <span>Remember Me</span>
+              </label>
+            </div>
+
+            {/* Sign In Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -258,7 +270,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
               ) : (
                 <>
                   <Lock className="w-4 h-4" />
-                  <span>Authenticate Admin Session</span>
+                  <span>Sign In</span>
                 </>
               )}
             </button>
@@ -271,18 +283,29 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
                 <Server className="w-3 h-3 text-[#F5B400]" />
                 <span>SuperAdmin Platform Setup</span>
               </span>
-              <span className="text-[10px] text-slate-500">Root Access</span>
+              <span className="text-[10px] text-slate-500">Authorized</span>
             </div>
             
-            <button
-              type="button"
-              onClick={handleBootstrapSuperAdmin}
-              disabled={isLoading}
-              className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-xl transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#F5B400]" />
-              <span>Bootstrap SuperAdmin ({SUPER_ADMIN_EMAIL})</span>
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => onNavigate('/admin/setup')}
+                className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-xl transition border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Lock className="w-3 h-3 text-[#F5B400]" />
+                <span>First-Time Setup</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleBootstrapSuperAdmin}
+                disabled={isLoading}
+                className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-xl transition border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3 text-[#F5B400]" />
+                <span>Quick Bootstrap</span>
+              </button>
+            </div>
           </div>
 
         </div>

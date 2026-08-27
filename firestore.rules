@@ -23,14 +23,17 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn() && (
         exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com' && request.auth.token.email_verified == true)
+        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com')
       );
     }
 
     function isSuperAdmin() {
       return isSignedIn() && (
-        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com' && request.auth.token.email_verified == true) ||
-        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin')
+        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com') ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin' ||
+          get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'SUPER_ADMIN'
+        ))
       );
     }
 
@@ -38,7 +41,7 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow get: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
       allow list: if isAdmin();
-      allow create: if isSuperAdmin();
+      allow create: if isSuperAdmin() || (isSignedIn() && request.auth.uid == adminId && request.auth.token.email == 'ipesolasulaiman@gmail.com');
       allow update: if isSuperAdmin() || (isAdmin() && request.auth.uid == adminId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'permissions', 'status']));
       allow delete: if isSuperAdmin() && adminId != request.auth.uid;
     }
@@ -176,9 +179,17 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // ADMIN LOGS & SETTINGS
+    // ADMIN LOGS, SECURITY EVENTS & SETTINGS
     match /adminLogs/{logId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /securityEvents/{eventId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isSuperAdmin();
     }
 
     match /platformSettings/{settingId} {

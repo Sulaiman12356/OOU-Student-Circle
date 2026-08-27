@@ -1,6 +1,6 @@
 export type AdminRole = 'SUPER_ADMIN' | 'ADMIN' | 'super_admin' | 'admin';
 
-export type AdminStatus = 'active' | 'suspended' | 'deactivated';
+export type AdminStatus = 'active' | 'invited' | 'suspended' | 'deactivated';
 
 export type AdminPermission = 
   // User Governance

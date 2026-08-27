@@ -4,6 +4,7 @@ import {
   AdminProfile, 
   AdminPermission, 
   AdminRole, 
+  AdminStatus,
   SecurityEvent,
   ALL_ADMIN_PERMISSIONS, 
   SUPER_ADMIN_EMAIL,
@@ -59,7 +60,11 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newPhoto, setNewPhoto] = useState('');
   const [newRole, setNewRole] = useState<AdminRole>('ADMIN');
+  const [newStatus, setNewStatus] = useState<AdminStatus>('active');
+  const [sendInvitation, setSendInvitation] = useState(true);
   const [newDepartment, setNewDepartment] = useState('Campus Operations');
   const [selectedPermissions, setSelectedPermissions] = useState<AdminPermission[]>([
     'users.view',
@@ -148,15 +153,21 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
         uid: generatedUid,
         name: newName.trim(),
         email: newEmail.trim().toLowerCase(),
+        phoneNumber: newPhone.trim(),
+        profilePhoto: newPhoto.trim() || undefined,
         role: newRole,
+        status: newStatus,
+        sendInvitation,
         permissions: newRole === 'SUPER_ADMIN' ? SUPER_ADMIN_PERMISSIONS : selectedPermissions,
         department: newDepartment
       });
 
-      setSuccessMsg(`Administrator account for ${newName} provisioned successfully in Firestore.`);
+      setSuccessMsg(`Administrator account for ${newName} provisioned successfully in Firestore${sendInvitation ? ' and invitation email sent' : ''}.`);
       setShowCreateModal(false);
       setNewName('');
       setNewEmail('');
+      setNewPhone('');
+      setNewPhoto('');
       await loadData();
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to create administrator.');
@@ -184,6 +195,45 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
       await loadData();
     } catch (err: any) {
       alert(err.message || 'Failed to update administrator status.');
+    }
+  };
+
+  const handleSendResetLink = async (admin: AdminProfile) => {
+    if (!adminProfile) return;
+    setActionLoading(true);
+    try {
+      const res = await AdminService.sendPasswordResetForAdmin(adminProfile, admin.email);
+      if (res.success) {
+        setSuccessMsg(res.message || `Password reset link dispatched to ${admin.email}`);
+      } else {
+        alert(res.error || 'Failed to send reset link.');
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRemoveAdmin = async (admin: AdminProfile) => {
+    if (!adminProfile) return;
+    if (admin.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || admin.uid === adminProfile.uid) {
+      alert('Root Super Administrator cannot be removed.');
+      return;
+    }
+
+    const confirmed = window.confirm(`Are you sure you want to remove administrator ${admin.name} (${admin.email})? This action will revoke all portal permissions.`);
+    if (!confirmed) return;
+
+    setActionLoading(true);
+    try {
+      const res = await AdminService.removeAdministrator(adminProfile, admin.uid, admin.email);
+      if (res.success) {
+        setSuccessMsg(`Administrator ${admin.name} removed.`);
+        await loadData();
+      } else {
+        alert(res.error || 'Failed to remove admin.');
+      }
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -477,24 +527,42 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => setEditingAdmin(admin)}
-                                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition"
+                                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
                                 title="Edit Permissions"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
+
+                              <button
+                                onClick={() => handleSendResetLink(admin)}
+                                className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition cursor-pointer"
+                                title="Send Password Reset / Invitation Link"
+                              >
+                                <KeyRound className="w-3.5 h-3.5" />
+                              </button>
                               
                               {!isSuper && (
-                                <button
-                                  onClick={() => handleToggleStatus(admin)}
-                                  className={`p-1.5 rounded-lg transition ${
-                                    admin.status === 'active' 
-                                      ? 'bg-rose-50 hover:bg-rose-100 text-rose-600' 
-                                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
-                                  }`}
-                                  title={admin.status === 'active' ? 'Deactivate Admin' : 'Reactivate Admin'}
-                                >
-                                  {admin.status === 'active' ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                                </button>
+                                <>
+                                  <button
+                                    onClick={() => handleToggleStatus(admin)}
+                                    className={`p-1.5 rounded-lg transition cursor-pointer ${
+                                      admin.status === 'active' 
+                                        ? 'bg-rose-50 hover:bg-rose-100 text-rose-600' 
+                                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                                    }`}
+                                    title={admin.status === 'active' ? 'Deactivate Admin' : 'Reactivate Admin'}
+                                  >
+                                    {admin.status === 'active' ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleRemoveAdmin(admin)}
+                                    className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition cursor-pointer"
+                                    title="Remove Admin Account"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </>
                               )}
                             </div>
                           </td>
@@ -658,6 +726,32 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
                 />
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700">Phone Number (Optional)</label>
+                  <input
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="+234..."
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#061A4F]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700">Account Status</label>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value as AdminStatus)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#061A4F]"
+                  >
+                    <option value="active">Active</option>
+                    <option value="invited">Invited (Pending Setup)</option>
+                    <option value="suspended">Suspended</option>
+                  </select>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700">Role Tier</label>
@@ -683,12 +777,56 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
                 </div>
               </div>
 
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Profile Photo URL (Optional)</label>
+                <input
+                  type="url"
+                  value={newPhoto}
+                  onChange={(e) => setNewPhoto(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#061A4F]"
+                />
+              </div>
+
+              {/* Email Invitation Checkbox */}
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={sendInvitation}
+                    onChange={(e) => setSendInvitation(e.target.checked)}
+                    className="w-4 h-4 text-[#061A4F] rounded"
+                  />
+                  <span>Dispatch Setup / Password Reset Email Invitation</span>
+                </label>
+                <p className="text-[10px] text-slate-500 mt-1 pl-6">
+                  Sends an automated Firebase credential access link directly to the administrator's email.
+                </p>
+              </div>
+
               {/* Permissions Checklist */}
               {newRole !== 'SUPER_ADMIN' && (
                 <div className="space-y-2 pt-2 border-t border-slate-100">
                   <div className="flex items-center justify-between">
                     <label className="font-bold text-slate-700">Granular Role Permissions</label>
-                    <span className="text-[10px] text-slate-400">{selectedPermissions.length} selected</span>
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPermissions(ALL_ADMIN_PERMISSIONS.filter(p => !p.key.startsWith('admins.')).map(p => p.key))}
+                        className="text-[#061A4F] font-bold hover:underline cursor-pointer"
+                      >
+                        Select All
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPermissions([])}
+                        className="text-slate-500 hover:underline cursor-pointer"
+                      >
+                        Clear All
+                      </button>
+                      <span className="text-slate-400">({selectedPermissions.length} active)</span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1 bg-slate-50 rounded-xl border border-slate-200">
