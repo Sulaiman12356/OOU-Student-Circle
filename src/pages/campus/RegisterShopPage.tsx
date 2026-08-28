@@ -39,9 +39,7 @@ export const RegisterShopPage: React.FC<RegisterShopPageProps> = ({ onNavigate }
   const [openingHours, setOpeningHours] = useState('08:00');
   const [closingHours, setClosingHours] = useState('18:30');
   const [pickupInstructions, setPickupInstructions] = useState('Present your StudentCircle order reference at the counter.');
-  const [photos, setPhotos] = useState<string[]>([
-    'https://images.unsplash.com/photo-1568667256549-094345857637?w=800&auto=format&fit=crop&q=80'
-  ]);
+  const [photos, setPhotos] = useState<string[]>([]);
   
   // Selected Services
   const [selectedServices, setSelectedServices] = useState<string[]>([
@@ -110,8 +108,8 @@ export const RegisterShopPage: React.FC<RegisterShopPageProps> = ({ onNavigate }
         workingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
         manualStatusOverride: 'auto',
         pickupInstructions: pickupInstructions.trim(),
-        photos: photos.length > 0 ? photos : ['https://images.unsplash.com/photo-1568667256549-094345857637?w=800&auto=format&fit=crop&q=80'],
-        coverPhoto: photos[0] || 'https://images.unsplash.com/photo-1568667256549-094345857637?w=800&auto=format&fit=crop&q=80',
+        photos: photos,
+        coverPhoto: photos.length > 0 ? photos[0] : '',
         verificationStatus: 'pending',
         rating: 5.0,
         reviewsCount: 0,

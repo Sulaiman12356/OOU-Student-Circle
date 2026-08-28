@@ -7,7 +7,7 @@
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
         "email": { "type": "string", "format": "email", "maxLength": 256 },
-        "role": { "type": "string", "enum": ["student", "client", "admin"] },
+        "role": { "type": "string", "enum": ["student", "client", "aspirant", "campus_shop_owner", "market_vendor", "service_provider", "admin", "super_admin", "STUDENT", "CLIENT", "ASPIRANT", "CAMPUS_SHOP_OWNER", "MARKET_VENDOR", "SERVICE_PROVIDER", "ADMIN", "SUPER_ADMIN"] },
         "fullName": { "type": "string", "maxLength": 120 },
         "phoneNumber": { "type": "string", "maxLength": 30 },
         "profilePhoto": { "type": "string", "maxLength": 1024 },

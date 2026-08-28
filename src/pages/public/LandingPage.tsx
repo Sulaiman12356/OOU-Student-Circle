@@ -45,12 +45,14 @@ import {
   Scale,
   RefreshCw,
   Plus,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  HeartHandshake
 } from 'lucide-react';
 import { founderConfig } from '../../config/founder';
 import { CampusStore } from '../../services/campusStore';
-import { DataStore, initialServices } from '../../services/dataStore';
-import { MarketplaceStore, initialProducts } from '../../services/marketplaceStore';
+import { DataStore } from '../../services/dataStore';
+import { MarketplaceStore } from '../../services/marketplaceStore';
 import { OpportunityStore } from '../../services/opportunityStore';
 import { UserAvatar } from '../../components/common/UserAvatar';
 import { ScrollReveal } from '../../components/common/ScrollReveal';
@@ -133,7 +135,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const personaFlows = {
     students: {
       title: "For Student Professionals",
-      subtitle: "Monetize your creative & technical skills with client milestone protection.",
+      subtitle: "Monetize your creative and technical skills with client milestone protection.",
       ctaText: "Become a Student Provider",
       ctaPath: "/auth/register",
       steps: [
@@ -160,14 +162,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       ]
     },
     customers: {
-      title: "For Clients & Students",
+      title: "For Clients and Students",
       subtitle: "Discover verified student talent and campus businesses with zero deposit risk.",
       ctaText: "Explore Student Services",
       ctaPath: "/explore",
       steps: [
         {
           number: "01",
-          title: "Search & Filter",
+          title: "Search and Filter",
           desc: "Browse verified student freelancers by campus, department, rating, and specialized skill."
         },
         {
@@ -177,7 +179,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         },
         {
           number: "03",
-          title: "Request & Escrow",
+          title: "Request and Escrow",
           desc: "Submit your order or post a custom job brief. Funds remain safely in escrow until you approve."
         },
         {
@@ -189,7 +191,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     },
     vendors: {
       title: "For Student Vendors",
-      subtitle: "Launch an on-campus digital storefront and reach thousands of student buyers.",
+      subtitle: "Launch an on-campus digital storefront and reach student buyers across all campuses.",
       ctaText: "Register as a Vendor",
       ctaPath: "/auth/register",
       steps: [
@@ -233,12 +235,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         },
         {
           number: "03",
-          title: "List Services & Rates",
+          title: "List Services and Rates",
           desc: "Publish per-page printing costs, colored slide printing, hardcover project binding, and photo services."
         },
         {
           number: "04",
-          title: "Prepare & Serve Orders",
+          title: "Prepare and Serve Orders",
           desc: "Receive PDF uploads before students arrive, print ahead of time, and hand over with zero queueing."
         }
       ]
@@ -260,11 +262,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     },
     {
       q: "Can clients outside OOU hire student talent?",
-      a: "Yes. Startups, SMEs, university departments, alumni, and external clients anywhere in Nigeria and internationally can post job briefs, browse verified student portfolios, and hire talented OOU students for remote, hybrid, or on-campus tasks."
+      a: "Yes. Startups, businesses, university departments, alumni, and external clients anywhere in Nigeria can post job briefs, browse verified student portfolios, and hire talented OOU students for remote, hybrid, or on-campus tasks."
     },
     {
       q: "Which OOU campuses are supported?",
-      a: "StudentCircle connects all OOU campus locations: Main Campus (Permanent Site, Ago-Iwoye), Mini Campus (Ago-Iwoye), Ibogun Campus (College of Engineering & Technology), Ayetoro Campus (College of Agricultural Sciences), and Sagamu Campus (Obafemi Awolowo College of Health Sciences)."
+      a: "StudentCircle connects all OOU campus locations: Main Campus (Permanent Site, Ago-Iwoye), Mini Campus (Ago-Iwoye), Ibogun Campus (College of Engineering and Technology), Ayetoro Campus (College of Agricultural Sciences), and Sagamu Campus (Obafemi Awolowo College of Health Sciences)."
     },
     {
       q: "Is it free for students to join and list services?",
@@ -303,7 +305,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <div className="text-[11px] font-black text-[#061A4F]">Student Professional</div>
-                <div className="text-[9px] text-slate-500 font-semibold">Verified Portfolio & Escrow</div>
+                <div className="text-[9px] text-slate-500 font-semibold">Verified Portfolio and Escrow</div>
               </div>
             </div>
 
@@ -319,7 +321,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <div className="text-[11px] font-black text-[#061A4F]">Motion Ground Hub</div>
-                <div className="text-[9px] text-emerald-600 font-bold">Pre-Order & Skip Queues</div>
+                <div className="text-[9px] text-emerald-600 font-bold">Pre-Order and Skip Queues</div>
               </div>
             </div>
 
@@ -335,7 +337,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <div className="text-[11px] font-black text-[#061A4F]">Campus Vendor</div>
-                <div className="text-[9px] text-slate-500 font-semibold">Fashion, Tech & Essentials</div>
+                <div className="text-[9px] text-slate-500 font-semibold">Fashion, Tech and Essentials</div>
               </div>
             </div>
 
@@ -351,7 +353,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <div className="text-[11px] font-black text-[#061A4F]">New Opportunity</div>
-                <div className="text-[9px] text-slate-500 font-semibold">Client Briefs & SIWES</div>
+                <div className="text-[9px] text-slate-500 font-semibold">Client Briefs and Projects</div>
               </div>
             </div>
 
@@ -404,7 +406,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               OOU StudentCircle connects students, professionals, vendors, campus businesses and clients in one digital ecosystem built around the real student economy.
             </p>
 
-            {/* Primary & Secondary Call to Action Row */}
+            {/* Primary and Secondary Call to Action Row */}
             <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
               <button
                 id="hero-cta-join"
@@ -445,7 +447,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </button>
             </div>
 
-            {/* MOBILE & TABLET FLOATING ECOSYSTEM FLOW (Interactive on touch devices) */}
+            {/* MOBILE and TABLET FLOATING ECOSYSTEM FLOW */}
             <div className="lg:hidden pt-4">
               <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-2 px-1">
                 <div 
@@ -490,9 +492,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* ============================================================ */}
-            {/* FOUR IMMEDIATE ENTRY POINTS (VISIBLE IN FIRST VIEWPORT)       */}
-            {/* ============================================================ */}
+            {/* FOUR IMMEDIATE ENTRY POINTS (VISIBLE IN FIRST VIEWPORT) */}
             <div className="pt-8 sm:pt-10">
               <div className="flex items-center justify-center gap-2 text-xs font-black text-slate-400 uppercase tracking-wider mb-4">
                 <span>Immediate Entry Points</span>
@@ -515,7 +515,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     </div>
                     <div className="mt-3">
                       <div className="text-xs sm:text-sm font-black text-[#061A4F]">Student Connect</div>
-                      <div className="text-[11px] text-slate-500 line-clamp-1">Meet peers & collaborate</div>
+                      <div className="text-[11px] text-slate-500 line-clamp-1">Meet peers and collaborate</div>
                     </div>
                   </button>
                 </ScrollReveal>
@@ -575,7 +575,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     </div>
                     <div className="mt-3">
                       <div className="text-xs sm:text-sm font-black text-[#061A4F]">Campus Hub</div>
-                      <div className="text-[11px] text-slate-500 line-clamp-1">Print & Motion Ground</div>
+                      <div className="text-[11px] text-slate-500 line-clamp-1">Print and Motion Ground</div>
                     </div>
                   </button>
                 </ScrollReveal>
@@ -589,13 +589,257 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 2. FOUR PILLARS SECTION                                      */}
+      {/* 2. WHAT IS OOU STUDENTCIRCLE? (CLEAR PURPOSE INTRODUCTION)   */}
       {/* ============================================================ */}
-      <section id="four-pillars-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+      <section id="what-is-studentcircle-section" className="py-16 sm:py-20 bg-slate-50/70 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <ScrollReveal direction="up" delay={0}>
+              <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200 shadow-2xs">
+                WHAT IS OOU STUDENTCIRCLE?
+              </span>
+            </ScrollReveal>
+
+            <ScrollReveal direction="up" delay={50}>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-[#061A4F] tracking-tight leading-tight">
+                A Unified Digital Ecosystem for the Entire OOU Student Community
+              </h2>
+            </ScrollReveal>
+
+            <ScrollReveal direction="up" delay={100}>
+              <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed">
+                OOU StudentCircle is the dedicated platform built for students, creatives, entrepreneurs, and campus businesses across Olabisi Onabanjo University. Instead of relying on short-lived status updates, unverified contacts, or walking from shop to shop under the sun, StudentCircle brings verified student talent, campus commerce, Motion Ground business centers, and peer networking into one trusted circle.
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal direction="up" delay={150}>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-left">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#061A4F] flex items-center justify-center font-bold">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-sm font-black text-[#061A4F]">Connected Campuses</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Linking students across Main Campus Ago-Iwoye, Mini Campus, Ibogun, Ayetoro, and Sagamu.
+                  </p>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                  <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-sm font-black text-[#061A4F]">Protected Transactions</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Milestone escrow security ensures providers get paid for good work and buyers receive what they ordered.
+                  </p>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <Store className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-sm font-black text-[#061A4F]">Everyday Utility</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Digital pre-orders for Motion Ground printing, project binding, and student vendor storefronts.
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 3. PURPOSE: OUR AIM, OUR MISSION, OUR VISION (EXACT ORDER)   */}
+      {/* Storytelling order:                                          */}
+      {/* 1. WHAT WE ARE TRYING TO ACHIEVE -> Our Aim                  */}
+      {/* 2. HOW WE INTEND TO ACHIEVE IT   -> Our Mission              */}
+      {/* 3. THE FUTURE WE WANT TO CREATE  -> Our Vision              */}
+      {/* ============================================================ */}
+      <section id="purpose-aim-mission-vision-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          
+          <ScrollReveal direction="up" delay={0} className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
+              PURPOSE AND DIRECTION
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F] tracking-tight">
+              What Drives OOU StudentCircle
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              Every tool, feature, and workflow on StudentCircle is designed with a clear purpose: to support student growth, protect hard work, and make campus opportunities accessible to everyone.
+            </p>
+          </ScrollReveal>
+
+          {/* Sequential 3-Step Story Cards: Aim -> Mission -> Vision */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
+            
+            {/* 1. OUR AIM (WHAT WE ARE TRYING TO ACHIEVE) - PLACED FIRST */}
+            <ScrollReveal direction="up" delay={50} className="h-full">
+              <div 
+                id="purpose-card-aim"
+                className="interactive-card bg-slate-50/90 rounded-3xl p-7 sm:p-8 border-2 border-amber-200/80 shadow-2xs hover:border-[#F5B400] transition-all flex flex-col justify-between space-y-6 h-full relative"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#061A4F] flex items-center justify-center font-bold border border-amber-200">
+                      <Target className="w-6 h-6 text-[#061A4F]" />
+                    </div>
+                    <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                      Step 1 • The Goal
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-700 block">
+                      WHAT WE ARE TRYING TO ACHIEVE
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-[#061A4F] mt-1">
+                      Our Aim
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    To bridge the gap between student talent, campus businesses, and real opportunities across all OOU campuses. We aim to ensure that every student with a skill can be discovered, every campus vendor can grow, and every student arriving on campus can find reliable services without stress or uncertainty.
+                  </p>
+
+                  <div className="space-y-2 pt-2 border-t border-slate-200/70 text-xs text-slate-600">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Make every student skill searchable across all campuses</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Give student vendors and campus shops a permanent digital home</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <span>Provide incoming aspirants with trusted, verified campus services</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-bold text-slate-500 pt-3 border-t border-slate-200/60">
+                  Focus: Discovery, Accessibility and Community Support
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* 2. OUR MISSION (HOW WE INTEND TO ACHIEVE IT) - PLACED SECOND */}
+            <ScrollReveal direction="up" delay={120} className="h-full">
+              <div 
+                id="purpose-card-mission"
+                className="interactive-card bg-[#061A4F] text-white rounded-3xl p-7 sm:p-8 border-2 border-[#0B2A6F] shadow-xl hover:border-[#F5B400] transition-all flex flex-col justify-between space-y-6 h-full relative"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-[#0B2A6F] text-[#F5B400] flex items-center justify-center font-bold border border-white/10 shadow-inner">
+                      <Zap className="w-6 h-6 text-[#F5B400]" />
+                    </div>
+                    <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-white/10 text-[#F5B400] border border-white/10">
+                      Step 2 • The Execution
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-[#F5B400] block">
+                      HOW WE INTEND TO ACHIEVE IT
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
+                      Our Mission
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                    "{founderConfig.mission}"
+                  </p>
+
+                  <div className="space-y-2 pt-2 border-t border-white/10 text-xs text-slate-300">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#F5B400] flex-shrink-0 mt-0.5" />
+                      <span>Verified matriculation profiles to build real peer and client trust</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#F5B400] flex-shrink-0 mt-0.5" />
+                      <span>Milestone escrow protection so students are paid fairly and safely</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#F5B400] flex-shrink-0 mt-0.5" />
+                      <span>Digital pre-orders for Motion Ground printing and project binding</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-bold text-slate-400 pt-3 border-t border-white/10">
+                  Method: Structured Tools, Security and Verified Standards
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* 3. OUR VISION (THE FUTURE WE WANT TO CREATE) - PLACED THIRD */}
+            <ScrollReveal direction="up" delay={190} className="h-full">
+              <div 
+                id="purpose-card-vision"
+                className="interactive-card bg-slate-50/90 rounded-3xl p-7 sm:p-8 border-2 border-blue-200/80 shadow-2xs hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-6 h-full relative"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-100 text-[#061A4F] flex items-center justify-center font-bold border border-blue-200">
+                      <Compass className="w-6 h-6 text-[#061A4F]" />
+                    </div>
+                    <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-blue-100 text-[#061A4F] border border-blue-200">
+                      Step 3 • The Future
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-[#061A4F] block">
+                      THE FUTURE WE WANT TO CREATE
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-[#061A4F] mt-1">
+                      Our Vision
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    "{founderConfig.vision}"
+                  </p>
+
+                  <div className="space-y-2 pt-2 border-t border-slate-200/70 text-xs text-slate-600">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#061A4F] flex-shrink-0 mt-0.5" />
+                      <span>Establish a thriving student-led economy at OOU</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#061A4F] flex-shrink-0 mt-0.5" />
+                      <span>Turn campus projects and skills into lifelong career opportunities</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#061A4F] flex-shrink-0 mt-0.5" />
+                      <span>Build a proven model for student empowerment across Nigeria</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-bold text-slate-500 pt-3 border-t border-slate-200/60">
+                  Horizon: Long-Term Economic Opportunity and Empowerment
+                </div>
+              </div>
+            </ScrollReveal>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 4. FOUR PILLARS SECTION                                      */}
+      {/* ============================================================ */}
+      <section id="four-pillars-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0} className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200 shadow-2xs">
               CORE PLATFORM FOUNDATION
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
@@ -766,14 +1010,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 3. PROBLEM SECTION                                           */}
+      {/* 5. WHY WE ARE BUILDING (PROBLEM & SOLUTION)                   */}
       {/* ============================================================ */}
-      <section id="problem-section" className="py-16 sm:py-24 bg-slate-50/80 border-b border-slate-200">
+      <section id="problem-solution-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0} className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200">
-              THE FRAGMENTATION REALITY
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
+              THE REALITY AND THE SOLUTION
             </span>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-[#061A4F] tracking-tight">
               Student talent is everywhere. <br className="hidden sm:inline" />
@@ -907,14 +1151,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 4. HOW IT WORKS (PERSONA SWITCHER WITH ANIMATED STEPS)        */}
+      {/* 6. HOW IT WORKS (PERSONA SWITCHER WITH ANIMATED STEPS)        */}
       {/* ============================================================ */}
-      <section id="how-it-works-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+      <section id="how-it-works-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0} className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
-              CLEAR & INTUITIVE PROCESS
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200 shadow-2xs">
+              CLEAR AND INTUITIVE PROCESS
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
               How StudentCircle Works
@@ -925,7 +1169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </ScrollReveal>
 
           {/* Persona Switcher Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto p-1.5 bg-slate-100 rounded-2xl">
+          <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto p-1.5 bg-slate-200/80 rounded-2xl">
             <button
               onClick={() => setActivePersonaTab('students')}
               className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer ${
@@ -983,12 +1227,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               {personaFlows[activePersonaTab].steps.map((step, idx) => (
                 <ScrollReveal key={step.number} direction="up" delay={idx * 60}>
                   <div 
-                    className="interactive-card bg-slate-50/80 p-6 rounded-3xl border border-slate-200 hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-4 relative group h-full"
+                    className="interactive-card bg-white p-6 rounded-3xl border border-slate-200 hover:border-[#061A4F] transition-all flex flex-col justify-between space-y-4 relative group h-full shadow-2xs"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-2xl font-black text-[#F5B400]">{step.number}</span>
-                        <span className="w-6 h-6 rounded-full bg-white text-[#061A4F] text-[10px] font-black flex items-center justify-center border border-slate-200">
+                        <span className="w-6 h-6 rounded-full bg-slate-100 text-[#061A4F] text-[10px] font-black flex items-center justify-center border border-slate-200">
                           {idx + 1}
                         </span>
                       </div>
@@ -1002,7 +1246,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-200/60 text-[10px] text-slate-400 font-semibold flex items-center gap-1.5">
+                    <div className="pt-2 border-t border-slate-100 text-[10px] text-slate-400 font-semibold flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Verified Protocol</span>
                     </div>
@@ -1026,9 +1270,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 5. MOTION GROUND DEDICATED SECTION                           */}
+      {/* 7. MOTION GROUND DEDICATED SECTION                           */}
       {/* ============================================================ */}
-      <section id="motion-ground-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
+      <section id="motion-ground-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -1066,7 +1310,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
             
             <ScrollReveal direction="up" delay={40}>
-              <div className="interactive-card bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
+              <div className="interactive-card bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
                 <div className="text-xs font-black text-[#F5B400]">Step 01</div>
                 <div className="text-xs font-black text-[#061A4F]">Search Provider</div>
                 <p className="text-[11px] text-slate-500">Find verified campus centers at Motion Ground or faculty areas.</p>
@@ -1074,7 +1318,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={80}>
-              <div className="interactive-card bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
+              <div className="interactive-card bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
                 <div className="text-xs font-black text-[#F5B400]">Step 02</div>
                 <div className="text-xs font-black text-[#061A4F]">Select Service</div>
                 <p className="text-[11px] text-slate-500">Choose per-page printing, colored slides, hardcover, or passport.</p>
@@ -1082,7 +1326,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={120}>
-              <div className="interactive-card bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
+              <div className="interactive-card bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
                 <div className="text-xs font-black text-[#F5B400]">Step 03</div>
                 <div className="text-xs font-black text-[#061A4F]">Submit Request</div>
                 <p className="text-[11px] text-slate-500">Upload PDF documents and specify binding preferences.</p>
@@ -1090,7 +1334,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={160}>
-              <div className="interactive-card bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
+              <div className="interactive-card bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
                 <div className="text-xs font-black text-[#F5B400]">Step 04</div>
                 <div className="text-xs font-black text-[#061A4F]">Receive Code</div>
                 <p className="text-[11px] text-slate-500">Get an instant unique pickup reference code on your device.</p>
@@ -1098,16 +1342,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={200}>
-              <div className="interactive-card bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
+              <div className="interactive-card bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 h-full">
                 <div className="text-xs font-black text-[#F5B400]">Step 05</div>
-                <div className="text-xs font-black text-[#061A4F]">Arrive & Collect</div>
+                <div className="text-xs font-black text-[#061A4F]">Arrive and Collect</div>
                 <p className="text-[11px] text-slate-500">Walk in, display code, and pick up ready prints immediately.</p>
               </div>
             </ScrollReveal>
 
           </div>
 
-          {/* Real Campus Shops List or Honest State */}
+          {/* Real Campus Shops List */}
           <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-black uppercase tracking-wider text-[#061A4F]">
@@ -1159,7 +1403,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white p-8 rounded-3xl border border-slate-200 text-center space-y-3 max-w-xl mx-auto">
+              <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 text-center space-y-3 max-w-xl mx-auto">
                 <Store className="w-10 h-10 text-slate-400 mx-auto" />
                 <div className="text-sm font-bold text-[#061A4F]">No campus shops registered yet</div>
                 <p className="text-xs text-slate-500">
@@ -1179,9 +1423,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 6. STUDENT CONNECT SECTION                                   */}
+      {/* 8. STUDENT CONNECT SECTION                                   */}
       {/* ============================================================ */}
-      <section id="student-connect-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+      <section id="student-connect-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0}>
@@ -1272,7 +1516,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 7. STUDENT SERVICES SECTION (PROFESSIONAL MARKETPLACE)        */}
+      {/* 9. STUDENT SERVICES SECTION (TALENT SHOWCASE)                */}
       {/* ============================================================ */}
       <section id="services-showcase-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -1376,7 +1620,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 8. MARKETPLACE SECTION                                       */}
+      {/* 10. MARKETPLACE SECTION                                      */}
       {/* ============================================================ */}
       <section id="marketplace-showcase-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -1476,14 +1720,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 9. TRUST & SAFETY SECTION                                    */}
+      {/* 11. TRUST & SAFETY SECTION                                   */}
       {/* ============================================================ */}
       <section id="trust-safety-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
           <ScrollReveal direction="up" delay={0} className="text-center max-w-3xl mx-auto space-y-3">
             <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-emerald-50 px-3.5 py-1 rounded-full border border-emerald-200 text-emerald-800">
-              SAFETY, ESCROW & INTEGRITY
+              SAFETY, ESCROW AND INTEGRITY
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#061A4F]">
               How StudentCircle Builds Trust
@@ -1550,7 +1794,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               onClick={() => onNavigate('/safety')}
               className="text-xs font-bold text-[#061A4F] hover:underline flex items-center gap-1.5 mx-auto cursor-pointer"
             >
-              <span>Visit our Safety Center & Trust Policy</span>
+              <span>Visit our Safety Center and Trust Policy</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#F5B400]" />
             </button>
           </div>
@@ -1559,7 +1803,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 10. CAMPUS COVERAGE ZONE                                     */}
+      {/* 12. CAMPUS COVERAGE ZONE                                     */}
       {/* ============================================================ */}
       <section id="campus-coverage-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -1667,7 +1911,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 11. FOUNDER SECTION                                          */}
+      {/* 13. FOUNDER STORY SECTION                                    */}
       {/* ============================================================ */}
       <section id="founder-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1738,7 +1982,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     </p>
                   </div>
 
-                  {/* CTA & Connect Buttons */}
+                  {/* CTA and Connect Buttons */}
                   <div className="pt-2 flex flex-wrap items-center gap-3">
                     <button
                       onClick={() => onNavigate('/about')}
@@ -1770,60 +2014,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 12. MISSION & VISION SECTION                                 */}
+      {/* 14. FREQUENTLY ASKED QUESTIONS ACCORDION                     */}
       {/* ============================================================ */}
-      <section id="mission-vision-section" className="py-16 sm:py-20 bg-slate-50/80 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
-            {/* Mission */}
-            <ScrollReveal direction="right" delay={50}>
-              <div className="interactive-card bg-[#061A4F] text-white p-7 sm:p-8 rounded-3xl border border-[#0B2A6F] shadow-xl space-y-3 h-full flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#0B2A6F] text-[#F5B400] flex items-center justify-center font-bold border border-white/10 shadow-inner">
-                    <Target className="w-5 h-5 text-[#F5B400]" />
-                  </div>
-                  <div className="text-xs font-black uppercase tracking-wider text-[#F5B400]">Our Mission</div>
-                  <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
-                    "{founderConfig.mission}"
-                  </p>
-                </div>
-                <p className="text-xs text-slate-300 pt-2 border-t border-[#0B2A6F]">
-                  Making student talent and campus enterprises immediately accessible and rewarding.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            {/* Vision */}
-            <ScrollReveal direction="left" delay={100}>
-              <div className="interactive-card bg-white p-7 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-3 h-full flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-50 text-[#061A4F] flex items-center justify-center font-bold border border-amber-100">
-                    <Compass className="w-5 h-5 text-[#061A4F]" />
-                  </div>
-                  <div className="text-xs font-black uppercase tracking-wider text-[#061A4F]">Our Vision</div>
-                  <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
-                    "{founderConfig.vision}"
-                  </p>
-                </div>
-                <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">
-                  Building a permanent bridge between student learning and lifelong economic opportunities.
-                </p>
-              </div>
-            </ScrollReveal>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* 13. FREQUENTLY ASKED QUESTIONS ACCORDION                     */}
-      {/* ============================================================ */}
-      <section id="faq-section" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+      <section id="faq-section" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
           <ScrollReveal direction="up" delay={0} className="text-center space-y-3">
-            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-slate-100 px-3.5 py-1 rounded-full border border-slate-200">
+            <span className="text-xs font-black tracking-widest text-[#061A4F] uppercase bg-white px-3.5 py-1 rounded-full border border-slate-200 shadow-2xs">
               FREQUENTLY ASKED QUESTIONS
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#061A4F]">
@@ -1865,7 +2062,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ============================================================ */}
-      {/* 14. FINAL CALL TO ACTION                                     */}
+      {/* 15. FINAL CALL TO ACTION                                     */}
       {/* ============================================================ */}
       <section id="final-cta-section" className="py-16 sm:py-24 bg-[#061A4F] text-white relative overflow-hidden">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative z-10">

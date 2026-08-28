@@ -46,9 +46,9 @@ interface VendorDashboardProps {
 
 export const VendorDashboard: React.FC<VendorDashboardProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
-  const studentId = currentUser?.id || 'student-1';
+  const studentId = currentUser?.id || '';
   
-  const vendor = MarketplaceStore.getVendorByStudentId(studentId);
+  const vendor = studentId ? MarketplaceStore.getVendorByStudentId(studentId) : null;
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'wallet' | 'promotions' | 'settings'>('overview');
 
   // Modals

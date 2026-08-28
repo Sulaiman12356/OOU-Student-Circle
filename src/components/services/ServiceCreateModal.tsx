@@ -241,12 +241,12 @@ export const ServiceCreateModal: React.FC<ServiceCreateModalProps> = ({
 
     const newOrUpdatedService: ServiceItem = {
       id: editingService?.id || `srv-${Date.now()}`,
-      studentId: currentUser?.id || 'student-1',
+      studentId: currentUser?.id || '',
       studentName: currentUser?.fullName || 'Student Provider',
-      studentPhoto: currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-      studentDepartment: currentUser?.department || 'Computer Science',
-      studentLevel: currentUser?.level || '400L',
-      studentFaculty: currentUser?.faculty || 'Faculty of Science',
+      studentPhoto: currentUser?.profilePhoto || '',
+      studentDepartment: currentUser?.department || '',
+      studentLevel: currentUser?.level || '',
+      studentFaculty: currentUser?.faculty || '',
       isStudentVerified: currentUser?.isVerified || false,
       title: title.trim(),
       category,

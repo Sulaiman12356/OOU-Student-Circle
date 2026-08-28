@@ -1,37 +1,33 @@
+import { db, isConfigured } from './firebase';
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { UserProfile, StudentLevel } from '../types';
 import { 
   PublicStudentProfile, 
+  StudentPrivacySettings, 
   ConnectionRequest, 
   StudentConnection, 
-  StudentPrivacySettings, 
-  StudentConnectFilter, 
-  SmartRecommendations 
+  StudentConnectFilter 
 } from '../types/studentConnect';
-import { UserProfile, ServiceItem } from '../types';
-import { initialUsers, DataStore } from './dataStore';
-import { CampusStore } from './campusStore';
-import { db, isConfigured } from './firebase';
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where 
-} from 'firebase/firestore';
+import { DataStore } from './dataStore';
 
 const STORAGE_PREFIX = 'oou_student_connect_';
 
-// Default privacy settings
+export type { PublicStudentProfile, ConnectionRequest, StudentConnection, StudentConnectFilter };
+
+export interface SmartRecommendations {
+  nearCampus: PublicStudentProfile[];
+  similarSkills: PublicStudentProfile[];
+  inDepartment: PublicStudentProfile[];
+  youMayKnow: PublicStudentProfile[];
+}
+
 export const defaultPrivacySettings: StudentPrivacySettings = {
   profileVisibility: 'public',
-  showServices: true,
-  allowConnectionRequests: true,
-  allowDirectMessages: 'everyone',
   showEmail: false,
   showPhone: false,
+  showServices: true,
+  allowConnectionRequests: true,
+  allowDirectMessages: 'everyone'
 };
 
 // Initial student interests for OOU students
@@ -52,205 +48,8 @@ export const popularStudentInterests = [
   'Leadership & Governance'
 ];
 
-// Rich Initial Seed Student Data for Discovery
-export const extendedSeedStudents: PublicStudentProfile[] = [
-  {
-    id: 'student-1',
-    fullName: 'Onifade Sulaiman',
-    profilePhoto: initialUsers[0]?.profilePhoto,
-    department: 'Computer Science',
-    faculty: 'Faculty of Science',
-    level: '400L',
-    location: 'Main Campus (Permanent Site)',
-    campusSlug: 'main-campus',
-    shortBio: 'Computer Science student and full-stack web developer passionate about building digital products that empower students and solve real community problems.',
-    skills: ['Web Development', 'React', 'TypeScript', 'Tailwind CSS', 'UI/UX Design', 'Node.js'],
-    interests: ['Artificial Intelligence', 'Web & Mobile Development', 'Campus Entrepreneurship', 'Fintech & Cryptocurrency'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 4.9,
-    reviewsCount: 28,
-    completedJobsCount: 28,
-    availableForWork: true,
-    createdAt: '2024-01-15T10:00:00Z',
-    achievements: [
-      { id: 'ach-1', title: 'NACOSS OOU Tech Lead & Hackathon Winner', year: '2023', issuer: 'NACOSS OOU Chapter', description: 'Awarded 1st place in campus product development hackathon.' },
-      { id: 'ach-2', title: 'Dean\'s Honours List for Academic Excellence', year: '2023', issuer: 'Faculty of Science' }
-    ],
-    portfolio: [
-      {
-        id: 'p-1',
-        title: 'OOU Campus Marketplace',
-        description: 'Modern student portal and service directory built with React.',
-        imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80',
-        projectUrl: 'https://github.com/ipesola/oou-studentcircle'
-      }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-2',
-    fullName: 'Adebayo Samuel',
-    profilePhoto: initialUsers[1]?.profilePhoto,
-    department: 'Fine and Applied Arts',
-    faculty: 'Faculty of Arts',
-    level: '300L',
-    location: 'Mini Campus',
-    campusSlug: 'mini-campus',
-    shortBio: 'Graphic designer specialized in minimalist logos, professional business branding, social media fliers and print design.',
-    skills: ['Logo Design', 'Brand Identity', 'Flyer Design', 'Photoshop', 'Illustrator'],
-    interests: ['Graphic Design & 3D Art', 'Content Creation & Media', 'Campus Entrepreneurship'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 4.8,
-    reviewsCount: 19,
-    completedJobsCount: 19,
-    availableForWork: true,
-    createdAt: '2024-02-01T08:00:00Z',
-    achievements: [
-      { id: 'ach-3', title: 'Best Visual Artist Award', year: '2023', issuer: 'OOU Arts & Cultural Exhibition' }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-3',
-    fullName: 'Maryam Adeola',
-    profilePhoto: initialUsers[2]?.profilePhoto,
-    department: 'Mass Communication',
-    faculty: 'Faculty of Social and Management Sciences',
-    level: '300L',
-    location: 'Main Campus (Permanent Site)',
-    campusSlug: 'main-campus',
-    shortBio: 'Mass Communication student, creative writer, and social media strategist helping small businesses tell compelling brand stories.',
-    skills: ['Content Writing', 'Copywriting', 'Social Media Management', 'Proofreading', 'SEO Writing'],
-    interests: ['Content Creation & Media', 'Digital Marketing & Sales', 'Public Speaking & Debate'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 4.9,
-    reviewsCount: 14,
-    completedJobsCount: 14,
-    availableForWork: true,
-    createdAt: '2024-02-15T09:00:00Z',
-    achievements: [
-      { id: 'ach-4', title: 'OOU Press Club Editor-in-Chief', year: '2024', issuer: 'Union of Campus Journalists' }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-4',
-    fullName: 'Praise Daniel',
-    profilePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    department: 'Biochemistry',
-    faculty: 'Faculty of Basic Medical Sciences',
-    level: '300L',
-    location: 'Sagamu Campus',
-    campusSlug: 'sagamu-campus',
-    shortBio: 'Campus event photographer & short-form video editor producing visual content for student brands and university events.',
-    skills: ['Photography', 'Video Editing', 'Premiere Pro', 'Event Coverage', 'Reels Creation'],
-    interests: ['Photography & Video Production', 'Health & Fitness', 'Music & Entertainment'],
-    isVerified: false,
-    verificationStatus: 'pending',
-    rating: 4.7,
-    reviewsCount: 8,
-    completedJobsCount: 8,
-    availableForWork: true,
-    createdAt: '2024-03-01T12:00:00Z',
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-5',
-    fullName: 'Fatima Balogun',
-    profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-    department: 'Agricultural Economics',
-    faculty: 'College of Agricultural Sciences',
-    level: '400L',
-    location: 'Ayetoro Campus',
-    campusSlug: 'ayetoro-campus',
-    shortBio: 'Agritech researcher, agribusiness planner, and campus tutor helping farm cooperatives and student startups structure viable farm proposals.',
-    skills: ['Agribusiness Planning', 'Data Analysis', 'Excel & SPSS', 'Market Research', 'Project Management'],
-    interests: ['Academic Research & Study', 'Campus Entrepreneurship', 'Leadership & Governance'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 5.0,
-    reviewsCount: 11,
-    completedJobsCount: 11,
-    availableForWork: true,
-    createdAt: '2024-03-10T14:00:00Z',
-    achievements: [
-      { id: 'ach-5', title: 'Ogun Agribusiness Innovation Fellow', year: '2023', issuer: 'Ogun State Agri-Hub' }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-6',
-    fullName: 'Kolawole Emmanuel',
-    profilePhoto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
-    department: 'Mechanical Engineering',
-    faculty: 'College of Engineering and Environmental Studies',
-    level: '500L',
-    location: 'Ibogun Campus',
-    campusSlug: 'ibogun-campus',
-    shortBio: 'Engineering student specializing in CAD modeling, 3D printing preparation, technical documentation, and drone electronics.',
-    skills: ['AutoCAD', 'SolidWorks', '3D Modeling', 'Robotics', 'MATLAB', 'Technical Writing'],
-    interests: ['Artificial Intelligence', 'Academic Research & Study', 'Web & Mobile Development'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 4.9,
-    reviewsCount: 16,
-    completedJobsCount: 16,
-    availableForWork: true,
-    createdAt: '2024-01-28T16:00:00Z',
-    achievements: [
-      { id: 'ach-6', title: 'OOU Engineering Design Expo Silver Medal', year: '2023', issuer: 'Faculty of Engineering' }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-7',
-    fullName: 'Chidinma Okafor',
-    profilePhoto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
-    department: 'Law',
-    faculty: 'Faculty of Law',
-    level: '400L',
-    location: 'Main Campus (Permanent Site)',
-    campusSlug: 'main-campus',
-    shortBio: 'Law student, university debater, and student legal advisor passionate about corporate law, contracts review, and startup IP advisory.',
-    skills: ['Legal Drafting', 'Contract Review', 'Debating', 'Public Speaking', 'Research'],
-    interests: ['Public Speaking & Debate', 'Leadership & Governance', 'Campus Entrepreneurship'],
-    isVerified: true,
-    verificationStatus: 'verified',
-    rating: 5.0,
-    reviewsCount: 7,
-    completedJobsCount: 7,
-    availableForWork: true,
-    createdAt: '2024-02-20T10:00:00Z',
-    achievements: [
-      { id: 'ach-7', title: 'All-Nigeria Universities Debating Champion', year: '2023', issuer: 'ANUDC' }
-    ],
-    privacySettings: { ...defaultPrivacySettings }
-  },
-  {
-    id: 'student-8',
-    fullName: 'David Olawale',
-    profilePhoto: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80',
-    department: 'Accounting',
-    faculty: 'Faculty of Social and Management Sciences',
-    level: '200L',
-    location: 'Main Campus (Permanent Site)',
-    campusSlug: 'main-campus',
-    shortBio: 'Accounting enthusiast, bookkeeping consultant for campus student vendors, and financial modeling learner.',
-    skills: ['Bookkeeping', 'Financial Analysis', 'QuickBooks', 'Excel Modeling', 'Tax Fundamentals'],
-    interests: ['Fintech & Cryptocurrency', 'Campus Entrepreneurship', 'Academic Research & Study'],
-    isVerified: false,
-    verificationStatus: 'unverified',
-    rating: 4.6,
-    reviewsCount: 3,
-    completedJobsCount: 3,
-    availableForWork: true,
-    createdAt: '2024-04-05T11:00:00Z',
-    privacySettings: { ...defaultPrivacySettings }
-  }
-];
+// Public Student Profiles - Empty by default, populated strictly from real registered accounts
+export const extendedSeedStudents: PublicStudentProfile[] = [];
 
 export class StudentConnectStore {
   // Local storage helpers
@@ -263,40 +62,49 @@ export class StudentConnectStore {
     }
   }
 
-  private static setStored<T>(key: string, val: T): void {
+  private static setStored<T>(key: string, value: T): void {
     try {
-      localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(val));
-    } catch {
-      // ignore
+      localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    } catch (e) {
+      console.error('Storage set error:', e);
     }
   }
 
   /**
-   * Sanitizes a student profile to ensure no private data is publicly exposed.
-   * Matric number, JAMB number, and private phone/email are strictly removed.
+   * Helper to format UserProfile to PublicStudentProfile while respecting privacy
    */
-  public static sanitizeProfile(user: UserProfile, privacy?: StudentPrivacySettings): PublicStudentProfile {
-    const priv = privacy || this.getPrivacySettingsSync(user.id);
+  public static sanitizeProfile(user: UserProfile): PublicStudentProfile {
+    const priv: StudentPrivacySettings = this.getPrivacySettingsSync(user.id);
     
+    // Map campus string to slug if needed
+    let campusSlug = 'main-campus';
+    const loc = (user.location || 'Main Campus').toLowerCase();
+    if (loc.includes('mini')) campusSlug = 'mini-campus';
+    else if (loc.includes('sagamu')) campusSlug = 'sagamu-campus';
+    else if (loc.includes('ayetoro')) campusSlug = 'ayetoro-campus';
+    else if (loc.includes('ibogun')) campusSlug = 'ibogun-campus';
+
     return {
       id: user.id,
-      fullName: user.fullName,
+      fullName: user.fullName || 'Student',
       profilePhoto: user.profilePhoto,
+      coverPhoto: user.coverPhoto,
       department: user.department,
       faculty: user.faculty,
-      level: user.level,
+      level: user.level as StudentLevel,
       location: user.location || 'Main Campus (Permanent Site)',
+      campusSlug,
       shortBio: user.shortBio,
       skills: user.skills || [],
-      interests: (user as any).interests || [],
-      achievements: (user as any).achievements || [],
-      portfolio: user.portfolio || [],
-      isVerified: user.isVerified || user.verificationStatus === 'verified',
-      verificationStatus: user.verificationStatus,
-      rating: user.rating || 5.0,
+      interests: user.interests || [],
+      isVerified: user.isVerified || false,
+      verificationStatus: user.verificationStatus || (user.isVerified ? 'verified' : 'unverified'),
+      rating: user.rating || 0,
       reviewsCount: user.reviewsCount || 0,
       completedJobsCount: user.completedJobsCount || 0,
       availableForWork: user.availableForWork ?? true,
+      achievements: user.achievements || [],
+      portfolio: user.portfolio || [],
       createdAt: user.createdAt || new Date().toISOString(),
       privacySettings: priv,
       // Only include contact if explicitly made public by user
@@ -330,12 +138,9 @@ export class StudentConnectStore {
       }
     }
 
-    // 2. Merge with extended seed students for comprehensive search experience
+    // 2. Merge with real local users from DataStore
     const localUsers = DataStore.getUsers().filter(u => u.role === 'student');
     const mergedMap = new Map<string, PublicStudentProfile>();
-
-    // Add extended seed students first
-    extendedSeedStudents.forEach(s => mergedMap.set(s.id, s));
 
     // Add/overwrite from DataStore
     localUsers.forEach(u => {
@@ -376,11 +181,11 @@ export class StudentConnectStore {
       }
 
       if (filter.faculty && filter.faculty !== 'all') {
-        result = result.filter(s => s.faculty?.toLowerCase() === filter.faculty.toLowerCase());
+        result = result.filter(s => s.faculty?.toLowerCase() === filter.faculty!.toLowerCase());
       }
 
       if (filter.department && filter.department !== 'all') {
-        result = result.filter(s => s.department?.toLowerCase().includes(filter.department.toLowerCase()));
+        result = result.filter(s => s.department?.toLowerCase().includes(filter.department!.toLowerCase()));
       }
 
       if (filter.level && filter.level !== 'all') {
@@ -388,11 +193,11 @@ export class StudentConnectStore {
       }
 
       if (filter.skill && filter.skill !== 'all') {
-        result = result.filter(s => s.skills?.some(sk => sk.toLowerCase() === filter.skill.toLowerCase()));
+        result = result.filter(s => s.skills?.some(sk => sk.toLowerCase() === filter.skill!.toLowerCase()));
       }
 
       if (filter.interest && filter.interest !== 'all') {
-        result = result.filter(s => s.interests?.some(it => it.toLowerCase() === filter.interest.toLowerCase()));
+        result = result.filter(s => s.interests?.some(it => it.toLowerCase() === filter.interest!.toLowerCase()));
       }
 
       if (filter.onlyVerified) {
@@ -497,7 +302,7 @@ export class StudentConnectStore {
     const newRequest: ConnectionRequest = {
       id: requestId,
       senderId: sender.id,
-      senderName: sender.fullName,
+      senderName: sender.fullName || 'Student',
       senderPhoto: sender.profilePhoto,
       senderDepartment: sender.department || 'Student',
       senderLevel: sender.level || '',
@@ -530,8 +335,8 @@ export class StudentConnectStore {
         userId: targetUserId,
         type: 'system',
         title: 'New Connection Request',
-        message: `${sender.fullName} from ${sender.department || 'OOU'} wants to connect with you.`,
-        link: '/student-connect/requests',
+        message: `${sender.fullName || 'A student'} from ${sender.department || 'OOU'} wants to connect with you.`,
+        link: '/student-connect?tab=requests',
         read: false,
         createdAt: new Date().toISOString()
       });
@@ -731,8 +536,8 @@ export class StudentConnectStore {
       };
     }
 
-    const userCampus = currentUser.location?.toLowerCase() || '';
-    const userDept = currentUser.department?.toLowerCase() || '';
+    const userCampus = (currentUser.location || '').toLowerCase();
+    const userDept = (currentUser.department || '').toLowerCase();
     const userSkills = new Set((currentUser.skills || []).map(s => s.toLowerCase()));
 
     // 1. Same/Near Campus
@@ -804,35 +609,10 @@ export class StudentConnectStore {
 
   // Internal storage helpers
   private static getAllRequests(): ConnectionRequest[] {
-    const initialReqs: ConnectionRequest[] = [
-      {
-        id: 'req_seed_1',
-        senderId: 'student-2',
-        senderName: 'Adebayo Samuel',
-        senderPhoto: initialUsers[1]?.profilePhoto,
-        senderDepartment: 'Fine and Applied Arts',
-        senderLevel: '300L',
-        senderCampus: 'Mini Campus',
-        receiverId: 'student-1',
-        status: 'pending',
-        createdAt: '2024-05-16T10:00:00Z',
-        updatedAt: '2024-05-16T10:00:00Z',
-        note: 'Hey Sulaiman! Loved your campus marketplace project. Would love to collaborate on UI/brand designs.'
-      }
-    ];
-    return this.getStored<ConnectionRequest[]>('requests', initialReqs);
+    return this.getStored<ConnectionRequest[]>('requests', []);
   }
 
   private static getAllConnections(): StudentConnection[] {
-    const initialConns: StudentConnection[] = [
-      {
-        id: 'conn_seed_1',
-        user1Id: 'student-1',
-        user2Id: 'student-3',
-        users: ['student-1', 'student-3'],
-        connectedAt: '2024-05-01T12:00:00Z'
-      }
-    ];
-    return this.getStored<StudentConnection[]>('connections', initialConns);
+    return this.getStored<StudentConnection[]>('connections', []);
   }
 }

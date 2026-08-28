@@ -70,18 +70,18 @@ export const TransactionsHubPage: React.FC<TransactionsHubPageProps> = ({
 
   const partyUser: PartyInfo = currentUser ? {
     id: currentUser.id,
-    name: currentUser.name,
+    name: currentUser.name || currentUser.fullName || 'User',
     email: currentUser.email,
     phoneNumber: currentUser.phoneNumber,
-    photo: currentUser.avatar,
+    photo: currentUser.avatar || currentUser.profilePhoto,
     role: currentUser.role as any,
     departmentOrCompany: currentUser.department || currentUser.companyName,
     faculty: currentUser.faculty,
     level: currentUser.level,
-    location: currentUser.campusLocation
+    location: currentUser.campusLocation || currentUser.location
   } : {
-    id: 'demo-user',
-    name: 'Student Demo User',
+    id: '',
+    name: 'Guest User',
     role: 'student'
   };
 

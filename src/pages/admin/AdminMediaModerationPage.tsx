@@ -30,53 +30,7 @@ interface MediaItem {
   rejectionReason?: string;
 }
 
-const initialMediaQueue: MediaItem[] = [
-  {
-    id: 'med-1',
-    type: 'shop_cover',
-    ownerId: 'student-1',
-    ownerName: 'Alhaja Kudirat',
-    ownerRole: 'Campus Shop Owner',
-    title: 'Alhaja Biz Venture Motion Ground Storefront',
-    imageUrl: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=800&auto=format&fit=crop&q=80',
-    status: 'approved',
-    submittedAt: '2024-05-18T08:00:00Z',
-    reviewedAt: '2024-05-18T09:00:00Z',
-  },
-  {
-    id: 'med-2',
-    type: 'product_image',
-    ownerId: 'student-2',
-    ownerName: 'Babatunde Fashola',
-    ownerRole: 'Student Vendor',
-    title: 'Custom OOU Branded Varsity Hoodie (Navy & Gold)',
-    imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80',
-    status: 'approved',
-    submittedAt: '2024-05-17T14:30:00Z',
-  },
-  {
-    id: 'med-3',
-    type: 'service_portfolio',
-    ownerId: 'student-3',
-    ownerName: 'Emmanuel Adeyemi',
-    ownerRole: 'Student Freelancer',
-    title: 'OOU Student Union Election Campaign Poster Sample',
-    imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
-    status: 'pending',
-    submittedAt: '2024-05-18T10:15:00Z',
-  },
-  {
-    id: 'med-4',
-    type: 'profile_photo',
-    ownerId: 'aspirant-2',
-    ownerName: 'Ngozi Okonjo',
-    ownerRole: 'Incoming Aspirant',
-    title: 'Profile Avatar Photo',
-    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
-    status: 'pending',
-    submittedAt: '2024-05-18T11:00:00Z',
-  }
-];
+const initialMediaQueue: MediaItem[] = [];
 
 export const AdminMediaModerationPage: React.FC = () => {
   const [queue, setQueue] = useState<MediaItem[]>(initialMediaQueue);

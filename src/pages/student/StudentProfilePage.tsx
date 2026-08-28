@@ -121,14 +121,14 @@ export const StudentProfilePage: React.FC = () => {
   useEffect(() => {
     if (currentUser?.id) {
       const allServices = DataStore.getServices();
-      const studentServices = allServices.filter(s => s.studentId === currentUser.id || s.studentId === 'student-1');
+      const studentServices = allServices.filter(s => s.studentId === currentUser.id);
       setUserServices(studentServices);
     }
   }, [currentUser]);
 
   const activeUserProfile: UserProfile = {
-    id: currentUser?.id || 'student-1',
-    email: currentUser?.email || 'student@ooustudentcircle.com',
+    id: currentUser?.id || '',
+    email: currentUser?.email || '',
     role: currentUser?.role || 'student',
     fullName,
     phoneNumber,

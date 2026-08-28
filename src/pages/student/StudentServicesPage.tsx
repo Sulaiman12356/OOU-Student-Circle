@@ -46,7 +46,7 @@ export const StudentServicesPage: React.FC<StudentServicesPageProps> = ({
   initialCreateOpen = false 
 }) => {
   const { currentUser } = useAuth();
-  const studentId = currentUser?.id || 'student-1';
+  const studentId = currentUser?.id || '';
 
   // Active Tab: 'services' | 'requests' | 'quotes' | 'orders' | 'reviews'
   const [activeTab, setActiveTab] = useState<'services' | 'requests' | 'quotes' | 'orders' | 'reviews'>(() => {

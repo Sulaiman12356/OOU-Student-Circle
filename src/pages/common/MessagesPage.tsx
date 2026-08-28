@@ -34,19 +34,27 @@ export const MessagesPage: React.FC<MessagesPageProps> = ({
   const [activeViewMode, setActiveViewMode] = useState<'chat' | 'test_studio'>('chat');
   const [mobileActiveView, setMobileActiveView] = useState<'list' | 'chat'>('list');
 
-  // Fallback demo user if currentUser is not yet loaded
-  const effectiveUser: UserProfile = currentUser || {
-    id: 'student-1',
-    fullName: 'Onifade Sulaiman',
-    email: 'sulaiman@ooustudentcircle.com',
-    role: 'student',
-    phoneNumber: '+234 812 345 6789',
-    location: 'Ago-Iwoye Main Campus',
-    isVerified: true,
-    status: 'active',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  };
+  if (!currentUser) {
+    return (
+      <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center max-w-lg mx-auto my-12 space-y-4">
+        <div className="w-12 h-12 rounded-full bg-blue-50 text-[#061A4F] flex items-center justify-center mx-auto">
+          <MessageSquare className="w-6 h-6 text-[#061A4F]" />
+        </div>
+        <h2 className="text-xl font-bold text-[#061A4F]">Sign In to Access Messages</h2>
+        <p className="text-xs text-slate-500">
+          Sign in to your OOU StudentCircle account to chat securely with fellow students, vendors, and service providers.
+        </p>
+        <button
+          onClick={() => onNavigate ? onNavigate('/login') : (window.location.href = '/login')}
+          className="px-6 py-2.5 bg-[#061A4F] text-white rounded-xl text-xs font-bold shadow-sm hover:bg-[#08246c] transition"
+        >
+          Sign In Now
+        </button>
+      </div>
+    );
+  }
+
+  const effectiveUser = currentUser;
 
   useEffect(() => {
     if (!effectiveUser?.id) return;
