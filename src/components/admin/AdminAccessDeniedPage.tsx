@@ -107,11 +107,11 @@ export const AdminAccessDeniedPage: React.FC<AdminAccessDeniedPageProps> = ({
             <span>Marketplace</span>
           </button>
           <button
-            onClick={() => onNavigate('/admin/login')}
+            onClick={() => onNavigate('/secure-admin')}
             className="w-full sm:w-1/2 px-4 py-2.5 bg-[#061A4F] hover:bg-[#08226b] text-[#F5B400] text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
           >
             <KeyRound className="w-3.5 h-3.5 text-[#F5B400]" />
-            <span>Admin Sign In</span>
+            <span>Administrator Access</span>
           </button>
         </div>
 

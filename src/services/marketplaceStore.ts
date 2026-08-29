@@ -103,7 +103,6 @@ export const initialPromotionPackages: PromotionPackage[] = [
   }
 ];
 
-// Initial Demo Vendors (Marked isDemo: true)
 // Initial Vendors - Empty by default, registered by real campus vendors
 export const initialVendors: VendorProfile[] = [];
 

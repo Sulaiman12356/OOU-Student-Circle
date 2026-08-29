@@ -5,6 +5,7 @@ import { OpportunityStore } from '../../services/opportunityStore';
 import { TransactionEngineStore } from '../../services/transactionEngineStore';
 import { TrustSafetyStore } from '../../services/trustSafetyStore';
 import { UserProfile, UserRole } from '../../types';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { 
   Users, 
   Search, 
@@ -234,10 +235,10 @@ export const AdminUsersPage: React.FC = () => {
                     {/* User info */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={user.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                          alt={user.fullName}
-                          className="w-9 h-9 rounded-xl object-cover border border-slate-200 flex-shrink-0"
+                        <UserAvatar
+                          name={user.fullName}
+                          photoUrl={user.profilePhoto}
+                          size="sm"
                         />
                         <div className="min-w-0">
                           <div className="font-bold text-[#061A4F] flex items-center gap-1.5">
@@ -374,10 +375,10 @@ export const AdminUsersPage: React.FC = () => {
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <img
-                  src={selectedUser.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                  alt={selectedUser.fullName}
-                  className="w-14 h-14 rounded-2xl object-cover border-2 border-slate-200"
+                <UserAvatar
+                  name={selectedUser.fullName}
+                  photoUrl={selectedUser.profilePhoto}
+                  size="lg"
                 />
                 <div>
                   <h3 className="text-base font-bold text-[#061A4F] flex items-center gap-1.5">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, ConversationType, ConversationContext, UserRole } from '../../types';
 import { MessagingStore } from '../../services/messagingStore';
 import { FirestoreService } from '../../services/firestoreService';
+import { UserAvatar } from '../common/UserAvatar';
 import { 
   X, 
   Search, 

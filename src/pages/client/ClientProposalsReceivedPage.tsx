@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { DataStore } from '../../services/dataStore';
 import { Proposal } from '../../types';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { 
   Users, 
   CheckCircle2, 
@@ -70,10 +71,10 @@ export const ClientProposalsReceivedPage: React.FC<ClientProposalsReceivedPagePr
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={proposal.studentPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}
-                      alt={proposal.studentName}
-                      className="w-12 h-12 rounded-2xl object-cover border-2 border-[#F5B400] flex-shrink-0"
+                    <UserAvatar
+                      name={proposal.studentName}
+                      photoUrl={proposal.studentPhoto}
+                      size="md"
                     />
                     <div>
                       <div className="flex items-center gap-2">

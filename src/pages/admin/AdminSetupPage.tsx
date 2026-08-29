@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { AdminService } from '../../services/adminService';
-import { SUPER_ADMIN_EMAIL, SUPER_ADMIN_PERMISSIONS } from '../../types/admin';
+import { SUPER_ADMIN_PERMISSIONS } from '../../types/admin';
 import { 
   ShieldCheck, 
   Lock, 
@@ -27,12 +27,12 @@ interface AdminSetupPageProps {
 export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) => {
   const { isAdminAuthenticated, isSuperAdmin, adminProfile } = useAdminAuth();
 
-  const [fullName, setFullName] = useState('Sulaiman Ipesola');
-  const [email, setEmail] = useState(SUPER_ADMIN_EMAIL);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80');
+  const [profilePhoto, setProfilePhoto] = useState('');
   const [securityKey, setSecurityKey] = useState('');
   
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
@@ -117,8 +117,8 @@ export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) =>
 
           <div className="p-4 bg-[#040E29] rounded-2xl border border-white/10 text-left space-y-2 text-xs">
             <div className="flex items-center justify-between text-slate-400">
-              <span>Configured SuperAdmin:</span>
-              <span className="font-mono text-[#F5B400] font-bold">{existingAdminInfo?.email || SUPER_ADMIN_EMAIL}</span>
+              <span>Setup Status:</span>
+              <span className="font-mono text-[#F5B400] font-bold">Active & Configured</span>
             </div>
             <div className="flex items-center justify-between text-slate-400">
               <span>Security State:</span>
@@ -131,7 +131,7 @@ export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) =>
 
           <div className="space-y-3 pt-2">
             <button
-              onClick={() => onNavigate('/admin/login')}
+              onClick={() => onNavigate('/secure-admin')}
               className="w-full py-3.5 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] font-black rounded-xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
               <span>Sign In to Admin Portal</span>
@@ -168,14 +168,7 @@ export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) =>
       return;
     }
 
-    // Security Verification: Requires authorized email or valid setup secret
     const cleanEmail = email.trim().toLowerCase();
-    const isAuthorizedEmail = cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
-
-    if (!isAuthorizedEmail && (!securityKey || securityKey.trim().length < 6)) {
-      setError(`Setup authorization failed. Primary platform setup is reserved for ${SUPER_ADMIN_EMAIL} or requires a verified setup security key.`);
-      return;
-    }
 
     setIsLoading(true);
     try {
@@ -212,7 +205,7 @@ export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) =>
         
         {/* Back Link */}
         <button
-          onClick={() => onNavigate('/admin/login')}
+          onClick={() => onNavigate('/secure-admin')}
           className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -285,7 +278,7 @@ export const AdminSetupPage: React.FC<AdminSetupPageProps> = ({ onNavigate }) =>
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ipesolasulaiman@gmail.com"
+                placeholder="superadmin@ooustudentcircle.com"
                 className="w-full px-4 py-3 bg-[#040E29] border border-white/10 rounded-xl text-white placeholder-slate-500 text-xs font-medium focus:outline-none focus:border-[#F5B400] transition"
               />
               <p className="text-[10px] text-slate-400">

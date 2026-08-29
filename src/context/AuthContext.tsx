@@ -11,6 +11,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { FirestoreService } from '../services/firestoreService';
+import { AdminService } from '../services/adminService';
 
 export interface LoginResult {
   success: boolean;
@@ -80,12 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               }
             }
 
-            // Check if root superadmin
-            const isSuperAdminEmail = (firebaseUser.email || '').toLowerCase() === 'ipesolasulaiman@gmail.com';
+            // Verify role from Firestore admin profile if present
             if (userProfile) {
-              if (isSuperAdminEmail && userProfile.role !== 'SUPER_ADMIN' && userProfile.role !== 'ADMIN' && userProfile.role !== 'admin') {
-                userProfile.role = 'SUPER_ADMIN';
-                await FirestoreService.saveUserProfile(userProfile);
+              const adminRecord = await AdminService.getAdminProfile(firebaseUser.uid);
+              if (adminRecord && adminRecord.status === 'active') {
+                userProfile.role = adminRecord.role;
               }
               setCurrentUser(userProfile);
               localStorage.setItem('oou_active_user_id', userProfile.id);
@@ -131,8 +131,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               };
             }
 
-            if (cleanEmail === 'ipesolasulaiman@gmail.com') {
-              profile.role = 'SUPER_ADMIN';
+            const adminRecord = await AdminService.getAdminProfile(uid);
+            if (adminRecord && adminRecord.status === 'active') {
+              profile.role = adminRecord.role;
             }
 
             const targetRole = normalizeUserRole(profile.role);
@@ -167,10 +168,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
         }
         
-        if (cleanEmail === 'ipesolasulaiman@gmail.com') {
-          matched.role = 'SUPER_ADMIN';
-        }
-
         const targetRole = normalizeUserRole(matched.role);
         const redirectPath = getRoleDashboardPath(targetRole, matched);
 
@@ -215,14 +212,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (!profile) {
-        const isSuper = cleanEmail === 'ipesolasulaiman@gmail.com';
+        const adminRecord = await AdminService.getAdminProfile(user.uid);
+        const derivedRole = adminRecord?.role || 'STUDENT';
         profile = {
           id: user.uid,
           email: cleanEmail,
           fullName: user.displayName || 'OOU Student',
-          role: isSuper ? 'SUPER_ADMIN' : 'STUDENT',
+          role: derivedRole,
           phoneNumber: user.phoneNumber || '',
-          profilePhoto: user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80',
+          profilePhoto: user.photoURL || '',
           location: 'Ago-Iwoye Main Campus',
           status: 'active',
           accountStatus: 'ACTIVE',
@@ -352,7 +350,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: targetRole,
         fullName: (userData.fullName || '').trim(),
         phoneNumber: cleanPhone,
-        profilePhoto: userData.profilePhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80',
+        profilePhoto: userData.profilePhoto || '',
         location: userData.location || 'Ago-Iwoye Main Campus',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Conversation, ConversationType, UserProfile } from '../../types';
+import { UserAvatar } from '../common/UserAvatar';
 import { 
   Search, 
   MessageSquare, 
@@ -254,10 +255,10 @@ export const ConversationListView: React.FC<ConversationListViewProps> = ({
               >
                 {/* Avatar with verified badge & status */}
                 <div className="relative flex-shrink-0">
-                  <img
-                    src={partner.details.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                    alt={partner.details.name}
-                    className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-100 shadow-2xs"
+                  <UserAvatar
+                    name={partner.details.name}
+                    photoUrl={partner.details.photo}
+                    size="md"
                   />
                   {partner.details.isVerified && (
                     <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-0.5 rounded-full ring-2 ring-white">

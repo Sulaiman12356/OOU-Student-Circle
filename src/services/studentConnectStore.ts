@@ -123,7 +123,7 @@ export class StudentConnectStore {
     if (db && isConfigured) {
       try {
         const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('role', '==', 'student'));
+        const q = query(usersRef, where('role', 'in', ['student', 'STUDENT']));
         const snap = await getDocs(q);
         
         if (!snap.empty) {
@@ -139,7 +139,7 @@ export class StudentConnectStore {
     }
 
     // 2. Merge with real local users from DataStore
-    const localUsers = DataStore.getUsers().filter(u => u.role === 'student');
+    const localUsers = DataStore.getUsers().filter(u => u.role === 'student' || u.role === 'STUDENT');
     const mergedMap = new Map<string, PublicStudentProfile>();
 
     // Add/overwrite from DataStore

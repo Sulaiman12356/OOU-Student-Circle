@@ -7,6 +7,7 @@ import {
   UserRole
 } from '../../types';
 import { MessagingStore } from '../../services/messagingStore';
+import { UserAvatar } from '../common/UserAvatar';
 import { 
   Send, 
   Paperclip, 
@@ -259,10 +260,10 @@ export const ChatAreaView: React.FC<ChatAreaViewProps> = ({
           )}
 
           <div className="relative flex-shrink-0">
-            <img
-              src={otherParticipant.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-              alt={otherParticipant.name}
-              className="w-10 h-10 rounded-2xl object-cover ring-2 ring-slate-100 shadow-2xs"
+            <UserAvatar
+              name={otherParticipant.name}
+              photoUrl={otherParticipant.photo}
+              size="md"
             />
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full ring-2 ring-white" title="Active on StudentCircle" />
           </div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import { SUPER_ADMIN_EMAIL } from '../../types/admin';
 import { 
   ShieldCheck, 
   Lock, 
@@ -9,11 +8,9 @@ import {
   AlertCircle, 
   CheckCircle2, 
   ArrowRight, 
-  Sparkles, 
   Eye, 
   EyeOff, 
-  ArrowLeft,
-  Server
+  ArrowLeft
 } from 'lucide-react';
 import { auth } from '../../services/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -23,7 +20,7 @@ interface AdminLoginPageProps {
 }
 
 export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) => {
-  const { loginAdmin, bootstrapSuperAdmin, isAdminAuthenticated, isSuperAdmin, adminProfile } = useAdminAuth();
+  const { loginAdmin, isAdminAuthenticated, isSuperAdmin, adminProfile } = useAdminAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,7 +62,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
               onClick={() => onNavigate('/')}
               className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-slate-300 font-bold rounded-xl transition text-xs border border-white/10 cursor-pointer"
             >
-              Return to Marketplace
+              Return to Public Platform
             </button>
           </div>
         </div>
@@ -125,21 +122,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
     }
   };
 
-  const handleBootstrapSuperAdmin = async () => {
-    setIsLoading(true);
-    setError(null);
-    const res = await bootstrapSuperAdmin();
-    setIsLoading(false);
-    if (res.success) {
-      setSuccessMsg('Super Administrator initialized in database! Redirecting...');
-      setTimeout(() => {
-        onNavigate('/admin/superadmin');
-      }, 700);
-    } else {
-      setError(res.error || 'Failed to bootstrap Super Admin.');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#040E29] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       
@@ -163,10 +145,10 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            OOU StudentCircle Administration
+            Administrative Portal
           </h1>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            Authorized personnel gateway for platform governance, identity verification, and financial arbitration.
+            Restricted access gateway for verified university administrators and platform governance personnel.
           </p>
         </div>
 
@@ -195,7 +177,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
             {/* Email Address */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-200">
-                Email Address
+                Administrator Email
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -204,7 +186,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@ooustudentcircle.com"
+                  placeholder="Enter administrator email"
                   className="w-full pl-10 pr-4 py-2.5 bg-[#040E29]/80 border border-slate-700 focus:border-[#F5B400] text-white text-xs rounded-xl focus:outline-none focus:ring-1 focus:ring-[#F5B400] transition placeholder:text-slate-500"
                 />
               </div>
@@ -270,43 +252,11 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
               ) : (
                 <>
                   <Lock className="w-4 h-4" />
-                  <span>Sign In</span>
+                  <span>Authenticate Session</span>
                 </>
               )}
             </button>
           </form>
-
-          {/* First-Run SuperAdmin Setup helper */}
-          <div className="pt-4 border-t border-slate-700/50 space-y-3">
-            <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <Server className="w-3 h-3 text-[#F5B400]" />
-                <span>SuperAdmin Platform Setup</span>
-              </span>
-              <span className="text-[10px] text-slate-500">Authorized</span>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => onNavigate('/admin/setup')}
-                className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-xl transition border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Lock className="w-3 h-3 text-[#F5B400]" />
-                <span>First-Time Setup</span>
-              </button>
-              
-              <button
-                type="button"
-                onClick={handleBootstrapSuperAdmin}
-                disabled={isLoading}
-                className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-xl transition border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Sparkles className="w-3 h-3 text-[#F5B400]" />
-                <span>Quick Bootstrap</span>
-              </button>
-            </div>
-          </div>
 
         </div>
 
@@ -372,7 +322,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onNavigate }) =>
                     required
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="admin@ooustudentcircle.com"
+                    placeholder="name@example.com"
                     className="w-full px-3 py-2 bg-[#040E29] border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-[#F5B400]"
                   />
                 </div>

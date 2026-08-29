@@ -28,8 +28,7 @@ import {
   SecurityEvent,
   ALL_ADMIN_PERMISSIONS, 
   SUPER_ADMIN_PERMISSIONS,
-  DEFAULT_ADMIN_PERMISSIONS,
-  SUPER_ADMIN_EMAIL 
+  DEFAULT_ADMIN_PERMISSIONS
 } from '../types/admin';
 import { DataStore } from './dataStore';
 import { MarketplaceStore } from './marketplaceStore';
@@ -161,7 +160,7 @@ export class AdminService {
         createdBy: 'bootstrap_setup',
         permissions: SUPER_ADMIN_PERMISSIONS,
         lastActivityAt: new Date().toISOString(),
-        profilePhoto: params.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+        profilePhoto: params.profilePhoto || '',
         department: 'Platform Governance & Executive Direction'
       };
 
@@ -211,22 +210,21 @@ export class AdminService {
 
   // 2b. BOOTSTRAP SUPER ADMIN ACCOUNT IN FIRESTORE FOR AUTHENTICATED USER
   static async bootstrapSuperAdmin(user: { uid: string; email: string; name?: string }): Promise<AdminProfile> {
-    const isSuperAdminEmail = user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
-    const cleanEmail = user.email.toLowerCase();
+    const cleanEmail = user.email.toLowerCase().trim();
 
     const adminProfile: AdminProfile = {
       uid: user.uid,
-      name: user.name || (isSuperAdminEmail ? 'Sulaiman Ipesola' : 'OOU Administrator'),
+      name: user.name || 'Platform Administrator',
       email: cleanEmail,
-      role: isSuperAdminEmail ? 'SUPER_ADMIN' : 'ADMIN',
+      role: 'SUPER_ADMIN',
       status: 'active',
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
       createdBy: 'system_bootstrap',
-      permissions: isSuperAdminEmail ? SUPER_ADMIN_PERMISSIONS : DEFAULT_ADMIN_PERMISSIONS,
+      permissions: SUPER_ADMIN_PERMISSIONS,
       lastActivityAt: new Date().toISOString(),
-      profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-      department: isSuperAdminEmail ? 'Platform Governance & Executive Direction' : 'Campus Operations'
+      profilePhoto: '',
+      department: 'Platform Governance & Executive Direction'
     };
 
     if (db) {
@@ -240,7 +238,7 @@ export class AdminService {
           id: user.uid,
           email: cleanEmail,
           fullName: adminProfile.name,
-          role: isSuperAdminEmail ? 'SUPER_ADMIN' : 'ADMIN',
+          role: 'SUPER_ADMIN',
           status: 'active',
           isVerified: true,
           verificationStatus: 'verified',
@@ -314,7 +312,7 @@ export class AdminService {
       createdBy: creatorAdmin.uid,
       permissions: normalizedRole === 'SUPER_ADMIN' ? SUPER_ADMIN_PERMISSIONS : data.permissions,
       lastActivityAt: new Date().toISOString(),
-      profilePhoto: data.profilePhoto || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80',
+      profilePhoto: data.profilePhoto || '',
       department: data.department || 'Campus Operations & Moderation'
     };
 
@@ -434,8 +432,8 @@ export class AdminService {
 
   // 6. DEACTIVATE ADMINISTRATOR
   static async deactivateAdministrator(editorAdmin: AdminProfile, targetUid: string, targetEmail: string): Promise<void> {
-    if (targetEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-      throw new Error('Root Super Administrator cannot be deactivated.');
+    if (targetUid === editorAdmin.uid) {
+      throw new Error('You cannot deactivate your own administrative account.');
     }
     await this.updateAdministrator(editorAdmin, targetUid, { status: 'deactivated' });
     await this.recordSecurityEvent({
@@ -513,8 +511,8 @@ export class AdminService {
       return { success: false, error: 'Access denied. SuperAdmin permission required.' };
     }
 
-    if (targetEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || targetUid === editorAdmin.uid) {
-      return { success: false, error: 'Root Super Administrator cannot be removed.' };
+    if (targetUid === editorAdmin.uid) {
+      return { success: false, error: 'You cannot remove your own administrator account.' };
     }
 
     if (db) {

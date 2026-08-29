@@ -22,6 +22,7 @@ import {
   Tag
 } from 'lucide-react';
 import { UserProfile, PortfolioItem, ServiceItem } from '../../types';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface PublicStudentProfileViewProps {
   user: UserProfile;
@@ -47,7 +48,6 @@ export const PublicStudentProfileView: React.FC<PublicStudentProfileViewProps> =
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
   const defaultCoverGradient = 'bg-gradient-to-r from-[#061A4F] via-[#0B2A6F] to-[#061A4F]';
-  const fallbackAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80';
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -104,11 +104,13 @@ export const PublicStudentProfileView: React.FC<PublicStudentProfileViewProps> =
             {/* Avatar & Title Info */}
             <div className="flex flex-col md:flex-row items-center md:items-end gap-4 text-center md:text-left">
               <div className="relative">
-                <img
-                  src={user.profilePhoto || fallbackAvatar}
-                  alt={user.fullName}
-                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl object-cover border-4 border-white shadow-xl bg-slate-100"
-                />
+                <div className="ring-4 ring-white rounded-3xl shadow-xl bg-white">
+                  <UserAvatar
+                    name={user.fullName}
+                    photoUrl={user.profilePhoto}
+                    size="2xl"
+                  />
+                </div>
                 {user.isVerified && (
                   <div 
                     className="absolute -bottom-1 -right-1 p-1.5 bg-[#061A4F] text-[#F5B400] rounded-full border-2 border-white shadow"

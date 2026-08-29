@@ -2,8 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   AdminProfile, 
   AdminPermission, 
-  AdminRole, 
-  SUPER_ADMIN_EMAIL 
+  AdminRole
 } from '../types/admin';
 import { AdminService } from '../services/adminService';
 import { auth, isConfigured } from '../services/firebase';
@@ -41,15 +40,16 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             // Fetch real admin profile from Firestore
             let profile = await AdminService.getAdminProfile(firebaseUser.uid);
             
-            const isSuperEmail = (firebaseUser.email || '').toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
-
-            // First-time bootstrap for verified platform owner
-            if (!profile && isSuperEmail) {
-              profile = await AdminService.bootstrapSuperAdmin({
-                uid: firebaseUser.uid,
-                email: firebaseUser.email || SUPER_ADMIN_EMAIL,
-                name: firebaseUser.displayName || 'Sulaiman Ipesola'
-              });
+            // If zero superadmins exist in the database, allow the first authenticated administrator to initialize
+            if (!profile) {
+              const check = await AdminService.checkSuperAdminExists();
+              if (!check.exists) {
+                profile = await AdminService.bootstrapSuperAdmin({
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email || 'admin@ooustudentcircle.com',
+                  name: firebaseUser.displayName || 'Super Administrator'
+                });
+              }
             }
 
             if (profile && profile.status === 'active') {
@@ -79,8 +79,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const isSuperAdmin = !!adminProfile && (
     adminProfile.role === 'SUPER_ADMIN' || 
-    adminProfile.role === 'super_admin' || 
-    adminProfile.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()
+    adminProfile.role === 'super_admin'
   );
 
   const hasPermission = (permission: AdminPermission): boolean => {
@@ -106,14 +105,16 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // Query Firestore for admin profile
         let profile = await AdminService.getAdminProfile(user.uid);
 
-        const isSuperEmail = cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
-
-        if (!profile && isSuperEmail) {
-          profile = await AdminService.bootstrapSuperAdmin({
-            uid: user.uid,
-            email: cleanEmail,
-            name: user.displayName || 'Sulaiman Ipesola'
-          });
+        // If zero superadmins exist on first setup, initialize the primary SuperAdmin
+        if (!profile) {
+          const check = await AdminService.checkSuperAdminExists();
+          if (!check.exists) {
+            profile = await AdminService.bootstrapSuperAdmin({
+              uid: user.uid,
+              email: cleanEmail,
+              name: user.displayName || 'Super Administrator'
+            });
+          }
         }
 
         if (!profile) {
@@ -126,13 +127,13 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             severity: 'medium',
             userId: user.uid,
             email: cleanEmail,
-            description: `Non-admin user ${cleanEmail} attempted Admin Portal sign-in.`
+            description: `Non-admin account ${cleanEmail} attempted Admin Portal sign-in.`
           });
 
           setIsLoading(false);
           return {
             success: false,
-            error: 'Access Denied: Your account does not have administrator privileges.'
+            error: 'Access Denied: Your account does not have administrator clearance.'
           };
         }
 
@@ -145,7 +146,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             severity: 'high',
             userId: user.uid,
             email: cleanEmail,
-            description: `Suspended admin ${cleanEmail} attempted portal login.`
+            description: `Suspended/inactive admin ${cleanEmail} attempted portal login.`
           });
 
           setIsLoading(false);
@@ -158,7 +159,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // Successful authentication
         setAdminProfile(profile);
 
-        const superAdminFlag = profile.role === 'SUPER_ADMIN' || profile.role === 'super_admin' || isSuperEmail;
+        const superAdminFlag = profile.role === 'SUPER_ADMIN' || profile.role === 'super_admin';
 
         await AdminService.logActivity({
           adminId: profile.uid,
@@ -167,7 +168,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           action: 'ADMIN_LOGIN_SUCCESS',
           targetType: 'admin',
           targetId: profile.uid,
-          description: `Administrator ${profile.name} successfully authenticated.`
+          description: `Administrator ${profile.name} (${profile.role}) successfully authenticated.`
         });
 
         await AdminService.recordSecurityEvent({
@@ -204,7 +205,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
         }
 
-        // Generic error to prevent email enumeration
+        // Generic error to prevent account enumeration
         return { 
           success: false, 
           error: 'Invalid email or password.' 
@@ -250,8 +251,8 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const user = auth.currentUser;
         const profile = await AdminService.bootstrapSuperAdmin({
           uid: user.uid,
-          email: user.email || SUPER_ADMIN_EMAIL,
-          name: user.displayName || 'Sulaiman Ipesola'
+          email: user.email || 'superadmin@ooustudentcircle.com',
+          name: user.displayName || 'Super Administrator'
         });
         setAdminProfile(profile);
         setIsLoading(false);
@@ -260,12 +261,12 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsLoading(false);
         return { 
           success: false, 
-          error: `Please sign into Firebase Authentication with ${SUPER_ADMIN_EMAIL} to complete platform owner initialization.` 
+          error: 'Please authenticate with the session credentials to complete Super Administrator initialization.' 
         };
       }
     } catch (err: any) {
       setIsLoading(false);
-      return { success: false, error: err.message || 'Failed to bootstrap Super Admin account.' };
+      return { success: false, error: err.message || 'Failed to initialize Super Administrator account.' };
     }
   };
 

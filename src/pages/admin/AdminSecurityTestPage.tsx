@@ -15,7 +15,6 @@ import {
   KeyRound,
   Shield
 } from 'lucide-react';
-import { SUPER_ADMIN_EMAIL } from '../../types/admin';
 
 interface SecurityEvaluationScenario {
   id: string;
@@ -115,7 +114,7 @@ const SECURITY_SCENARIOS: SecurityEvaluationScenario[] = [
     roleCode: 'SUPER_ADMIN',
     targetRoute: '/admin/superadmin',
     expectedVerdict: 'AUTHORIZED_SUPERADMIN',
-    description: `Root SuperAdmin (${SUPER_ADMIN_EMAIL}) with immutable governance clearance.`,
+    description: 'Root SuperAdmin with immutable governance clearance.',
     backendGateRule: 'isSuperAdmin() == true -> Master Access Granted'
   }
 ];

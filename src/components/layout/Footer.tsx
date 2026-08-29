@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { OouLogo } from '../brand/OouLogo';
-import { Mail, MapPin, Send, CheckCircle2, MessageCircle, ShieldCheck, KeyRound, Lock, Sparkles, ShieldAlert, Cpu } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle2, MessageCircle } from 'lucide-react';
 import { founderConfig } from '../../config/founder';
-import { SUPER_ADMIN_EMAIL } from '../../types/admin';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
@@ -178,7 +177,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
 
-          {/* For Businesses & Admin Governance */}
+          {/* For Businesses */}
           <div className="lg:col-span-1 space-y-6">
             <div>
               <h4 className="text-sm font-bold text-[#061A4F] uppercase tracking-wider mb-4">
@@ -198,34 +197,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <li>
                   <button onClick={() => onNavigate('/campus/register-shop')} className="text-slate-600 hover:text-[#061A4F] transition font-semibold text-[#061A4F] cursor-pointer">
                     Register Campus Shop
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Governance quick links */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#F5B400]" />
-                <span>Governance & Admin</span>
-              </h4>
-              <ul className="space-y-1.5 text-xs">
-                <li>
-                  <button onClick={() => onNavigate('/admin/login')} className="text-[#061A4F] hover:underline font-bold flex items-center gap-1.5 cursor-pointer">
-                    <KeyRound className="w-3 h-3 text-[#F5B400]" />
-                    <span>Admin Setup & Login</span>
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => onNavigate('/admin/superadmin')} className="text-slate-600 hover:text-[#061A4F] transition flex items-center gap-1.5 cursor-pointer">
-                    <Sparkles className="w-3 h-3 text-amber-500" />
-                    <span>SuperAdmin Console</span>
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => onNavigate('/admin/security-test')} className="text-slate-500 hover:text-[#061A4F] transition flex items-center gap-1.5 cursor-pointer">
-                    <Cpu className="w-3 h-3 text-slate-400" />
-                    <span>RBAC Security Suite</span>
                   </button>
                 </li>
               </ul>
@@ -265,70 +236,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         </div>
 
-        {/* Dedicated Admin Setup & Registration Banner Card */}
-        <div className="bg-linear-to-r from-[#040E29] to-[#061A4F] rounded-3xl p-6 sm:p-8 text-white border border-[#F5B400]/30 shadow-xl relative overflow-hidden">
-          <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-[#F5B400]/5 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-            
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#F5B400] text-xs font-black border border-white/10">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>PLATFORM GOVERNANCE & ADMIN ONBOARDING</span>
-              </div>
-              <h3 className="text-lg sm:text-xl font-black text-white">
-                Admin Setup & SuperAdmin Control Center
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Appointed university moderators and StudentCircle administrators can access the Control Center, manage verification queues, handle disputes, and configure RBAC roles.
-              </p>
-              <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
-                <span>• Root SuperAdmin: <strong className="text-white">{SUPER_ADMIN_EMAIL}</strong></span>
-                <span>• Zero-Trust Role-Based Access Control</span>
-                <span>• Immutable Firestore Audit Logging</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto flex-shrink-0">
-              <button
-                id="footer-admin-login-btn"
-                onClick={() => onNavigate('/admin/login')}
-                className="w-full sm:w-auto px-5 py-3 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] text-xs font-black rounded-xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <KeyRound className="w-4 h-4 text-[#061A4F]" />
-                <span>Admin Login & Setup</span>
-              </button>
-
-              <button
-                id="footer-superadmin-btn"
-                onClick={() => onNavigate('/admin/superadmin')}
-                className="w-full sm:w-auto px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-[#F5B400]" />
-                <span>SuperAdmin Center</span>
-              </button>
-
-              <button
-                id="footer-security-test-btn"
-                onClick={() => onNavigate('/admin/security-test')}
-                className="w-full sm:w-auto px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>RBAC Test Lab</span>
-              </button>
-            </div>
-
-          </div>
-        </div>
-
         {/* Bottom copyright */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} OOU StudentCircle. All rights reserved. Founded by {founderConfig.name} ({founderConfig.alias}).</p>
           <div className="flex items-center space-x-6">
-            <button onClick={() => onNavigate('/admin/login')} className="text-slate-400 hover:text-[#061A4F] transition text-[11px] flex items-center gap-1 cursor-pointer">
-              <Lock className="w-3 h-3" />
-              <span>Admin Portal</span>
-            </button>
             <span className="text-slate-400">One Platform. Four Ways to Move Forward.</span>
           </div>
         </div>

@@ -107,13 +107,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="px-2.5 py-0.5 text-[11px] font-bold bg-white/95 text-slate-800 rounded-md shadow-sm border border-slate-200">
               {getConditionLabel(product.condition)}
             </span>
-
-            {/* Demo Badge */}
-            {product.isDemo && (
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-50 text-blue-700 rounded border border-blue-200">
-                Demo Listing
-              </span>
-            )}
           </div>
 
           {/* Wishlist Button */}

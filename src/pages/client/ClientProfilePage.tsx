@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserProfile } from '../../types';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { Building, MapPin, Mail, Phone, Calendar, ShieldCheck, Briefcase, ExternalLink, Edit2 } from 'lucide-react';
 
 interface ClientProfilePageProps {
@@ -31,10 +32,10 @@ export const ClientProfilePage: React.FC<ClientProfilePageProps> = ({ currentUse
       {/* Profile Card */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-          <img
-            src={currentUser.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-            alt={currentUser.fullName}
-            className="w-20 h-20 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
+          <UserAvatar
+            name={currentUser.businessName || currentUser.fullName}
+            photoUrl={currentUser.profilePhoto}
+            size="xl"
           />
           <div className="space-y-1">
             <div className="flex items-center gap-2">

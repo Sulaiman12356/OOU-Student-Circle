@@ -159,5 +159,3 @@ export const DEFAULT_ADMIN_PERMISSIONS: AdminPermission[] = [
   'analytics.view',
   'activity_logs.view'
 ];
-
-export const SUPER_ADMIN_EMAIL = 'ipesolasulaiman@gmail.com';

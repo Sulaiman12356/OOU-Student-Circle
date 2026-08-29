@@ -7,10 +7,10 @@ import {
   AdminStatus,
   SecurityEvent,
   ALL_ADMIN_PERMISSIONS, 
-  SUPER_ADMIN_EMAIL,
   SUPER_ADMIN_PERMISSIONS
 } from '../../types/admin';
 import { AdminService, PlatformLiveStats } from '../../services/adminService';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -118,7 +118,7 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
         <div className="space-y-2">
           <h2 className="text-xl font-black text-[#061A4F]">Access Denied: SuperAdmin Required</h2>
           <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
-            This module contains root infrastructure governance, administrator provisioning, and zero-trust security events. Access is restricted to the platform owner ({SUPER_ADMIN_EMAIL}).
+            This module contains root infrastructure governance, administrator provisioning, and zero-trust security events. Access is restricted to authorized Super Administrators.
           </p>
         </div>
         {onNavigate && (
@@ -178,8 +178,8 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
 
   const handleToggleStatus = async (admin: AdminProfile) => {
     if (!adminProfile) return;
-    if (admin.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-      alert('The root Super Administrator account cannot be deactivated.');
+    if (admin.uid === adminProfile.uid) {
+      alert('You cannot deactivate your own administrator account.');
       return;
     }
 
@@ -215,8 +215,8 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
 
   const handleRemoveAdmin = async (admin: AdminProfile) => {
     if (!adminProfile) return;
-    if (admin.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || admin.uid === adminProfile.uid) {
-      alert('Root Super Administrator cannot be removed.');
+    if (admin.uid === adminProfile.uid) {
+      alert('You cannot remove your own administrator account.');
       return;
     }
 
@@ -444,17 +444,17 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
                     </tr>
                   ) : (
                     filteredAdmins.map((admin) => {
-                      const isSuper = admin.role === 'SUPER_ADMIN' || admin.role === 'super_admin' || admin.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+                      const isSuper = admin.role === 'SUPER_ADMIN' || admin.role === 'super_admin';
                       return (
                         <tr key={admin.uid} className="hover:bg-slate-50/80 transition">
                           
                           {/* User info */}
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-3">
-                              <img
-                                src={admin.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                                alt={admin.name}
-                                className="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
+                              <UserAvatar
+                                name={admin.name}
+                                photoUrl={admin.profilePhoto}
+                                size="sm"
                               />
                               <div>
                                 <div className="font-bold text-[#061A4F] flex items-center gap-1.5">
@@ -783,7 +783,7 @@ export const AdminSuperAdminPage: React.FC<AdminSuperAdminPageProps> = ({
                   type="url"
                   value={newPhoto}
                   onChange={(e) => setNewPhoto(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="https://example.com/avatar.jpg"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#061A4F]"
                 />
               </div>

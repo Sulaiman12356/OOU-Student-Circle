@@ -4,10 +4,10 @@ import {
   AdminProfile, 
   AdminPermission, 
   AdminRole, 
-  ALL_ADMIN_PERMISSIONS, 
-  SUPER_ADMIN_EMAIL 
+  ALL_ADMIN_PERMISSIONS 
 } from '../../types/admin';
 import { AdminService } from '../../services/adminService';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -77,7 +77,7 @@ export const AdminManagementPage: React.FC<AdminManagementPageProps> = ({ onNavi
         </div>
         <h2 className="text-xl font-black text-[#061A4F]">Access Restricted: Super Administrator Only</h2>
         <p className="text-xs text-slate-500 max-w-md mx-auto">
-          Provisioning and managing administrator roles requires primary platform ownership authorization ({SUPER_ADMIN_EMAIL}).
+          Provisioning and managing administrator roles requires primary Super Administrator authorization.
         </p>
         {onNavigate && (
           <button
@@ -137,8 +137,8 @@ export const AdminManagementPage: React.FC<AdminManagementPageProps> = ({ onNavi
 
   const handleToggleStatus = async (admin: AdminProfile) => {
     if (!adminProfile) return;
-    if (admin.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-      alert('The root Super Administrator cannot be suspended.');
+    if (admin.uid === adminProfile.uid) {
+      alert('You cannot suspend your own administrator account.');
       return;
     }
 
@@ -277,10 +277,10 @@ export const AdminManagementPage: React.FC<AdminManagementPageProps> = ({ onNavi
                     {/* User info */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={admin.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                          alt={admin.name}
-                          className="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
+                        <UserAvatar
+                          name={admin.name}
+                          photoUrl={admin.profilePhoto}
+                          size="sm"
                         />
                         <div>
                           <div className="font-bold text-[#061A4F] flex items-center gap-1.5">

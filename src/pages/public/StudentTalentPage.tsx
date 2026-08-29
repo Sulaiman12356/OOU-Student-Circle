@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { DataStore } from '../../services/dataStore';
 import { UserProfile } from '../../types';
+import { UserAvatar } from '../../components/common/UserAvatar';
 import { 
   Search, 
   Star, 
@@ -148,10 +149,10 @@ export const StudentTalentPage: React.FC<StudentTalentPageProps> = ({ onNavigate
                 <div>
                   {/* Top Profile Header */}
                   <div className="flex items-start gap-4">
-                    <img
-                      src={student.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                      alt={student.fullName}
-                      className="w-14 h-14 rounded-2xl object-cover border-2 border-[#F5B400] shadow-sm flex-shrink-0"
+                    <UserAvatar
+                      name={student.fullName}
+                      photoUrl={student.profilePhoto}
+                      size="md"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">

@@ -22,18 +22,20 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() && (
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com')
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.status == 'active') ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'])
       );
     }
 
     function isSuperAdmin() {
       return isSignedIn() && (
-        (request.auth.token.email != null && request.auth.token.email == 'ipesolasulaiman@gmail.com') ||
-        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) && (
-          get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin' ||
-          get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'SUPER_ADMIN'
-        ))
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.status == 'active' &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['SUPER_ADMIN', 'super_admin']) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['SUPER_ADMIN', 'super_admin'])
       );
     }
 
@@ -41,7 +43,7 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow get: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
       allow list: if isAdmin();
-      allow create: if isSuperAdmin() || (isSignedIn() && request.auth.uid == adminId && request.auth.token.email == 'ipesolasulaiman@gmail.com');
+      allow create: if isSuperAdmin() || (isSignedIn() && request.auth.uid == adminId);
       allow update: if isSuperAdmin() || (isAdmin() && request.auth.uid == adminId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'permissions', 'status']));
       allow delete: if isSuperAdmin() && adminId != request.auth.uid;
     }

@@ -313,9 +313,16 @@ export const StudentProfilePage: React.FC = () => {
             {/* 2. Profile Photo Uploader */}
             <ProfilePhotoUploader
               currentPhotoUrl={profilePhoto}
+              userName={fullName || currentUser?.fullName || 'Student'}
               userId={currentUser?.id || 'student-1'}
-              onPhotoChange={(url) => setProfilePhoto(url)}
-              onPhotoRemove={() => setProfilePhoto('')}
+              onPhotoChange={(url) => {
+                setProfilePhoto(url);
+                updateCurrentUserProfile({ profilePhoto: url });
+              }}
+              onPhotoRemove={() => {
+                setProfilePhoto('');
+                updateCurrentUserProfile({ profilePhoto: '' });
+              }}
             />
           </div>
 

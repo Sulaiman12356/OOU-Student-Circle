@@ -4,6 +4,7 @@ import { optimizeImage, uploadMediaFile } from '../../services/storageService';
 
 interface ProfilePhotoUploaderProps {
   currentPhotoUrl?: string;
+  userName?: string;
   userId: string;
   onPhotoChange: (newUrl: string) => void;
   onPhotoRemove: () => void;
@@ -11,6 +12,7 @@ interface ProfilePhotoUploaderProps {
 
 export const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
   currentPhotoUrl,
+  userName = 'Student',
   userId,
   onPhotoChange,
   onPhotoRemove
@@ -21,7 +23,15 @@ export const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
   const [successNotice, setSuccessNotice] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fallbackAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80';
+  // Initials generator for neutral UI avatar
+  const getInitials = (text: string) => {
+    const parts = text.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'SC';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
+  const initials = getInitials(userName);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -96,11 +106,18 @@ export const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
       {/* Avatar Container with Preview & Progress */}
       <div className="relative group">
         <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl overflow-hidden border-4 border-white shadow-md bg-slate-100 flex items-center justify-center relative">
-          <img
-            src={currentPhotoUrl || fallbackAvatar}
-            alt="Profile Avatar"
-            className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-          />
+          {currentPhotoUrl ? (
+            <img
+              src={currentPhotoUrl}
+              alt="Profile Avatar"
+              className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#061A4F] text-[#F5B400] font-black flex flex-col items-center justify-center text-3xl select-none">
+              <span>{initials}</span>
+              <span className="text-[9px] font-bold text-white/60 tracking-wider uppercase mt-1">No Photo</span>
+            </div>
+          )}
 
           {/* Upload Progress Overlay */}
           {isUploading && (

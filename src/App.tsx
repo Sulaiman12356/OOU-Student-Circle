@@ -207,7 +207,23 @@ const AppContent: React.FC = () => {
       );
     }
 
-    // 4. Admin Workspace routes
+    // 4. Private Administrator Gateway & Workspace Routes
+    if (currentPath === '/secure-admin') {
+      const isAuthorized = isAdminAuthenticated || currentUser?.role === 'admin';
+      if (isAuthorized) {
+        return (
+          <DashboardLayout currentPath={isSuperAdmin ? '/admin/superadmin' : '/admin/dashboard'} onNavigate={navigate}>
+            {isSuperAdmin ? (
+              <AdminSuperAdminPage onNavigate={navigate} initialTab="admins" />
+            ) : (
+              <AdminDashboardPage onNavigate={navigate} />
+            )}
+          </DashboardLayout>
+        );
+      }
+      return <AdminLoginPage onNavigate={navigate} />;
+    }
+
     if (currentPath === '/admin/setup') {
       return <AdminSetupPage onNavigate={navigate} />;
     }
@@ -227,23 +243,23 @@ const AppContent: React.FC = () => {
                 <ShieldAlert className="w-8 h-8" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-black">Admin Access Denied</h2>
+                <h2 className="text-2xl font-black">Restricted Access</h2>
                 <p className="text-xs text-slate-300">
-                  The requested administrative workspace requires verified administrator credentials.
+                  This portal is reserved for verified university administrators and platform governance personnel.
                 </p>
               </div>
               <div className="space-y-3 pt-2">
                 <button
-                  onClick={() => navigate('/admin/login')}
+                  onClick={() => navigate('/secure-admin')}
                   className="w-full py-3 bg-[#F5B400] hover:bg-[#e0a400] text-[#061A4F] font-black rounded-xl transition text-xs shadow-lg cursor-pointer"
                 >
-                  Sign In as Administrator
+                  Administrator Portal
                 </button>
                 <button
                   onClick={() => navigate('/')}
                   className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-slate-300 font-bold rounded-xl transition text-xs border border-white/10 cursor-pointer"
                 >
-                  Return to Student Marketplace
+                  Return to Public Platform
                 </button>
               </div>
             </div>

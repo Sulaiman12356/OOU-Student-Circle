@@ -4,6 +4,7 @@ import { useAdminAuth } from '../../context/AdminAuthContext';
 import { OouLogo } from '../brand/OouLogo';
 import { DataStore } from '../../services/dataStore';
 import { MessagingStore } from '../../services/messagingStore';
+import { UserAvatar } from '../common/UserAvatar';
 import {
   LayoutDashboard,
   User,
@@ -271,7 +272,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const handleSignOut = async () => {
     if (isAdminRoute || isAdminAuthenticated) {
       await logoutAdmin();
-      onNavigate('/admin/login');
+      onNavigate('/');
     } else {
       logout();
       onNavigate('/');
@@ -279,8 +280,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   const activePhoto = isAdminRoute && adminProfile 
-    ? (adminProfile.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80')
-    : (currentUser?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80');
+    ? adminProfile.profilePhoto
+    : currentUser?.profilePhoto;
 
   const activeDisplayName = isAdminRoute && adminProfile
     ? adminProfile.name
@@ -312,10 +313,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Current User Snapshot */}
         <div className="p-4 border-b border-[#0B2A6F] bg-[#0B2A6F]/40 flex items-center gap-3">
-          <img 
-            src={activePhoto} 
-            alt={activeDisplayName} 
-            className="w-10 h-10 rounded-full object-cover border-2 border-[#F5B400]"
+          <UserAvatar 
+            name={activeDisplayName}
+            photoUrl={activePhoto}
+            size="sm"
           />
           <div className="min-w-0 flex-1">
             <div className="font-bold text-sm text-white truncate">
@@ -425,10 +426,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <div className="bg-[#061A4F] text-white w-full max-h-[85vh] rounded-t-2xl p-5 overflow-y-auto space-y-3">
             <div className="flex items-center justify-between pb-3 border-b border-[#0B2A6F]">
               <div className="flex items-center gap-3">
-                <img 
-                  src={activePhoto} 
-                  alt={activeDisplayName} 
-                  className="w-9 h-9 rounded-full object-cover border-2 border-[#F5B400]" 
+                <UserAvatar 
+                  name={activeDisplayName}
+                  photoUrl={activePhoto}
+                  size="sm"
                 />
                 <div>
                   <div className="font-bold text-sm">{activeDisplayName}</div>
@@ -542,10 +543,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               onClick={() => onNavigate(isAdminRoute ? (isSuperAdmin ? '/admin/superadmin' : '/admin/dashboard') : currentUser?.role === 'client' ? '/client/profile' : '/student/profile')}
               className="flex items-center gap-2 pl-3 border-l border-slate-200 cursor-pointer hover:opacity-80 transition"
             >
-              <img 
-                src={activePhoto} 
-                alt={activeDisplayName} 
-                className="w-8 h-8 rounded-full object-cover border border-slate-200" 
+              <UserAvatar 
+                name={activeDisplayName} 
+                photoUrl={activePhoto} 
+                size="sm" 
               />
               <div className="text-left leading-none hidden lg:block">
                 <div className="text-xs font-bold text-slate-800">{activeDisplayName}</div>
